@@ -15,14 +15,14 @@ if (!$venue_id || !$date) {
 $booked_slots = [];
 $seen_slots = []; // For deduplication
 
-// 1. Check primary venue in facility_reservations
+// 1. Check primary venue in facility_reservations - ONLY APPROVED
 $query1 = "SELECT start_datetime, end_datetime, 
           DATE_ADD(end_datetime, INTERVAL 1 HOUR) as buffer_end,
           id as reservation_id
           FROM facility_reservations 
           WHERE venue_id = ? 
           AND DATE(start_datetime) = ? 
-          AND status IN ('approved', 'pencil_booked')";
+          AND status = 'approved'"; // Changed from IN to only 'approved'
 
 $stmt1 = $conn->prepare($query1);
 $stmt1->bind_param("is", $venue_id, $date);
@@ -47,17 +47,7 @@ while ($row = $result1->fetch_assoc()) {
 }
 $stmt1->close();
 
-// 2. Check secondary venues in reservation_venues
-//
-// BUG FIX: The previous query selected r.start_datetime / r.end_datetime,
-// which are the columns on facility_reservations — i.e. the PRIMARY venue's
-// time window (7:00-12:00 for Function Room A).  Every secondary venue
-// (B = 12:00-16:00, C = 16:00-18:00) was therefore returning Room A's
-// times, making them all appear blocked at 7:00 AM - 12:00 PM.
-//
-// The fix is to select rv.start_datetime / rv.end_datetime from the
-// reservation_venues pivot table, which stores each venue's own times.
-// The buffer_end must also be calculated from rv.end_datetime.
+// 2. Check secondary venues in reservation_venues - ONLY APPROVED
 $query2 = "SELECT rv.start_datetime, rv.end_datetime,
           DATE_ADD(rv.end_datetime, INTERVAL 1 HOUR) as buffer_end,
           r.id as reservation_id
@@ -65,7 +55,7 @@ $query2 = "SELECT rv.start_datetime, rv.end_datetime,
           JOIN facility_reservations r ON rv.reservation_id = r.id
           WHERE rv.venue_id = ? 
           AND DATE(rv.start_datetime) = ? 
-          AND r.status IN ('approved', 'pencil_booked')";
+          AND r.status = 'approved'"; // Changed from IN to only 'approved'
 
 $stmt2 = $conn->prepare($query2);
 $stmt2->bind_param("is", $venue_id, $date);
