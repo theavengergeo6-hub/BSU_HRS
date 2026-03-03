@@ -1,0 +1,1736 @@
+[2026-02-26 08:20:58] ========== START reservation_submit.php ==========
+[2026-02-26 15:20:58] RAW POST data: Array
+(
+    [last_name] => De Guzman
+    [first_name] => Geo Mar
+    [middle_initial] => C
+    [email] => geomarc789@gmail.com
+    [contact] => 09087547440
+    [office_type_id] => 3
+    [office_id] => 135
+    [event_type_id] => 1
+    [activity_name] => CICS Student Council Meeting
+    [participants] => 80
+    [venue_ids] => Array
+        (
+            [0] => 1
+            [1] => 2
+        )
+
+    [banquet_style_id] => 13
+    [additional_instruction] => 
+    [action] => submit
+    [event_type] => Meeting and Conference
+    [venue_id] => 1
+    [facilities_schedules] => {"venues":[{"id":"1","name":"Function Room A","floor":"Ground Floor"},{"id":"2","name":"Function Room B","floor":"Ground Floor"}],"schedules":{"1":[{"date":"2026-02-26","start":"07:00","end":"12:00"}],"2":[{"date":"2026-02-26","start":"07:00","end":"12:00"}]}}
+    [miscellaneous_items] => {"basic_sound_system":{"speaker":2,"mic":1},"banquet_chairs":{"quantity":80}}
+)
+
+[2026-02-26 15:20:58] Generated numbers - booking_no: FAC-20260226-957, reservation_no: RES-20260226-485
+[2026-02-26 15:20:58] activity_name: 'CICS Student Council Meeting'
+[2026-02-26 15:20:58] event_type_id: 1
+[2026-02-26 15:20:58] facilities_schedules decoded: Array
+(
+    [venues] => Array
+        (
+            [0] => Array
+                (
+                    [id] => 1
+                    [name] => Function Room A
+                    [floor] => Ground Floor
+                )
+
+            [1] => Array
+                (
+                    [id] => 2
+                    [name] => Function Room B
+                    [floor] => Ground Floor
+                )
+
+        )
+
+    [schedules] => Array
+        (
+            [1] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-02-26
+                            [start] => 07:00
+                            [end] => 12:00
+                        )
+
+                )
+
+            [2] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-02-26
+                            [start] => 07:00
+                            [end] => 12:00
+                        )
+
+                )
+
+        )
+
+)
+
+[2026-02-26 15:20:58] Main reservation times - start: 2026-02-26 07:00, end: 2026-02-26 12:00
+[2026-02-26 15:20:58] Main SQL: INSERT INTO facility_reservations (
+            booking_no, reservation_no, last_name, first_name, middle_initial, 
+            email, contact_number, office_type_id, office_id, external_office_name, 
+            activity_name, event_type_id, venue_setup_id, banquet_style_id,
+            start_datetime, end_datetime, participants_count, miscellaneous_items, 
+            additional_instruction, status
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')
+[2026-02-26 15:20:58] ERROR: Cannot add or update a child row: a foreign key constraint fails (`bsu_hrs_schema`.`facility_reservations`, CONSTRAINT `fk_fr_venue` FOREIGN KEY (`venue_id`) REFERENCES `venues` (`id`) ON UPDATE CASCADE)
+[2026-02-26 08:34:15] ========== START reservation_submit.php ==========
+[2026-02-26 15:34:15] RAW POST data: Array
+(
+    [last_name] => De Guzman
+    [first_name] => Geo Mar
+    [middle_initial] => C
+    [email] => geomarc789@gmail.com
+    [contact] => 09087547440
+    [office_type_id] => 3
+    [office_id] => 135
+    [event_type_id] => 1
+    [activity_name] => CICS Student Council Meeting
+    [participants] => 80
+    [venue_ids] => Array
+        (
+            [0] => 1
+            [1] => 2
+        )
+
+    [banquet_style_id] => 13
+    [additional_instruction] => 
+    [action] => submit
+    [event_type] => Meeting and Conference
+    [venue_id] => 1
+    [facilities_schedules] => {"venues":[{"id":"1","name":"Function Room A","floor":"Ground Floor"},{"id":"2","name":"Function Room B","floor":"Ground Floor"}],"schedules":{"1":[{"date":"2026-02-26","start":"07:00","end":"12:00"}],"2":[{"date":"2026-02-26","start":"07:00","end":"12:00"}]}}
+    [miscellaneous_items] => {"basic_sound_system":{"speaker":2,"mic":1},"banquet_chairs":{"quantity":80}}
+)
+
+[2026-02-26 15:34:15] Generated numbers - booking_no: FAC-20260226-762, reservation_no: RES-20260226-669
+[2026-02-26 15:34:15] activity_name: 'CICS Student Council Meeting'
+[2026-02-26 15:34:15] event_type_id: 1
+[2026-02-26 15:34:15] facilities_schedules decoded: Array
+(
+    [venues] => Array
+        (
+            [0] => Array
+                (
+                    [id] => 1
+                    [name] => Function Room A
+                    [floor] => Ground Floor
+                )
+
+            [1] => Array
+                (
+                    [id] => 2
+                    [name] => Function Room B
+                    [floor] => Ground Floor
+                )
+
+        )
+
+    [schedules] => Array
+        (
+            [1] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-02-26
+                            [start] => 07:00
+                            [end] => 12:00
+                        )
+
+                )
+
+            [2] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-02-26
+                            [start] => 07:00
+                            [end] => 12:00
+                        )
+
+                )
+
+        )
+
+)
+
+[2026-02-26 15:34:15] Main reservation times - start: 2026-02-26 07:00, end: 2026-02-26 12:00
+[2026-02-26 15:34:15] First venue ID for main reservation: 1
+[2026-02-26 15:34:15] Main SQL: INSERT INTO facility_reservations (
+            booking_no, reservation_no, last_name, first_name, middle_initial, 
+            email, contact_number, office_type_id, office_id, external_office_name, 
+            activity_name, event_type_id, venue_id, venue_setup_id, banquet_style_id,
+            start_datetime, end_datetime, participants_count, miscellaneous_items, 
+            additional_instruction, status
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')
+[2026-02-26 08:38:13] ========== START reservation_submit.php ==========
+[2026-02-26 15:38:13] Generated numbers - booking_no: FAC-20260226-783, reservation_no: RES-20260226-827
+[2026-02-26 15:38:13] activity_name: 'CICS Student Council Meeting'
+[2026-02-26 08:40:54] ========== START reservation_submit.php ==========
+[2026-02-26 15:40:54] Generated numbers - booking_no: FAC-20260226-579, reservation_no: RES-20260226-027
+[2026-02-26 15:40:54] activity_name: 'CICS Student Council Meeting'
+[2026-02-26 08:41:54] ========== START reservation_submit.php ==========
+[2026-02-26 15:41:54] RAW POST data: Array
+(
+    [last_name] => De Guzman
+    [first_name] => Geo Mar
+    [middle_initial] => C
+    [email] => geomarc789@gmail.com
+    [contact] => 09087547440
+    [office_type_id] => 3
+    [office_id] => 135
+    [event_type_id] => 1
+    [activity_name] => CICS Student Council Meeting
+    [participants] => 80
+    [venue_ids] => Array
+        (
+            [0] => 1
+            [1] => 2
+        )
+
+    [banquet_style_id] => 13
+    [additional_instruction] => 
+    [action] => submit
+    [event_type] => Meeting and Conference
+    [venue_id] => 1
+    [facilities_schedules] => {"venues":[{"id":"1","name":"Function Room A","floor":"Ground Floor"},{"id":"2","name":"Function Room B","floor":"Ground Floor"}],"schedules":{"1":[{"date":"2026-02-26","start":"07:00","end":"12:00"}],"2":[{"date":"2026-02-26","start":"07:00","end":"12:00"}]}}
+    [miscellaneous_items] => {}
+)
+
+[2026-02-26 15:41:54] SPECIFIC CHECK - activity_name: 'CICS Student Council Meeting'
+[2026-02-26 15:41:54] SPECIFIC CHECK - event_type_id: '1'
+[2026-02-26 15:41:54] Generated numbers - booking_no: FAC-20260226-043, reservation_no: RES-20260226-599
+[2026-02-26 15:41:54] BEFORE CLEAN - activity_name: 'CICS Student Council Meeting'
+[2026-02-26 15:41:54] AFTER CLEAN - activity_name: 'CICS Student Council Meeting'
+[2026-02-26 15:41:54] event_type_id: 1
+[2026-02-26 15:41:54] FINAL activity_name: 'CICS Student Council Meeting'
+[2026-02-26 15:41:54] facilities_schedules decoded: Array
+(
+    [venues] => Array
+        (
+            [0] => Array
+                (
+                    [id] => 1
+                    [name] => Function Room A
+                    [floor] => Ground Floor
+                )
+
+            [1] => Array
+                (
+                    [id] => 2
+                    [name] => Function Room B
+                    [floor] => Ground Floor
+                )
+
+        )
+
+    [schedules] => Array
+        (
+            [1] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-02-26
+                            [start] => 07:00
+                            [end] => 12:00
+                        )
+
+                )
+
+            [2] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-02-26
+                            [start] => 07:00
+                            [end] => 12:00
+                        )
+
+                )
+
+        )
+
+)
+
+[2026-02-26 15:41:54] Times - start_datetime: 2026-02-26 07:00, end_datetime: 2026-02-26 12:00
+[2026-02-26 15:41:54] SQL: INSERT INTO facility_reservations (
+        booking_no, reservation_no, last_name, first_name, middle_initial, 
+        email, contact_number, office_type_id, office_id, external_office_name, 
+        activity_name, event_type_id, venue_id, venue_setup_id, banquet_style_id,
+        start_datetime, end_datetime, participants_count, miscellaneous_items, 
+        additional_instruction
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+[2026-02-26 15:41:54] Success! Inserted ID: 12
+[2026-02-26 15:41:54] Inserted activity_name: CICS Student Council Meeting
+[2026-02-26 09:07:11] ========== START reservation_submit.php ==========
+[2026-02-26 16:07:11] RAW POST data: Array
+(
+    [last_name] => Polo
+    [first_name] => Marco
+    [middle_initial] => C
+    [email] => theavengergeo6@gmail.com
+    [contact] => 09087547440
+    [office_type_id] => 1
+    [office_id] => 6
+    [event_type_id] => 5
+    [activity_name] => CTE Assembly
+    [participants] => 80
+    [venue_ids] => Array
+        (
+            [0] => 1
+            [1] => 2
+        )
+
+    [banquet_style_id] => 
+    [additional_instruction] => 
+    [action] => submit
+    [event_type] => Programs and Special Events
+    [venue_id] => 1
+    [facilities_schedules] => {"venues":[{"id":"1","name":"Function Room A","floor":"Ground Floor"},{"id":"2","name":"Function Room B","floor":"Ground Floor"}],"schedules":{"1":[{"date":"2026-02-28","start":"13:00","end":"17:00"}],"2":[{"date":"2026-02-26","start":"13:00","end":"17:00"}]}}
+    [miscellaneous_items] => {"basic_sound_system":{"speaker":1,"mic":1},"banquet_chairs":{"quantity":80}}
+)
+
+[2026-02-26 16:07:11] SPECIFIC CHECK - activity_name: 'CTE Assembly'
+[2026-02-26 16:07:11] SPECIFIC CHECK - event_type_id: '5'
+[2026-02-26 16:07:11] Generated numbers - booking_no: FAC-20260226-724, reservation_no: RES-20260226-391
+[2026-02-26 16:07:11] BEFORE CLEAN - activity_name: 'CTE Assembly'
+[2026-02-26 16:07:11] AFTER CLEAN - activity_name: 'CTE Assembly'
+[2026-02-26 16:07:11] event_type_id: 5
+[2026-02-26 16:07:11] FINAL activity_name: 'CTE Assembly'
+[2026-02-26 16:07:11] facilities_schedules decoded: Array
+(
+    [venues] => Array
+        (
+            [0] => Array
+                (
+                    [id] => 1
+                    [name] => Function Room A
+                    [floor] => Ground Floor
+                )
+
+            [1] => Array
+                (
+                    [id] => 2
+                    [name] => Function Room B
+                    [floor] => Ground Floor
+                )
+
+        )
+
+    [schedules] => Array
+        (
+            [1] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-02-28
+                            [start] => 13:00
+                            [end] => 17:00
+                        )
+
+                )
+
+            [2] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-02-26
+                            [start] => 13:00
+                            [end] => 17:00
+                        )
+
+                )
+
+        )
+
+)
+
+[2026-02-26 16:07:11] Times - start_datetime: 2026-02-28 13:00, end_datetime: 2026-02-28 17:00
+[2026-02-26 16:07:11] SQL: INSERT INTO facility_reservations (
+        booking_no, reservation_no, last_name, first_name, middle_initial, 
+        email, contact_number, office_type_id, office_id, external_office_name, 
+        activity_name, event_type_id, venue_id, venue_setup_id, banquet_style_id,
+        start_datetime, end_datetime, participants_count, miscellaneous_items, 
+        additional_instruction
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+[2026-02-26 09:09:32] ========== START reservation_submit.php ==========
+[2026-02-26 16:09:32] RAW POST data: Array
+(
+    [last_name] => Polo
+    [first_name] => Marco
+    [middle_initial] => C
+    [email] => theavengergeo6@gmail.com
+    [contact] => 09087547440
+    [office_type_id] => 1
+    [office_id] => 6
+    [event_type_id] => 5
+    [activity_name] => CTE Assembly
+    [participants] => 80
+    [venue_ids] => Array
+        (
+            [0] => 1
+            [1] => 2
+        )
+
+    [banquet_style_id] => 
+    [additional_instruction] => 
+    [action] => submit
+    [event_type] => Programs and Special Events
+    [venue_id] => 1
+    [facilities_schedules] => {"venues":[{"id":"1","name":"Function Room A","floor":"Ground Floor"},{"id":"2","name":"Function Room B","floor":"Ground Floor"}],"schedules":{"1":[{"date":"2026-02-28","start":"13:00","end":"17:00"}],"2":[{"date":"2026-02-26","start":"13:00","end":"17:00"}]}}
+    [miscellaneous_items] => {"basic_sound_system":{"speaker":1,"mic":1},"banquet_chairs":{"quantity":80}}
+)
+
+[2026-02-26 16:09:32] SPECIFIC CHECK - activity_name: 'CTE Assembly'
+[2026-02-26 16:09:32] SPECIFIC CHECK - event_type_id: '5'
+[2026-02-26 16:09:32] Generated numbers - booking_no: FAC-20260226-984, reservation_no: RES-20260226-888
+[2026-02-26 16:09:32] BEFORE CLEAN - activity_name: 'CTE Assembly'
+[2026-02-26 16:09:32] AFTER CLEAN - activity_name: 'CTE Assembly'
+[2026-02-26 16:09:32] event_type_id: 5
+[2026-02-26 16:09:32] FINAL activity_name: 'CTE Assembly'
+[2026-02-26 16:09:32] facilities_schedules decoded: Array
+(
+    [venues] => Array
+        (
+            [0] => Array
+                (
+                    [id] => 1
+                    [name] => Function Room A
+                    [floor] => Ground Floor
+                )
+
+            [1] => Array
+                (
+                    [id] => 2
+                    [name] => Function Room B
+                    [floor] => Ground Floor
+                )
+
+        )
+
+    [schedules] => Array
+        (
+            [1] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-02-28
+                            [start] => 13:00
+                            [end] => 17:00
+                        )
+
+                )
+
+            [2] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-02-26
+                            [start] => 13:00
+                            [end] => 17:00
+                        )
+
+                )
+
+        )
+
+)
+
+[2026-02-26 16:09:32] Times - start_datetime: 2026-02-28 13:00, end_datetime: 2026-02-28 17:00
+[2026-02-26 16:09:32] SQL: INSERT INTO facility_reservations (
+        booking_no, reservation_no, last_name, first_name, middle_initial, 
+        email, contact_number, office_type_id, office_id, external_office_name, 
+        activity_name, event_type_id, venue_id, venue_setup_id, banquet_style_id,
+        start_datetime, end_datetime, participants_count, miscellaneous_items, 
+        additional_instruction
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+[2026-02-26 16:09:32] Success! Inserted ID: 13
+[2026-02-26 16:09:32] Inserted activity_name: CTE Assembly
+[2026-02-26 09:11:33] ========== START reservation_submit.php ==========
+[2026-02-26 16:11:33] RAW POST data: Array
+(
+    [last_name] => Tesfaye
+    [first_name] => Abel
+    [middle_initial] => M.
+    [email] => geomarc789@gmail.com
+    [contact] => 09087547440
+    [office_type_id] => 1
+    [office_id] => 5
+    [event_type_id] => 4
+    [activity_name] => CICS Assembly
+    [participants] => 60
+    [venue_ids] => Array
+        (
+            [0] => 1
+            [1] => 2
+        )
+
+    [banquet_style_id] => 3
+    [additional_instruction] => 
+    [action] => submit
+    [event_type] => Orientation and Presentation
+    [venue_id] => 1
+    [facilities_schedules] => {"venues":[{"id":"1","name":"Function Room A","floor":"Ground Floor"},{"id":"2","name":"Function Room B","floor":"Ground Floor"}],"schedules":{"1":[{"date":"2026-03-01","start":"07:00","end":"10:00"}],"2":[{"date":"2026-03-01","start":"07:00","end":"10:00"}]}}
+    [miscellaneous_items] => {"basic_sound_system":{"speaker":2,"mic":2}}
+)
+
+[2026-02-26 16:11:33] SPECIFIC CHECK - activity_name: 'CICS Assembly'
+[2026-02-26 16:11:33] SPECIFIC CHECK - event_type_id: '4'
+[2026-02-26 16:11:33] Generated numbers - booking_no: FAC-20260226-706, reservation_no: RES-20260226-226
+[2026-02-26 16:11:33] BEFORE CLEAN - activity_name: 'CICS Assembly'
+[2026-02-26 16:11:33] AFTER CLEAN - activity_name: 'CICS Assembly'
+[2026-02-26 16:11:33] event_type_id: 4
+[2026-02-26 16:11:33] FINAL activity_name: 'CICS Assembly'
+[2026-02-26 16:11:33] facilities_schedules decoded: Array
+(
+    [venues] => Array
+        (
+            [0] => Array
+                (
+                    [id] => 1
+                    [name] => Function Room A
+                    [floor] => Ground Floor
+                )
+
+            [1] => Array
+                (
+                    [id] => 2
+                    [name] => Function Room B
+                    [floor] => Ground Floor
+                )
+
+        )
+
+    [schedules] => Array
+        (
+            [1] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-03-01
+                            [start] => 07:00
+                            [end] => 10:00
+                        )
+
+                )
+
+            [2] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-03-01
+                            [start] => 07:00
+                            [end] => 10:00
+                        )
+
+                )
+
+        )
+
+)
+
+[2026-02-26 16:11:33] Times - start_datetime: 2026-03-01 07:00, end_datetime: 2026-03-01 10:00
+[2026-02-26 16:11:33] SQL: INSERT INTO facility_reservations (
+        booking_no, reservation_no, last_name, first_name, middle_initial, 
+        email, contact_number, office_type_id, office_id, external_office_name, 
+        activity_name, event_type_id, venue_id, venue_setup_id, banquet_style_id,
+        start_datetime, end_datetime, participants_count, miscellaneous_items, 
+        additional_instruction
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+[2026-02-26 09:13:24] ========== START reservation_submit.php ==========
+[2026-02-26 16:13:24] RAW POST data: Array
+(
+    [last_name] => Tesfaye
+    [first_name] => Abel
+    [middle_initial] => M.
+    [email] => geomarc789@gmail.com
+    [contact] => 09087547440
+    [office_type_id] => 1
+    [office_id] => 5
+    [event_type_id] => 4
+    [activity_name] => CICS Assembly
+    [participants] => 60
+    [venue_ids] => Array
+        (
+            [0] => 1
+            [1] => 2
+        )
+
+    [banquet_style_id] => 3
+    [additional_instruction] => 
+    [action] => submit
+    [event_type] => Orientation and Presentation
+    [venue_id] => 1
+    [facilities_schedules] => {"venues":[{"id":"1","name":"Function Room A","floor":"Ground Floor"},{"id":"2","name":"Function Room B","floor":"Ground Floor"}],"schedules":{"1":[{"date":"2026-03-01","start":"07:00","end":"10:00"}],"2":[{"date":"2026-03-01","start":"07:00","end":"10:00"}]}}
+    [miscellaneous_items] => {}
+)
+
+[2026-02-26 16:13:24] SPECIFIC CHECK - activity_name: 'CICS Assembly'
+[2026-02-26 16:13:24] SPECIFIC CHECK - event_type_id: '4'
+[2026-02-26 16:13:24] Generated numbers - booking_no: FAC-20260226-335, reservation_no: RES-20260226-983
+[2026-02-26 16:13:24] BEFORE CLEAN - activity_name: 'CICS Assembly'
+[2026-02-26 16:13:24] AFTER CLEAN - activity_name: 'CICS Assembly'
+[2026-02-26 16:13:24] event_type_id: 4
+[2026-02-26 16:13:24] FINAL activity_name: 'CICS Assembly'
+[2026-02-26 16:13:24] facilities_schedules decoded: Array
+(
+    [venues] => Array
+        (
+            [0] => Array
+                (
+                    [id] => 1
+                    [name] => Function Room A
+                    [floor] => Ground Floor
+                )
+
+            [1] => Array
+                (
+                    [id] => 2
+                    [name] => Function Room B
+                    [floor] => Ground Floor
+                )
+
+        )
+
+    [schedules] => Array
+        (
+            [1] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-03-01
+                            [start] => 07:00
+                            [end] => 10:00
+                        )
+
+                )
+
+            [2] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-03-01
+                            [start] => 07:00
+                            [end] => 10:00
+                        )
+
+                )
+
+        )
+
+)
+
+[2026-02-26 16:13:24] Times - start_datetime: 2026-03-01 07:00, end_datetime: 2026-03-01 10:00
+[2026-02-26 16:13:24] SQL: INSERT INTO facility_reservations (
+        booking_no, reservation_no, last_name, first_name, middle_initial, 
+        email, contact_number, office_type_id, office_id, external_office_name, 
+        activity_name, event_type_id, venue_id, venue_setup_id, banquet_style_id,
+        start_datetime, end_datetime, participants_count, miscellaneous_items, 
+        additional_instruction
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+[26-Feb-2026 16:13:24 Asia/Manila] PHP Fatal error:  Uncaught ArgumentCountError: The number of elements in the type definition string must match the number of bind variables in C:\xampp\htdocs\BSU_HRS\ajax\reservation_submit.php:178
+Stack trace:
+#0 C:\xampp\htdocs\BSU_HRS\ajax\reservation_submit.php(178): mysqli_stmt->bind_param('ssssssssissiiis...', 'FAC-20260226-33...', 'RES-20260226-98...', 'Tesfaye', 'Abel', 'M.', 'geomarc789@gmai...', '09087547440', 1, 5, '', 'CICS Assembly', 4, 1, 1, 3, '2026-03-01 07:0...', '2026-03-01 10:0...', 60, '{}', '')
+#1 {main}
+  thrown in C:\xampp\htdocs\BSU_HRS\ajax\reservation_submit.php on line 178
+[2026-02-26 09:15:27] ========== START reservation_submit.php ==========
+[2026-02-26 16:15:27] RAW POST data: Array
+(
+    [last_name] => Tesfaye
+    [first_name] => Abel
+    [middle_initial] => M.
+    [email] => geomarc789@gmail.com
+    [contact] => 09087547440
+    [office_type_id] => 1
+    [office_id] => 5
+    [event_type_id] => 4
+    [activity_name] => CICS Assembly
+    [participants] => 60
+    [venue_ids] => Array
+        (
+            [0] => 1
+            [1] => 2
+        )
+
+    [banquet_style_id] => 3
+    [additional_instruction] => 
+    [action] => submit
+    [event_type] => Orientation and Presentation
+    [venue_id] => 1
+    [facilities_schedules] => {"venues":[{"id":"1","name":"Function Room A","floor":"Ground Floor"},{"id":"2","name":"Function Room B","floor":"Ground Floor"}],"schedules":{"1":[{"date":"2026-03-01","start":"07:00","end":"10:00"}],"2":[{"date":"2026-03-01","start":"07:00","end":"10:00"}]}}
+    [miscellaneous_items] => {}
+)
+
+[2026-02-26 16:15:27] SPECIFIC CHECK - activity_name: 'CICS Assembly'
+[2026-02-26 16:15:27] SPECIFIC CHECK - event_type_id: '4'
+[2026-02-26 16:15:27] Generated numbers - booking_no: FAC-20260226-976, reservation_no: RES-20260226-831
+[2026-02-26 16:15:27] BEFORE CLEAN - activity_name: 'CICS Assembly'
+[2026-02-26 16:15:27] AFTER CLEAN - activity_name: 'CICS Assembly'
+[2026-02-26 16:15:27] event_type_id: 4
+[2026-02-26 16:15:27] FINAL activity_name: 'CICS Assembly'
+[2026-02-26 16:15:27] facilities_schedules decoded: Array
+(
+    [venues] => Array
+        (
+            [0] => Array
+                (
+                    [id] => 1
+                    [name] => Function Room A
+                    [floor] => Ground Floor
+                )
+
+            [1] => Array
+                (
+                    [id] => 2
+                    [name] => Function Room B
+                    [floor] => Ground Floor
+                )
+
+        )
+
+    [schedules] => Array
+        (
+            [1] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-03-01
+                            [start] => 07:00
+                            [end] => 10:00
+                        )
+
+                )
+
+            [2] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-03-01
+                            [start] => 07:00
+                            [end] => 10:00
+                        )
+
+                )
+
+        )
+
+)
+
+[2026-02-26 16:15:27] Times - start_datetime: 2026-03-01 07:00, end_datetime: 2026-03-01 10:00
+[2026-02-26 16:15:27] SQL: INSERT INTO facility_reservations (
+        booking_no, reservation_no, last_name, first_name, middle_initial, 
+        email, contact_number, office_type_id, office_id, external_office_name, 
+        activity_name, event_type_id, venue_id, venue_setup_id, banquet_style_id,
+        start_datetime, end_datetime, participants_count, miscellaneous_items, 
+        additional_instruction
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+[2026-02-26 16:15:27] Success! Inserted ID: 14
+[2026-02-26 16:15:27] Inserted activity_name: CICS Assembly
+[2026-02-26 09:28:30] ========== START reservation_submit.php ==========
+[2026-02-26 16:28:30] RAW POST data: Array
+(
+    [last_name] => Jackson
+    [first_name] => Michael
+    [middle_initial] => J
+    [email] => theavengergeo6@gmail.com
+    [contact] => 09087547440
+    [office_type_id] => 2
+    [office_id] => 32
+    [event_type_id] => 3
+    [activity_name] => OVCDEA Party
+    [participants] => 80
+    [venue_ids] => Array
+        (
+            [0] => 4
+            [1] => 5
+        )
+
+    [banquet_style_id] => 3
+    [additional_instruction] => 
+    [action] => submit
+    [event_type] => Buffet and Celebrations
+    [venue_id] => 4
+    [facilities_schedules] => {"venues":[{"id":"4","name":"Function Room D","floor":"Ground Floor"},{"id":"5","name":"Function Room E","floor":"Ground Floor"}],"schedules":{"4":[{"date":"2026-03-02","start":"07:00","end":"17:00"}],"5":[{"date":"2026-03-02","start":"07:00","end":"17:00"}]}}
+    [miscellaneous_items] => {"basic_sound_system":{"speaker":2,"mic":1},"view_board":{"quantity":2}}
+)
+
+[2026-02-26 16:28:30] SPECIFIC CHECK - activity_name: 'OVCDEA Party'
+[2026-02-26 16:28:30] SPECIFIC CHECK - event_type_id: '3'
+[2026-02-26 16:28:30] Generated numbers - booking_no: FAC-20260226-638, reservation_no: RES-20260226-329
+[2026-02-26 16:28:30] BEFORE CLEAN - activity_name: 'OVCDEA Party'
+[2026-02-26 16:28:30] AFTER CLEAN - activity_name: 'OVCDEA Party'
+[2026-02-26 16:28:30] event_type_id: 3
+[2026-02-26 16:28:30] FINAL activity_name: 'OVCDEA Party'
+[2026-02-26 16:28:30] facilities_schedules decoded: Array
+(
+    [venues] => Array
+        (
+            [0] => Array
+                (
+                    [id] => 4
+                    [name] => Function Room D
+                    [floor] => Ground Floor
+                )
+
+            [1] => Array
+                (
+                    [id] => 5
+                    [name] => Function Room E
+                    [floor] => Ground Floor
+                )
+
+        )
+
+    [schedules] => Array
+        (
+            [4] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-03-02
+                            [start] => 07:00
+                            [end] => 17:00
+                        )
+
+                )
+
+            [5] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-03-02
+                            [start] => 07:00
+                            [end] => 17:00
+                        )
+
+                )
+
+        )
+
+)
+
+[2026-02-26 16:28:30] Times - start_datetime: 2026-03-02 07:00, end_datetime: 2026-03-02 17:00
+[2026-02-26 16:28:30] SQL: INSERT INTO facility_reservations (
+        booking_no, reservation_no, last_name, first_name, middle_initial, 
+        email, contact_number, office_type_id, office_id, external_office_name, 
+        activity_name, event_type_id, venue_id, venue_setup_id, banquet_style_id,
+        start_datetime, end_datetime, participants_count, miscellaneous_items, 
+        additional_instruction
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+[2026-02-26 16:28:30] Success! Inserted ID: 15
+[2026-02-26 16:28:30] Inserted activity_name: OVCDEA Party
+[2026-02-27 02:46:14] ========== START reservation_submit.php ==========
+[2026-02-27 09:46:14] RAW POST data: Array
+(
+    [last_name] => Curry
+    [first_name] => Stephen 
+    [middle_initial] => C
+    [email] => geomarc789@gmail.com
+    [contact] => 09087547440
+    [office_type_id] => 2
+    [office_id] => 20
+    [event_type_id] => 3
+    [activity_name] => Head Birthday
+    [participants] => 40
+    [venue_ids] => Array
+        (
+            [0] => 2
+        )
+
+    [banquet_style_id] => 14
+    [additional_instruction] => 
+    [action] => submit
+    [event_type] => Buffet and Celebrations
+    [venue_id] => 2
+    [facilities_schedules] => {"venues":[{"id":"2","name":"Function Room B","floor":"Ground Floor"}],"schedules":{"2":[{"date":"2026-03-03","start":"10:00","end":"17:00"}]}}
+    [miscellaneous_items] => {"banquet_chairs":{"quantity":40},"rectangular_table":{"quantity":7}}
+)
+
+[2026-02-27 09:46:14] SPECIFIC CHECK - activity_name: 'Head Birthday'
+[2026-02-27 09:46:14] SPECIFIC CHECK - event_type_id: '3'
+[2026-02-27 09:46:14] Generated numbers - booking_no: FAC-20260227-123, reservation_no: RES-20260227-850
+[2026-02-27 09:46:14] BEFORE CLEAN - activity_name: 'Head Birthday'
+[2026-02-27 09:46:14] AFTER CLEAN - activity_name: 'Head Birthday'
+[2026-02-27 09:46:14] event_type_id: 3
+[2026-02-27 09:46:14] FINAL activity_name: 'Head Birthday'
+[2026-02-27 09:46:14] facilities_schedules decoded: Array
+(
+    [venues] => Array
+        (
+            [0] => Array
+                (
+                    [id] => 2
+                    [name] => Function Room B
+                    [floor] => Ground Floor
+                )
+
+        )
+
+    [schedules] => Array
+        (
+            [2] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-03-03
+                            [start] => 10:00
+                            [end] => 17:00
+                        )
+
+                )
+
+        )
+
+)
+
+[2026-02-27 09:46:14] Times - start_datetime: 2026-03-03 10:00, end_datetime: 2026-03-03 17:00
+[2026-02-27 09:46:14] SQL: INSERT INTO facility_reservations (
+        booking_no, reservation_no, last_name, first_name, middle_initial, 
+        email, contact_number, office_type_id, office_id, external_office_name, 
+        activity_name, event_type_id, venue_id, venue_setup_id, banquet_style_id,
+        start_datetime, end_datetime, participants_count, miscellaneous_items, 
+        additional_instruction
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+[2026-02-27 09:46:14] Success! Inserted ID: 16
+[2026-02-27 09:46:14] Inserted activity_name: Head Birthday
+[2026-02-27 03:08:02] ========== START reservation_submit.php ==========
+[2026-02-27 10:08:02] RAW POST data: Array
+(
+    [last_name] => Santos
+    [first_name] => Vilma
+    [middle_initial] => R
+    [email] => vilmasantos@gmail.com
+    [contact] => 09087547440
+    [office_type_id] => 4
+    [office_external_name] => VSR
+    [event_type_id] => 3
+    [activity_name] => Christmas Party
+    [participants] => 200
+    [venue_ids] => Array
+        (
+            [0] => 1
+            [1] => 2
+            [2] => 3
+            [3] => 4
+            [4] => 5
+        )
+
+    [banquet_style_id] => 11
+    [additional_instruction] => 
+    [action] => submit
+    [event_type] => Buffet and Celebrations
+    [venue_id] => 1
+    [facilities_schedules] => {"venues":[{"id":"1","name":"Function Room A","floor":"Ground Floor"},{"id":"2","name":"Function Room B","floor":"Ground Floor"},{"id":"3","name":"Function Room C","floor":"Ground Floor"},{"id":"4","name":"Function Room D","floor":"Ground Floor"},{"id":"5","name":"Function Room E","floor":"Ground Floor"}],"schedules":{"1":[{"date":"2026-03-04","start":"07:00","end":"17:00"}],"2":[{"date":"2026-03-04","start":"07:00","end":"17:00"}],"3":[{"date":"2026-03-04","start":"07:00","end":"17:00"}],"4":[{"date":"2026-02-27","start":"07:00","end":"17:00"}],"5":[{"date":"2026-02-27","start":"07:00","end":"17:00"}]}}
+    [miscellaneous_items] => {"basic_sound_system":{"speaker":2,"mic":2},"round_table":{"quantity":10},"banquet_chairs":{"quantity":200}}
+)
+
+[2026-02-27 10:08:02] SPECIFIC CHECK - activity_name: 'Christmas Party'
+[2026-02-27 10:08:02] SPECIFIC CHECK - event_type_id: '3'
+[2026-02-27 10:08:02] Generated numbers - booking_no: FAC-20260227-639, reservation_no: RES-20260227-357
+[2026-02-27 10:08:02] BEFORE CLEAN - activity_name: 'Christmas Party'
+[2026-02-27 10:08:02] AFTER CLEAN - activity_name: 'Christmas Party'
+[2026-02-27 10:08:02] event_type_id: 3
+[2026-02-27 10:08:02] FINAL activity_name: 'Christmas Party'
+[2026-02-27 10:08:02] facilities_schedules decoded: Array
+(
+    [venues] => Array
+        (
+            [0] => Array
+                (
+                    [id] => 1
+                    [name] => Function Room A
+                    [floor] => Ground Floor
+                )
+
+            [1] => Array
+                (
+                    [id] => 2
+                    [name] => Function Room B
+                    [floor] => Ground Floor
+                )
+
+            [2] => Array
+                (
+                    [id] => 3
+                    [name] => Function Room C
+                    [floor] => Ground Floor
+                )
+
+            [3] => Array
+                (
+                    [id] => 4
+                    [name] => Function Room D
+                    [floor] => Ground Floor
+                )
+
+            [4] => Array
+                (
+                    [id] => 5
+                    [name] => Function Room E
+                    [floor] => Ground Floor
+                )
+
+        )
+
+    [schedules] => Array
+        (
+            [1] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-03-04
+                            [start] => 07:00
+                            [end] => 17:00
+                        )
+
+                )
+
+            [2] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-03-04
+                            [start] => 07:00
+                            [end] => 17:00
+                        )
+
+                )
+
+            [3] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-03-04
+                            [start] => 07:00
+                            [end] => 17:00
+                        )
+
+                )
+
+            [4] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-02-27
+                            [start] => 07:00
+                            [end] => 17:00
+                        )
+
+                )
+
+            [5] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-02-27
+                            [start] => 07:00
+                            [end] => 17:00
+                        )
+
+                )
+
+        )
+
+)
+
+[2026-02-27 10:08:02] Times - start_datetime: 2026-03-04 07:00, end_datetime: 2026-03-04 17:00
+[2026-02-27 10:08:02] SQL: INSERT INTO facility_reservations (
+        booking_no, reservation_no, last_name, first_name, middle_initial, 
+        email, contact_number, office_type_id, office_id, external_office_name, 
+        activity_name, event_type_id, venue_id, venue_setup_id, banquet_style_id,
+        start_datetime, end_datetime, participants_count, miscellaneous_items, 
+        additional_instruction
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+[2026-02-27 10:08:02] Success! Inserted ID: 17
+[2026-02-27 10:08:02] Inserted activity_name: Christmas Party
+[2026-02-27 10:08:02] Inserted 5 venue(s) into reservation_venues for reservation ID 17
+[2026-02-27 08:08:47] ========== START reservation_submit.php ==========
+[2026-02-27 15:08:47] RAW POST data: Array
+(
+    [last_name] => Johnson
+    [first_name] => Magic
+    [middle_initial] => E
+    [email] => geomarc789@gmail.com
+    [contact] => 09087547440
+    [office_type_id] => 1
+    [office_id] => 5
+    [event_type_id] => 3
+    [activity_name] => NBA Championship
+    [participants] => 60
+    [venue_ids] => Array
+        (
+            [0] => 1
+        )
+
+    [banquet_style_id] => 14
+    [additional_instruction] => 
+    [action] => submit
+    [event_type] => Buffet and Celebrations
+    [venue_id] => 1
+    [facilities_schedules] => {"venues":[{"id":"1","name":"Function Room A","floor":"Ground Floor"}],"schedules":{"1":[{"date":"2026-02-27","start":"07:00","end":"17:00"}]}}
+    [miscellaneous_items] => {"basic_sound_system":{"speaker":2,"mic":2},"round_table":{"quantity":7},"banquet_chairs":{"quantity":50}}
+)
+
+[2026-02-27 15:08:47] SPECIFIC CHECK - activity_name: 'NBA Championship'
+[2026-02-27 15:08:47] SPECIFIC CHECK - event_type_id: '3'
+[2026-02-27 15:08:47] Generated numbers - booking_no: FAC-20260227-605, reservation_no: RES-20260227-903
+[2026-02-27 15:08:47] BEFORE CLEAN - activity_name: 'NBA Championship'
+[2026-02-27 15:08:47] AFTER CLEAN - activity_name: 'NBA Championship'
+[2026-02-27 15:08:47] event_type_id: 3
+[2026-02-27 15:08:47] FINAL activity_name: 'NBA Championship'
+[2026-02-27 15:08:47] facilities_schedules decoded: Array
+(
+    [venues] => Array
+        (
+            [0] => Array
+                (
+                    [id] => 1
+                    [name] => Function Room A
+                    [floor] => Ground Floor
+                )
+
+        )
+
+    [schedules] => Array
+        (
+            [1] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-02-27
+                            [start] => 07:00
+                            [end] => 17:00
+                        )
+
+                )
+
+        )
+
+)
+
+[2026-02-27 15:08:47] Times - start_datetime: 2026-02-27 07:00, end_datetime: 2026-02-27 17:00
+[2026-02-27 15:08:47] Conflict check passed for all venues
+[2026-02-27 15:08:47] SQL: INSERT INTO facility_reservations (
+        booking_no, reservation_no, last_name, first_name, middle_initial, 
+        email, contact_number, office_type_id, office_id, external_office_name, 
+        activity_name, event_type_id, venue_id, venue_setup_id, banquet_style_id,
+        start_datetime, end_datetime, participants_count, miscellaneous_items, 
+        additional_instruction
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+[2026-02-27 15:08:47] Success! Inserted ID: 18
+[2026-02-27 15:08:47] Inserted activity_name: NBA Championship
+[2026-02-27 15:08:47] Inserted 1 venue(s) into reservation_venues for reservation ID 18
+[2026-02-27 08:11:19] ========== START reservation_submit.php ==========
+[2026-02-27 15:11:19] RAW POST data: Array
+(
+    [last_name] => Hackerman
+    [first_name] => Gene
+    [middle_initial] => A
+    [email] => geomarc789@gmail.com
+    [contact] => 09087547440
+    [office_type_id] => 2
+    [office_id] => 25
+    [event_type_id] => 3
+    [activity_name] => Libreng Pakain
+    [participants] => 80
+    [venue_ids] => Array
+        (
+            [0] => 4
+            [1] => 5
+        )
+
+    [banquet_style_id] => 9
+    [additional_instruction] => 
+    [action] => submit
+    [event_type] => Buffet and Celebrations
+    [venue_id] => 4
+    [facilities_schedules] => {"venues":[{"id":"4","name":"Function Room D","floor":"Ground Floor"},{"id":"5","name":"Function Room E","floor":"Ground Floor"}],"schedules":{"4":[{"date":"2026-03-01","start":"07:00","end":"12:00"}],"5":[{"date":"2026-03-01","start":"07:00","end":"12:00"}]}}
+    [miscellaneous_items] => {"basic_sound_system":{"speaker":1,"mic":1},"view_board":{"quantity":1},"rectangular_table":{"quantity":5}}
+)
+
+[2026-02-27 15:11:19] SPECIFIC CHECK - activity_name: 'Libreng Pakain'
+[2026-02-27 15:11:19] SPECIFIC CHECK - event_type_id: '3'
+[2026-02-27 15:11:19] Generated numbers - booking_no: FAC-20260227-756, reservation_no: RES-20260227-360
+[2026-02-27 15:11:19] BEFORE CLEAN - activity_name: 'Libreng Pakain'
+[2026-02-27 15:11:19] AFTER CLEAN - activity_name: 'Libreng Pakain'
+[2026-02-27 15:11:19] event_type_id: 3
+[2026-02-27 15:11:19] FINAL activity_name: 'Libreng Pakain'
+[2026-02-27 15:11:19] facilities_schedules decoded: Array
+(
+    [venues] => Array
+        (
+            [0] => Array
+                (
+                    [id] => 4
+                    [name] => Function Room D
+                    [floor] => Ground Floor
+                )
+
+            [1] => Array
+                (
+                    [id] => 5
+                    [name] => Function Room E
+                    [floor] => Ground Floor
+                )
+
+        )
+
+    [schedules] => Array
+        (
+            [4] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-03-01
+                            [start] => 07:00
+                            [end] => 12:00
+                        )
+
+                )
+
+            [5] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-03-01
+                            [start] => 07:00
+                            [end] => 12:00
+                        )
+
+                )
+
+        )
+
+)
+
+[2026-02-27 15:11:19] Times - start_datetime: 2026-03-01 07:00, end_datetime: 2026-03-01 12:00
+[2026-02-27 15:11:19] Conflict check passed for all venues
+[2026-02-27 15:11:19] SQL: INSERT INTO facility_reservations (
+        booking_no, reservation_no, last_name, first_name, middle_initial, 
+        email, contact_number, office_type_id, office_id, external_office_name, 
+        activity_name, event_type_id, venue_id, venue_setup_id, banquet_style_id,
+        start_datetime, end_datetime, participants_count, miscellaneous_items, 
+        additional_instruction
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+[2026-02-27 15:11:19] Success! Inserted ID: 19
+[2026-02-27 15:11:19] Inserted activity_name: Libreng Pakain
+[2026-02-27 15:11:19] Inserted 2 venue(s) into reservation_venues for reservation ID 19
+[2026-02-27 09:06:13] ========== START reservation_submit.php ==========
+[2026-02-27 16:06:13] RAW POST data: Array
+(
+    [last_name] => dela vega
+    [first_name] => irish
+    [middle_initial] => r.
+    [email] => geomarc789@gmail.com
+    [contact] => 09087547440
+    [office_type_id] => 1
+    [office_id] => 1
+    [event_type_id] => 1
+    [activity_name] => collaborative meeting
+    [participants] => 20
+    [venue_ids] => Array
+        (
+            [0] => 1
+            [1] => 2
+        )
+
+    [banquet_style_id] => 
+    [additional_instruction] => 
+    [action] => submit
+    [event_type] => Meeting and Conference
+    [venue_id] => 1
+    [facilities_schedules] => {"venues":[{"id":"1","name":"Function Room A","floor":"Ground Floor"},{"id":"2","name":"Function Room B","floor":"Ground Floor"}],"schedules":{"1":[{"date":"2026-03-02","start":"07:00","end":"13:00"}],"2":[{"date":"2026-03-02","start":"07:00","end":"13:00"}]}}
+    [miscellaneous_items] => {"basic_sound_system":{"speaker":1,"mic":1}}
+)
+
+[2026-02-27 16:06:13] SPECIFIC CHECK - activity_name: 'collaborative meeting'
+[2026-02-27 16:06:13] SPECIFIC CHECK - event_type_id: '1'
+[2026-02-27 16:06:13] Generated numbers - booking_no: FAC-20260227-952, reservation_no: RES-20260227-224
+[2026-02-27 16:06:13] BEFORE CLEAN - activity_name: 'collaborative meeting'
+[2026-02-27 16:06:13] AFTER CLEAN - activity_name: 'collaborative meeting'
+[2026-02-27 16:06:13] event_type_id: 1
+[2026-02-27 16:06:13] FINAL activity_name: 'collaborative meeting'
+[2026-02-27 16:06:13] facilities_schedules decoded: Array
+(
+    [venues] => Array
+        (
+            [0] => Array
+                (
+                    [id] => 1
+                    [name] => Function Room A
+                    [floor] => Ground Floor
+                )
+
+            [1] => Array
+                (
+                    [id] => 2
+                    [name] => Function Room B
+                    [floor] => Ground Floor
+                )
+
+        )
+
+    [schedules] => Array
+        (
+            [1] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-03-02
+                            [start] => 07:00
+                            [end] => 13:00
+                        )
+
+                )
+
+            [2] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-03-02
+                            [start] => 07:00
+                            [end] => 13:00
+                        )
+
+                )
+
+        )
+
+)
+
+[2026-02-27 16:06:13] Times - start_datetime: 2026-03-02 07:00, end_datetime: 2026-03-02 13:00
+[2026-02-27 16:06:13] Conflict check passed for all venues
+[2026-02-27 16:06:13] SQL: INSERT INTO facility_reservations (
+        booking_no, reservation_no, last_name, first_name, middle_initial, 
+        email, contact_number, office_type_id, office_id, external_office_name, 
+        activity_name, event_type_id, venue_id, venue_setup_id, banquet_style_id,
+        start_datetime, end_datetime, participants_count, miscellaneous_items, 
+        additional_instruction
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+[2026-02-27 16:06:13] Success! Inserted ID: 20
+[2026-02-27 16:06:13] Inserted activity_name: collaborative meeting
+[2026-02-27 16:06:13] Inserted 2 venue(s) into reservation_venues for reservation ID 20
+[2026-03-02 06:09:33] ========== START reservation_submit.php ==========
+[2026-03-02 13:09:33] RAW POST data: Array
+(
+    [last_name] => Graham
+    [first_name] => Aubery
+    [middle_initial] => D
+    [email] => geomarc789@gmail.com
+    [contact] => 09087547440
+    [office_type_id] => 2
+    [office_id] => 22
+    [event_type_id] => 3
+    [activity_name] => CHS Buffet
+    [participants] => 70
+    [venue_ids] => Array
+        (
+            [0] => 1
+            [1] => 2
+        )
+
+    [banquet_style_id] => 9
+    [additional_instruction] => 
+    [action] => submit
+    [event_type] => Buffet and Celebrations
+    [venue_id] => 1
+    [facilities_schedules] => {"venues":[{"id":"1","name":"Function Room A","floor":"Ground Floor"},{"id":"2","name":"Function Room B","floor":"Ground Floor"}],"schedules":{"1":[{"date":"2026-03-02","start":"07:00","end":"17:00"}],"2":[{"date":"2026-03-02","start":"07:00","end":"17:00"}]}}
+    [miscellaneous_items] => {"basic_sound_system":{"speaker":2,"mic":2},"round_table":{"quantity":0}}
+    [terms_agreed_by] => Aubery D Graham
+    [terms_position] => Organization President
+    [terms_date] => 
+)
+
+[2026-03-02 13:09:33] SPECIFIC CHECK - activity_name: 'CHS Buffet'
+[2026-03-02 13:09:33] SPECIFIC CHECK - event_type_id: '3'
+[2026-03-02 13:09:33] Generated numbers - booking_no: FAC-20260302-760, reservation_no: RES-20260302-793
+[2026-03-02 13:09:33] BEFORE CLEAN - activity_name: 'CHS Buffet'
+[2026-03-02 13:09:33] AFTER CLEAN - activity_name: 'CHS Buffet'
+[2026-03-02 13:09:33] event_type_id: 3
+[2026-03-02 13:09:33] FINAL activity_name: 'CHS Buffet'
+[2026-03-02 13:09:33] facilities_schedules decoded: Array
+(
+    [venues] => Array
+        (
+            [0] => Array
+                (
+                    [id] => 1
+                    [name] => Function Room A
+                    [floor] => Ground Floor
+                )
+
+            [1] => Array
+                (
+                    [id] => 2
+                    [name] => Function Room B
+                    [floor] => Ground Floor
+                )
+
+        )
+
+    [schedules] => Array
+        (
+            [1] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-03-02
+                            [start] => 07:00
+                            [end] => 17:00
+                        )
+
+                )
+
+            [2] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-03-02
+                            [start] => 07:00
+                            [end] => 17:00
+                        )
+
+                )
+
+        )
+
+)
+
+[2026-03-02 13:09:33] Times - start_datetime: 2026-03-02 07:00, end_datetime: 2026-03-02 17:00
+[2026-03-02 13:09:33] Conflict check passed for all venues
+[2026-03-02 13:09:33] SQL: INSERT INTO facility_reservations (
+        booking_no, reservation_no, last_name, first_name, middle_initial, 
+        email, contact_number, office_type_id, office_id, external_office_name, 
+        activity_name, event_type_id, venue_id, venue_setup_id, banquet_style_id,
+        start_datetime, end_datetime, participants_count, miscellaneous_items, 
+        additional_instruction
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+[2026-03-02 13:09:33] Success! Inserted ID: 21
+[2026-03-02 13:09:33] Inserted activity_name: CHS Buffet
+[2026-03-02 13:09:33] Inserted 2 venue(s) into reservation_venues for reservation ID 21
+[2026-03-02 07:19:17] ========== START reservation_submit.php ==========
+[2026-03-02 14:19:17] RAW POST data: Array
+(
+    [last_name] => Pantheress
+    [first_name] => Pink
+    [middle_initial] => E
+    [email] => geomarc789@gmail.com
+    [contact] => 09087547440
+    [office_type_id] => 4
+    [office_external_name] => BFP
+    [event_type_id] => 1
+    [activity_name] => BFP Fire Prevention Month
+    [participants] => 120
+    [banquet_style_id] => 3
+    [venue_ids] => Array
+        (
+            [0] => 1
+            [1] => 3
+            [2] => 5
+        )
+
+    [additional_instruction] => 
+    [action] => submit
+    [event_type] => Meeting and Conference
+    [venue_id] => 1
+    [facilities_schedules] => {"venues":[{"id":"1","name":"Function Room A","floor":"Ground Floor"},{"id":"3","name":"Function Room C","floor":"Ground Floor"},{"id":"5","name":"Function Room E","floor":"Ground Floor"}],"schedules":{"1":[{"date":"2026-03-02","start":"07:00","end":"17:00"}],"3":[{"date":"2026-03-02","start":"07:00","end":"17:00"}],"5":[{"date":"2026-03-02","start":"07:00","end":"17:00"}]}}
+    [miscellaneous_items] => {"basic_sound_system":{"speaker":2,"mic":2},"view_board":{"quantity":2},"rectangular_table":{"quantity":2}}
+    [terms_agreed_by] => Pink E Pantheress
+    [terms_position] => Event Coordinator
+    [terms_date] => 
+)
+
+[2026-03-02 14:19:17] SPECIFIC CHECK - activity_name: 'BFP Fire Prevention Month'
+[2026-03-02 14:19:17] SPECIFIC CHECK - event_type_id: '1'
+[2026-03-02 14:19:17] Generated numbers - booking_no: FAC-20260302-808, reservation_no: RES-20260302-597
+[2026-03-02 14:19:17] BEFORE CLEAN - activity_name: 'BFP Fire Prevention Month'
+[2026-03-02 14:19:17] AFTER CLEAN - activity_name: 'BFP Fire Prevention Month'
+[2026-03-02 14:19:17] event_type_id: 1
+[2026-03-02 14:19:17] FINAL activity_name: 'BFP Fire Prevention Month'
+[2026-03-02 14:19:17] facilities_schedules decoded: Array
+(
+    [venues] => Array
+        (
+            [0] => Array
+                (
+                    [id] => 1
+                    [name] => Function Room A
+                    [floor] => Ground Floor
+                )
+
+            [1] => Array
+                (
+                    [id] => 3
+                    [name] => Function Room C
+                    [floor] => Ground Floor
+                )
+
+            [2] => Array
+                (
+                    [id] => 5
+                    [name] => Function Room E
+                    [floor] => Ground Floor
+                )
+
+        )
+
+    [schedules] => Array
+        (
+            [1] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-03-02
+                            [start] => 07:00
+                            [end] => 17:00
+                        )
+
+                )
+
+            [3] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-03-02
+                            [start] => 07:00
+                            [end] => 17:00
+                        )
+
+                )
+
+            [5] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-03-02
+                            [start] => 07:00
+                            [end] => 17:00
+                        )
+
+                )
+
+        )
+
+)
+
+[2026-03-02 14:19:17] Times - start_datetime: 2026-03-02 07:00, end_datetime: 2026-03-02 17:00
+[2026-03-02 14:19:17] Conflict check passed for all venues
+[2026-03-02 14:19:17] SQL: INSERT INTO facility_reservations (
+        booking_no, reservation_no, last_name, first_name, middle_initial, 
+        email, contact_number, office_type_id, office_id, external_office_name, 
+        activity_name, event_type_id, venue_id, venue_setup_id, banquet_style_id,
+        start_datetime, end_datetime, participants_count, miscellaneous_items, 
+        additional_instruction
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+[2026-03-02 14:19:17] Success! Inserted ID: 22
+[2026-03-02 14:19:17] Inserted activity_name: BFP Fire Prevention Month
+[2026-03-02 14:19:17] Inserted 3 venue(s) into reservation_venues for reservation ID 22
+[2026-03-02 09:03:45] ========== START reservation_submit.php ==========
+[2026-03-02 16:03:45] RAW POST data: Array
+(
+    [last_name] => Drake
+    [first_name] => Drizzy
+    [middle_initial] => D
+    [email] => michaelblackson0975@gmail.com
+    [contact] => 09087547440
+    [office_type_id] => 3
+    [office_id] => 69
+    [event_type_id] => 2
+    [activity_name] => Kunwari Lang
+    [participants] => 60
+    [banquet_style_id] => 14
+    [venue_ids] => Array
+        (
+            [0] => 1
+        )
+
+    [view_board_qty] => 1
+    [additional_instruction] => 
+    [action] => submit
+    [event_type] => Seminar and Lecture
+    [venue_id] => 1
+    [facilities_schedules] => {"venues":[{"id":"1","name":"Function Room A","floor":"Ground Floor"}],"schedules":{"1":[{"date":"2026-03-02","start":"21:00","end":"23:00"}]}}
+    [miscellaneous_items] => {"basic_sound_system":{"speaker":2,"mic":2},"round_table":{"quantity":16},"banquet_chairs":{"quantity":190},"view_board":{"requested":true},"rectangular_table":{"quantity":10}}
+    [terms_agreed_by] => Drake D. Drizzy
+    [terms_position] => Even Coordinator
+    [terms_date] => 
+)
+
+[2026-03-02 16:03:45] SPECIFIC CHECK - activity_name: 'Kunwari Lang'
+[2026-03-02 16:03:45] SPECIFIC CHECK - event_type_id: '2'
+[2026-03-02 16:03:45] Generated numbers - booking_no: FAC-20260302-645, reservation_no: RES-20260302-235
+[2026-03-02 16:03:45] BEFORE CLEAN - activity_name: 'Kunwari Lang'
+[2026-03-02 16:03:45] AFTER CLEAN - activity_name: 'Kunwari Lang'
+[2026-03-02 16:03:45] event_type_id: 2
+[2026-03-02 16:03:45] FINAL activity_name: 'Kunwari Lang'
+[2026-03-02 16:03:45] facilities_schedules decoded: Array
+(
+    [venues] => Array
+        (
+            [0] => Array
+                (
+                    [id] => 1
+                    [name] => Function Room A
+                    [floor] => Ground Floor
+                )
+
+        )
+
+    [schedules] => Array
+        (
+            [1] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-03-02
+                            [start] => 21:00
+                            [end] => 23:00
+                        )
+
+                )
+
+        )
+
+)
+
+[2026-03-02 16:03:45] Times - start_datetime: 2026-03-02 21:00, end_datetime: 2026-03-02 23:00
+[2026-03-02 16:03:45] Conflict check passed for all venues
+[2026-03-02 16:03:45] SQL: INSERT INTO facility_reservations (
+        booking_no, reservation_no, last_name, first_name, middle_initial, 
+        email, contact_number, office_type_id, office_id, external_office_name, 
+        activity_name, event_type_id, venue_id, venue_setup_id, banquet_style_id,
+        start_datetime, end_datetime, participants_count, miscellaneous_items, 
+        additional_instruction
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+[2026-03-02 16:03:45] Success! Inserted ID: 23
+[2026-03-02 16:03:45] Inserted activity_name: Kunwari Lang
+[2026-03-02 16:03:45] Inserted 1 venue(s) into reservation_venues for reservation ID 23
+[2026-03-03 07:22:31] ========== START reservation_submit.php ==========
+[2026-03-03 14:22:31] RAW POST data: Array
+(
+    [last_name] => Curry
+    [first_name] => Marco
+    [middle_initial] => C
+    [email] => gomari13@gmail.com
+    [contact] => 09087547440
+    [office_type_id] => 1
+    [office_id] => 2
+    [event_type_id] => 2
+    [activity_name] => CTE Assembly
+    [participants] => 60
+    [banquet_style_id] => 9
+    [venue_ids] => Array
+        (
+            [0] => 1
+            [1] => 2
+            [2] => 3
+        )
+
+    [view_board_qty] => 1
+    [additional_instruction] => 
+    [action] => submit
+    [event_type] => Seminar and Lecture
+    [venue_id] => 1
+    [facilities_schedules] => {"venues":[{"id":"1","name":"Function Room A","floor":"Ground Floor"},{"id":"2","name":"Function Room B","floor":"Ground Floor"},{"id":"3","name":"Function Room C","floor":"Ground Floor"}],"schedules":{"1":[{"date":"2026-03-05","start":"07:00","end":"12:00"}],"2":[{"date":"2026-03-05","start":"12:00","end":"16:00"}],"3":[{"date":"2026-03-05","start":"16:00","end":"18:00"}]}}
+    [miscellaneous_items] => {"basic_sound_system":{"speaker":2,"mic":2},"banquet_chairs":{"quantity":2},"view_board":{"requested":true}}
+    [terms_agreed_by] => Marco C Curry
+    [terms_position] => Student
+    [terms_date] => 
+)
+
+[2026-03-03 14:22:31] SPECIFIC CHECK - activity_name: 'CTE Assembly'
+[2026-03-03 14:22:31] SPECIFIC CHECK - event_type_id: '2'
+[2026-03-03 14:22:31] Generated numbers - booking_no: FAC-20260303-316, reservation_no: RES-20260303-887
+[2026-03-03 14:22:31] BEFORE CLEAN - activity_name: 'CTE Assembly'
+[2026-03-03 14:22:31] AFTER CLEAN - activity_name: 'CTE Assembly'
+[2026-03-03 14:22:31] event_type_id: 2
+[2026-03-03 14:22:31] FINAL activity_name: 'CTE Assembly'
+[2026-03-03 14:22:31] facilities_schedules decoded: Array
+(
+    [venues] => Array
+        (
+            [0] => Array
+                (
+                    [id] => 1
+                    [name] => Function Room A
+                    [floor] => Ground Floor
+                )
+
+            [1] => Array
+                (
+                    [id] => 2
+                    [name] => Function Room B
+                    [floor] => Ground Floor
+                )
+
+            [2] => Array
+                (
+                    [id] => 3
+                    [name] => Function Room C
+                    [floor] => Ground Floor
+                )
+
+        )
+
+    [schedules] => Array
+        (
+            [1] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-03-05
+                            [start] => 07:00
+                            [end] => 12:00
+                        )
+
+                )
+
+            [2] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-03-05
+                            [start] => 12:00
+                            [end] => 16:00
+                        )
+
+                )
+
+            [3] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-03-05
+                            [start] => 16:00
+                            [end] => 18:00
+                        )
+
+                )
+
+        )
+
+)
+
+[2026-03-03 14:22:31] Times - start_datetime: 2026-03-05 07:00, end_datetime: 2026-03-05 12:00
+[2026-03-03 14:22:31] Conflict check passed for all venues
+[2026-03-03 14:22:31] SQL: INSERT INTO facility_reservations (
+        booking_no, reservation_no, last_name, first_name, middle_initial, 
+        email, contact_number, office_type_id, office_id, external_office_name, 
+        activity_name, event_type_id, venue_id, venue_setup_id, banquet_style_id,
+        start_datetime, end_datetime, participants_count, miscellaneous_items, 
+        additional_instruction
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+[2026-03-03 14:22:31] Success! Inserted ID: 24
+[2026-03-03 14:22:31] Inserted activity_name: CTE Assembly
+[2026-03-03 14:22:31] Inserted 3 venue(s) into reservation_venues for reservation ID 24
