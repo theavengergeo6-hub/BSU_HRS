@@ -15,14 +15,15 @@ $function_rooms = $conn->query("
     ORDER BY v.name
 ");
 
-// Get all guest rooms
+// Get all guest rooms — only show those that are active AND available for booking
 $guest_rooms = $conn->query("
     SELECT v.*, 
            (SELECT image_path FROM venue_images WHERE venue_id = v.id AND is_primary = 1 LIMIT 1) as primary_image,
            (SELECT COUNT(*) FROM venue_images WHERE venue_id = v.id) as image_count
     FROM venues v
-    WHERE v.is_active = 1 
-    AND v.name LIKE '%Guest%'
+    WHERE v.is_active  = 1 
+    AND   COALESCE(v.is_available, 1) = 1
+    AND   v.name LIKE '%Guest%'
     ORDER BY v.name
 ");
 
@@ -312,7 +313,6 @@ body {
     margin-top: 3.5rem;
 }
 
-/* Cards slide up from below on scroll */
 .fr-card {
     background: white;
     border-radius: 16px;
@@ -496,7 +496,6 @@ body {
 .banquet-track::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 10px; }
 .banquet-track::-webkit-scrollbar-thumb { background: var(--red); border-radius: 10px; }
 
-/* Banquet cards slide in from the right */
 .b-card {
     min-width: 275px;
     max-width: 275px;
@@ -545,7 +544,11 @@ body {
     line-height: 1.65;
 }
 
-/* ═══════════════ GUEST ROOMS — SPLIT REVEAL ═══════════════ */
+/* ============================================
+   RESPONSIVE CAROUSEL FOR GUEST ROOMS
+   ============================================ */
+
+/* Guest Rooms Section */
 .guest-rooms-section {
     padding: 4rem 2rem 8rem;
     max-width: 1280px;
@@ -575,6 +578,8 @@ body {
     opacity: 0;
     transform: translateX(-90px);
     transition: opacity 1s var(--ease-expo), transform 1s var(--ease-expo);
+    background: #f5f5f5;
+    min-height: 400px;
 }
 
 .gr-card.even .gr-img {
@@ -587,13 +592,174 @@ body {
     transform: translateX(0);
 }
 
-.gr-img img {
-    width: 100%; height: 100%;
+/* Carousel Styles */
+.gr-carousel-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.gr-carousel-slides {
+    display: flex;
+    height: 100%;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform;
+}
+
+.gr-carousel-slide {
+    min-width: 100%;
+    height: 100%;
+    position: relative;
+    flex-shrink: 0;
+}
+
+.gr-carousel-slide img {
+    width: 100%;
+    height: 100%;
     object-fit: cover;
     display: block;
-    transition: transform 1.1s var(--ease-expo);
+    pointer-events: none;
 }
-.gr-card:hover .gr-img img { transform: scale(1.05); }
+
+.gr-photo-badge {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    background: var(--red);
+    color: white;
+    font-size: 0.7rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 50px;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    z-index: 5;
+}
+
+/* Navigation Arrows */
+.gr-carousel-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.9);
+    border: none;
+    color: var(--red);
+    font-size: 1.2rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    z-index: 10;
+    opacity: 0;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.gr-card:hover .gr-carousel-btn {
+    opacity: 1;
+}
+
+.gr-carousel-prev {
+    left: 1rem;
+}
+
+.gr-carousel-next {
+    right: 1rem;
+}
+
+.gr-carousel-btn:hover {
+    background: var(--red);
+    color: white;
+    transform: translateY(-50%) scale(1.1);
+}
+
+/* Carousel Dots */
+.gr-carousel-dots {
+    position: absolute;
+    bottom: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 0.5rem;
+    z-index: 10;
+    background: rgba(0,0,0,0.3);
+    padding: 0.4rem 0.8rem;
+    border-radius: 50px;
+    backdrop-filter: blur(4px);
+}
+
+.gr-carousel-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.5);
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    transition: all 0.3s ease;
+}
+
+.gr-carousel-dot.active {
+    background: white;
+    transform: scale(1.3);
+    box-shadow: 0 0 10px rgba(255,255,255,0.5);
+}
+
+.gr-carousel-dot:hover {
+    background: white;
+}
+
+/* Photo Count Badge */
+.gr-photo-count {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: rgba(0,0,0,0.6);
+    color: white;
+    font-size: 0.75rem;
+    padding: 0.3rem 0.8rem;
+    border-radius: 50px;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    backdrop-filter: blur(4px);
+    z-index: 10;
+}
+
+/* Availability Badge */
+.gr-avail-badge {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    background: rgba(22,163,74,0.9);
+    color: white;
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 0.28rem 0.7rem;
+    border-radius: 50px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    z-index: 10;
+}
+.gr-avail-badge::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    background: white;
+    border-radius: 50%;
+    animation: pulse-avail 2s infinite;
+}
+@keyframes pulse-avail {
+    0%,100% { opacity: 1; transform: scale(1); }
+    50%      { opacity: 0.4; transform: scale(0.75); }
+}
 
 /* Text slides in from RIGHT (odd) or LEFT (even) */
 .gr-body {
@@ -656,6 +822,22 @@ body {
     margin-bottom: 1.4rem;
     font-weight: 300;
 }
+
+/* Extra bed badge */
+.gr-extra-bed {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: linear-gradient(135deg, #fff8e1, #fff3cd);
+    border: 1px solid #f0c040;
+    color: #7c5800;
+    font-size: 0.73rem;
+    font-weight: 600;
+    padding: 0.3rem 0.85rem;
+    border-radius: 50px;
+    margin-bottom: 1rem;
+}
+.gr-extra-bed i { color: #e6a817; font-size: 0.78rem; }
 
 .gr-features {
     display: flex;
@@ -826,15 +1008,28 @@ body {
 @media (max-width: 1024px) {
     .fr-grid { grid-template-columns: repeat(2, 1fr); }
 
-    /* On smaller screens, guest cards stack vertically */
-    .gr-card, .gr-card.even { grid-template-columns: 1fr; min-height: auto; }
+    .gr-card, .gr-card.even { 
+        grid-template-columns: 1fr; 
+        min-height: auto; 
+    }
     .gr-card.even .gr-img { order: 0; }
     .gr-card.even .gr-body { order: 1; transform: translateY(40px); }
-    .gr-img { height: 280px; transform: translateY(60px) !important; }
+    .gr-img { 
+        height: 350px; 
+        transform: translateY(60px) !important; 
+        min-height: 350px;
+    }
     .gr-card.even .gr-img { transform: translateY(60px) !important; }
     .gr-body { transform: translateY(40px) !important; padding: 2rem 2.25rem; }
     .gr-card.revealed .gr-img,
     .gr-card.revealed .gr-body { transform: translateY(0) !important; }
+    
+    /* Carousel adjustments for tablet */
+    .gr-carousel-btn {
+        width: 35px;
+        height: 35px;
+        opacity: 0.8;
+    }
 }
 
 @media (max-width: 768px) {
@@ -844,6 +1039,42 @@ body {
     .rs-hero h1 em { -webkit-text-stroke-width: 1px; }
     .gr-body { padding: 1.75rem; }
     .gr-number { font-size: 3.5rem; }
+    .gr-img { height: 300px; min-height: 300px; }
+    
+    /* Carousel adjustments for mobile */
+    .gr-carousel-btn {
+        width: 32px;
+        height: 32px;
+        font-size: 1rem;
+        opacity: 0.9;
+    }
+    
+    .gr-carousel-dots {
+        bottom: 0.75rem;
+        padding: 0.3rem 0.6rem;
+    }
+    
+    .gr-carousel-dot {
+        width: 6px;
+        height: 6px;
+    }
+    
+    .gr-photo-count {
+        font-size: 0.7rem;
+        padding: 0.25rem 0.6rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .gr-img { height: 250px; min-height: 250px; }
+    
+    .gr-carousel-btn {
+        width: 28px;
+        height: 28px;
+    }
+    
+    .gr-carousel-prev { left: 0.5rem; }
+    .gr-carousel-next { right: 0.5rem; }
 }
 </style>
 
@@ -986,14 +1217,84 @@ body {
                 while ($room = $guest_rooms->fetch_assoc()):
                     $gr_index++;
                     $is_even = ($gr_index % 2 === 0);
+                    
+                    // Get all images for this guest room (up to 5)
+                    $guest_images = $conn->query("
+                        SELECT image_path, is_primary 
+                        FROM venue_images 
+                        WHERE venue_id = {$room['id']} 
+                        ORDER BY is_primary DESC, id ASC 
+                        LIMIT 5
+                    ");
+                    $image_count = $guest_images ? $guest_images->num_rows : 0;
             ?>
             <div class="gr-card <?= $is_even ? 'even' : '' ?>">
+                <!-- Guest room image carousel -->
                 <div class="gr-img">
-                    <img src="<?= $room['primary_image'] ? '../assets/images/rooms/' . htmlspecialchars($room['primary_image']) : 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=800&q=80' ?>"
-                         alt="<?= htmlspecialchars($room['name']) ?>"
-                         loading="lazy"
-                         onerror="this.src='https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=800&q=80'">
+                    <div class="gr-carousel-container" id="carousel-<?= $room['id'] ?>">
+                        <div class="gr-carousel-slides" id="slides-<?= $room['id'] ?>">
+                            <?php
+                            if ($guest_images && $guest_images->num_rows > 0):
+                                $img_index = 0;
+                                while ($gimg = $guest_images->fetch_assoc()):
+                            ?>
+                            <div class="gr-carousel-slide">
+                                <img src="../assets/images/rooms/<?= htmlspecialchars($gimg['image_path']) ?>"
+                                     alt="<?= htmlspecialchars($room['name']) ?> - Photo <?= $img_index + 1 ?>"
+                                     loading="lazy"
+                                     onclick="openLightbox(<?= $room['id'] ?>, <?= $img_index ?>)"
+                                     onerror="this.src='https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=800&q=80'">
+                                <?php if ($gimg['is_primary']): ?>
+                                <span class="gr-photo-badge">
+                                    <i class="bi bi-star-fill"></i> Featured
+                                </span>
+                                <?php endif; ?>
+                            </div>
+                            <?php 
+                                    $img_index++;
+                                endwhile; 
+                            else:
+                                // Fallback if no images
+                            ?>
+                            <div class="gr-carousel-slide">
+                                <img src="https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=800&q=80"
+                                     alt="<?= htmlspecialchars($room['name']) ?>"
+                                     loading="lazy">
+                            </div>
+                            <?php endif; ?>
+                        </div>
+                        
+                        <?php if ($image_count > 1): ?>
+                        <!-- Carousel navigation arrows -->
+                        <button class="gr-carousel-btn gr-carousel-prev" onclick="slideCarousel(<?= $room['id'] ?>, -1)" aria-label="Previous image">
+                            <i class="bi bi-chevron-left"></i>
+                        </button>
+                        <button class="gr-carousel-btn gr-carousel-next" onclick="slideCarousel(<?= $room['id'] ?>, 1)" aria-label="Next image">
+                            <i class="bi bi-chevron-right"></i>
+                        </button>
+                        
+                        <!-- Carousel dots indicator -->
+                        <div class="gr-carousel-dots" id="dots-<?= $room['id'] ?>">
+                            <?php for ($d = 0; $d < $image_count; $d++): ?>
+                            <button class="gr-carousel-dot <?= $d === 0 ? 'active' : '' ?>" 
+                                    onclick="goToSlide(<?= $room['id'] ?>, <?= $d ?>)"
+                                    aria-label="Go to image <?= $d + 1 ?>"></button>
+                            <?php endfor; ?>
+                        </div>
+                        
+                        <!-- Photo count badge -->
+                        <span class="gr-photo-count">
+                            <i class="bi bi-images"></i> <?= $image_count ?> photos
+                        </span>
+                        <?php endif; ?>
+                    </div>
+                    
+                    <!-- Availability Badge -->
+                    <div class="gr-avail-badge">
+                        <i class="bi bi-check-circle-fill"></i> Available
+                    </div>
                 </div>
+                
                 <div class="gr-body">
                     <div class="gr-number">0<?= $gr_index ?></div>
                     <div class="gr-name"><?= htmlspecialchars($room['name']) ?></div>
@@ -1004,15 +1305,33 @@ body {
                     <p class="gr-desc">
                         <?= htmlspecialchars(substr($room['description'] ?? 'A comfortable and well-appointed room for your stay.', 0, 160)) ?><?= strlen($room['description'] ?? '') > 160 ? '…' : '' ?>
                     </p>
+                    
+                    <?php if (!empty($room['extra_bed_available'])): ?>
+                    <div class="gr-extra-bed">
+                        <i class="bi bi-plus-square-fill"></i>
+                        Extra bed available &mdash; up to
+                        <?= (int)($room['capacity'] ?? 2) + 2 ?> guests total
+                        <?php if (!empty($room['extra_bed_price'])): ?>
+                        &nbsp;·&nbsp; +₱<?= number_format($room['extra_bed_price'], 0) ?>/night
+                        <?php endif; ?>
+                    </div>
+                    <?php endif; ?>
+                    
                     <div class="gr-features">
-                        <span class="gr-feat"><i class="bi bi-people-fill"></i> <?= htmlspecialchars($room['capacity'] ?? '2') ?> guests</span>
+                        <span class="gr-feat"><i class="bi bi-people-fill"></i>
+                            Up to <?= htmlspecialchars($room['capacity'] ?? '2') ?> guests
+                        </span>
                         <span class="gr-feat"><i class="bi bi-wifi"></i> Free WiFi</span>
                         <span class="gr-feat"><i class="bi bi-snow"></i> Air-conditioned</span>
                         <span class="gr-feat"><i class="bi bi-moon-stars"></i> Overnight stay</span>
                     </div>
+                    
                     <div class="gr-price-row">
-                        <div class="gr-price">₱2,500 <sub>/ night</sub></div>
-                        <a href="reservation.php?room=<?= $room['id'] ?>" class="btn-book">
+                        <div class="gr-price">
+                            ₱<?= !empty($room['price']) ? number_format($room['price'], 0) : '2,500' ?>
+                            <sub>/ night</sub>
+                        </div>
+                        <a href="guest_reservation.php?room=<?= $room['id'] ?>" class="btn-book">
                             Book Now <i class="bi bi-arrow-right"></i>
                         </a>
                     </div>
@@ -1034,8 +1353,8 @@ body {
         <h2 class="cta-headline">Book Your Perfect Space Today</h2>
         <p class="cta-sub">Simple online reservation, fast confirmation — we handle the rest.</p>
         <div class="cta-buttons">
-            <a href="reservation.php" class="btn-cta-primary">Make a Reservation</a>
-            <a href="faqs.php" class="btn-cta-ghost">View FAQs</a>
+            <a href="reservation.php" class="btn-cta-primary">Reserve a Function Room</a>
+            <a href="guest_reservation.php" class="btn-cta-ghost">Book a Guest Room</a>
         </div>
     </div>
 
@@ -1044,6 +1363,87 @@ body {
 <script>
 (function () {
     'use strict';
+
+    // Carousel state management
+    var carouselState = {};
+
+    // Slide carousel function
+    window.slideCarousel = function(roomId, direction) {
+        if (!carouselState[roomId]) {
+            carouselState[roomId] = { currentSlide: 0 };
+        }
+        
+        var slides = document.getElementById('slides-' + roomId);
+        if (!slides) return;
+        
+        var totalSlides = slides.children.length;
+        var newSlide = carouselState[roomId].currentSlide + direction;
+        
+        // Loop around
+        if (newSlide < 0) newSlide = totalSlides - 1;
+        if (newSlide >= totalSlides) newSlide = 0;
+        
+        goToSlide(roomId, newSlide);
+    };
+
+    // Go to specific slide
+    window.goToSlide = function(roomId, slideIndex) {
+        if (!carouselState[roomId]) {
+            carouselState[roomId] = { currentSlide: 0 };
+        }
+        
+        var slides = document.getElementById('slides-' + roomId);
+        var dots = document.querySelectorAll('#dots-' + roomId + ' .gr-carousel-dot');
+        
+        if (!slides) return;
+        
+        carouselState[roomId].currentSlide = slideIndex;
+        slides.style.transform = 'translateX(-' + (slideIndex * 100) + '%)';
+        
+        // Update dots
+        if (dots.length) {
+            for (var i = 0; i < dots.length; i++) {
+                dots[i].classList.toggle('active', i === slideIndex);
+            }
+        }
+    };
+
+    // Open lightbox (simplified - opens in new tab)
+    window.openLightbox = function(roomId, slideIndex) {
+        var slides = document.getElementById('slides-' + roomId);
+        if (!slides) return;
+        
+        var img = slides.children[slideIndex].querySelector('img');
+        if (img) {
+            window.open(img.src, '_blank');
+        }
+    };
+
+    // Touch swipe support for mobile
+    document.querySelectorAll('.gr-carousel-container').forEach(function(container) {
+        var touchStartX = 0;
+        var touchEndX = 0;
+        var roomId = container.id.replace('carousel-', '');
+        
+        container.addEventListener('touchstart', function(e) {
+            touchStartX = e.changedTouches[0].screenX;
+        }, { passive: true });
+        
+        container.addEventListener('touchend', function(e) {
+            touchEndX = e.changedTouches[0].screenX;
+            var diff = touchStartX - touchEndX;
+            
+            if (Math.abs(diff) > 50) { // Minimum swipe distance
+                if (diff > 0) {
+                    // Swipe left - next
+                    slideCarousel(parseInt(roomId), 1);
+                } else {
+                    // Swipe right - previous
+                    slideCarousel(parseInt(roomId), -1);
+                }
+            }
+        }, { passive: true });
+    });
 
     /* ── Smooth anchor scroll ── */
     document.querySelectorAll('a[href^="#"]').forEach(function (a) {
@@ -1105,32 +1505,6 @@ body {
         btn.addEventListener('mouseleave', function () {
             btn.style.transform = '';
         });
-    });
-
-    /* ── Count-up animation for capacity numbers on fr-cards ── */
-    var countObs = new IntersectionObserver(function (entries) {
-        entries.forEach(function (entry) {
-            if (!entry.isIntersecting) return;
-            var el = entry.target;
-            var target = parseInt(el.getAttribute('data-target'), 10);
-            var start = 0;
-            var duration = 1200;
-            var startTime = null;
-            function step(ts) {
-                if (!startTime) startTime = ts;
-                var progress = Math.min((ts - startTime) / duration, 1);
-                var eased = 1 - Math.pow(1 - progress, 3);
-                el.textContent = Math.floor(eased * target);
-                if (progress < 1) requestAnimationFrame(step);
-                else el.textContent = target;
-            }
-            requestAnimationFrame(step);
-            countObs.unobserve(el);
-        });
-    }, { threshold: 0.5 });
-
-    document.querySelectorAll('[data-target]').forEach(function (el) {
-        countObs.observe(el);
     });
 
 })();
