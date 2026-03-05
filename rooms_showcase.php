@@ -15,6 +15,21 @@ $function_rooms = $conn->query("
     ORDER BY v.name
 ");
 
+// Pre-fetch all function room images indexed by venue_id
+$fr_images_map = [];
+$fr_imgs_res = $conn->query("
+    SELECT vi.venue_id, vi.image_path, vi.is_primary
+    FROM venue_images vi
+    JOIN venues v ON vi.venue_id = v.id
+    WHERE v.is_active = 1 AND v.name LIKE '%Function%'
+    ORDER BY vi.venue_id, vi.is_primary DESC, vi.sort_order ASC, vi.id ASC
+");
+if ($fr_imgs_res) {
+    while ($fri = $fr_imgs_res->fetch_assoc()) {
+        $fr_images_map[$fri['venue_id']][] = $fri;
+    }
+}
+
 // Get all guest rooms — only show those that are active AND available for booking
 $guest_rooms = $conn->query("
     SELECT v.*, 
@@ -299,6 +314,57 @@ body {
 }
 .section-intro.revealed .section-sub { opacity: 1; transform: translateY(0); }
 
+/* ═══════════════ FUNCTION ROOM CAROUSEL ═══════════════ */
+.fr-car-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.88);
+    border: none;
+    color: var(--red);
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    z-index: 10;
+    opacity: 0;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.18);
+}
+.fr-card:hover .fr-car-btn { opacity: 1; }
+.fr-car-prev { left: 0.65rem; }
+.fr-car-next { right: 0.65rem; }
+.fr-car-btn:hover { background: var(--red); color: white; transform: translateY(-50%) scale(1.08); }
+
+.fr-car-dots {
+    position: absolute;
+    bottom: 0.65rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 0.4rem;
+    z-index: 10;
+    background: rgba(0,0,0,0.3);
+    padding: 0.3rem 0.65rem;
+    border-radius: 50px;
+    backdrop-filter: blur(4px);
+}
+.fr-car-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.5);
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    transition: all 0.3s ease;
+}
+.fr-car-dot.active { background: white; transform: scale(1.3); }
+.fr-car-dot:hover  { background: white; }
+
 /* ═══════════════ FUNCTION ROOMS ═══════════════ */
 .function-rooms-section {
     padding: 4rem 2rem 6rem;
@@ -565,10 +631,10 @@ body {
 .gr-card {
     display: grid;
     grid-template-columns: 1fr 1fr;
+    grid-template-rows: 440px;
     border-radius: 20px;
     overflow: hidden;
     box-shadow: 0 8px 40px rgba(0,0,0,0.09);
-    min-height: 400px;
 }
 
 /* Image slides in from LEFT (odd) or RIGHT (even) */
@@ -579,7 +645,7 @@ body {
     transform: translateX(-90px);
     transition: opacity 1s var(--ease-expo), transform 1s var(--ease-expo);
     background: #f5f5f5;
-    min-height: 400px;
+    height: 440px;
 }
 
 .gr-card.even .gr-img {
@@ -594,24 +660,25 @@ body {
 
 /* Carousel Styles */
 .gr-carousel-container {
-    position: relative;
-    width: 100%;
-    height: 100%;
+    position: absolute;
+    inset: 0;
     overflow: hidden;
 }
 
 .gr-carousel-slides {
     display: flex;
     height: 100%;
-    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
     will-change: transform;
 }
 
 .gr-carousel-slide {
     min-width: 100%;
+    width: 100%;
     height: 100%;
     position: relative;
     flex-shrink: 0;
+    overflow: hidden;
 }
 
 .gr-carousel-slide img {
@@ -620,6 +687,7 @@ body {
     object-fit: cover;
     display: block;
     pointer-events: none;
+    user-select: none;
 }
 
 .gr-photo-badge {
@@ -771,6 +839,7 @@ body {
     opacity: 0;
     transform: translateX(60px);
     transition: opacity 1s var(--ease-expo) 0.15s, transform 1s var(--ease-expo) 0.15s;
+    overflow-y: auto;
 }
 
 .gr-card.even .gr-body {
@@ -1009,15 +1078,14 @@ body {
     .fr-grid { grid-template-columns: repeat(2, 1fr); }
 
     .gr-card, .gr-card.even { 
-        grid-template-columns: 1fr; 
-        min-height: auto; 
+        grid-template-columns: 1fr;
+        grid-template-rows: 320px auto;
     }
     .gr-card.even .gr-img { order: 0; }
     .gr-card.even .gr-body { order: 1; transform: translateY(40px); }
     .gr-img { 
-        height: 350px; 
-        transform: translateY(60px) !important; 
-        min-height: 350px;
+        height: 320px !important;
+        transform: translateY(60px) !important;
     }
     .gr-card.even .gr-img { transform: translateY(60px) !important; }
     .gr-body { transform: translateY(40px) !important; padding: 2rem 2.25rem; }
@@ -1039,7 +1107,10 @@ body {
     .rs-hero h1 em { -webkit-text-stroke-width: 1px; }
     .gr-body { padding: 1.75rem; }
     .gr-number { font-size: 3.5rem; }
-    .gr-img { height: 300px; min-height: 300px; }
+    .gr-card, .gr-card.even {
+        grid-template-rows: 280px auto;
+    }
+    .gr-img { height: 280px !important; }
     
     /* Carousel adjustments for mobile */
     .gr-carousel-btn {
@@ -1066,7 +1137,8 @@ body {
 }
 
 @media (max-width: 480px) {
-    .gr-img { height: 250px; min-height: 250px; }
+    .gr-card, .gr-card.even { grid-template-rows: 240px auto; }
+    .gr-img { height: 240px !important; }
     
     .gr-carousel-btn {
         width: 28px;
@@ -1125,17 +1197,59 @@ body {
                     $fr_index++;
             ?>
             <div class="fr-card" style="transition-delay: <?= ($fr_index - 1) * 0.1 ?>s">
-                <div class="fr-img-wrap">
-                    <img src="<?= $room['primary_image'] ? '../assets/images/rooms/' . htmlspecialchars($room['primary_image']) : 'https://images.unsplash.com/photo-1511578314322-379afb476865?w=700&q=80' ?>"
-                         alt="<?= htmlspecialchars($room['name']) ?>"
-                         loading="lazy"
-                         onerror="this.src='https://images.unsplash.com/photo-1511578314322-379afb476865?w=700&q=80'">
+                <?php
+                    $fr_imgs   = $fr_images_map[$room['id']] ?? [];
+                    $fr_cnt    = count($fr_imgs);
+                    $fr_has_car = $fr_cnt > 1;
+                ?>
+                <div class="fr-img-wrap" style="position:relative;overflow:hidden;">
+                    <!-- Carousel slides -->
+                    <div class="fr-carousel-slides" id="frslides-<?= $room['id'] ?>" style="display:flex;height:100%;transition:transform .4s cubic-bezier(.4,0,.2,1);will-change:transform;">
+                        <?php if ($fr_cnt > 0): foreach ($fr_imgs as $fi): ?>
+                        <div style="min-width:100%;height:100%;flex-shrink:0;position:relative;">
+                            <img src="../assets/images/rooms/<?= htmlspecialchars($fi['image_path']) ?>"
+                                 alt="<?= htmlspecialchars($room['name']) ?>"
+                                 loading="lazy"
+                                 style="width:100%;height:100%;object-fit:cover;"
+                                 onerror="this.src='https://images.unsplash.com/photo-1511578314322-379afb476865?w=700&q=80'">
+                        </div>
+                        <?php endforeach; else: ?>
+                        <div style="min-width:100%;height:100%;flex-shrink:0;">
+                            <img src="<?= $room['primary_image'] ? '../assets/images/rooms/' . htmlspecialchars($room['primary_image']) : 'https://images.unsplash.com/photo-1511578314322-379afb476865?w=700&q=80' ?>"
+                                 alt="<?= htmlspecialchars($room['name']) ?>"
+                                 loading="lazy"
+                                 style="width:100%;height:100%;object-fit:cover;"
+                                 onerror="this.src='https://images.unsplash.com/photo-1511578314322-379afb476865?w=700&q=80'">
+                        </div>
+                        <?php endif; ?>
+                    </div>
+
                     <div class="fr-img-overlay"></div>
                     <div class="fr-badge">Function Room</div>
+
+                    <?php if ($fr_has_car): ?>
+                    <!-- Prev/Next arrows -->
+                    <button class="fr-car-btn fr-car-prev" onclick="frCarNav(<?= $room['id'] ?>,-1)" aria-label="Previous">
+                        <i class="bi bi-chevron-left"></i>
+                    </button>
+                    <button class="fr-car-btn fr-car-next" onclick="frCarNav(<?= $room['id'] ?>,1)" aria-label="Next">
+                        <i class="bi bi-chevron-right"></i>
+                    </button>
+                    <!-- Dots -->
+                    <div class="fr-car-dots" id="frdots-<?= $room['id'] ?>">
+                        <?php for ($d = 0; $d < $fr_cnt; $d++): ?>
+                        <button class="fr-car-dot <?= $d===0?'active':'' ?>"
+                                onclick="frCarGo(<?= $room['id'] ?>,<?= $d ?>)"
+                                aria-label="Photo <?= $d+1 ?>"></button>
+                        <?php endfor; ?>
+                    </div>
+                    <?php endif; ?>
+
                     <?php if ($room['image_count'] > 0): ?>
-                        <div class="fr-photo-count">
-                            <i class="bi bi-images"></i> <?= $room['image_count'] ?> photos
-                        </div>
+                    <div class="fr-photo-count" id="fr-counter-<?= $room['id'] ?>">
+                        <i class="bi bi-images"></i>
+                        <span class="fr-cnt-txt">1</span>/<?= $room['image_count'] ?> photos
+                    </div>
                     <?php endif; ?>
                 </div>
                 <div class="fr-body">
@@ -1281,16 +1395,19 @@ body {
                                     aria-label="Go to image <?= $d + 1 ?>"></button>
                             <?php endfor; ?>
                         </div>
-                        
-                        <!-- Photo count badge -->
-                        <span class="gr-photo-count">
-                            <i class="bi bi-images"></i> <?= $image_count ?> photos
+                        <?php endif; ?>
+
+                        <?php if ($image_count > 0): ?>
+                        <!-- Photo count badge — always visible -->
+                        <span class="gr-photo-count" id="gr-counter-<?= $room['id'] ?>">
+                            <i class="bi bi-images"></i>
+                            <span class="gr-cnt-cur">1</span>/<?= $image_count ?>
                         </span>
                         <?php endif; ?>
                     </div>
                     
-                    <!-- Availability Badge -->
-                    <div class="gr-avail-badge">
+                    <!-- Availability Badge — sits above carousel container -->
+                    <div class="gr-avail-badge" style="z-index:20;">
                         <i class="bi bi-check-circle-fill"></i> Available
                     </div>
                 </div>
@@ -1394,6 +1511,7 @@ body {
         
         var slides = document.getElementById('slides-' + roomId);
         var dots = document.querySelectorAll('#dots-' + roomId + ' .gr-carousel-dot');
+        var counter = document.getElementById('gr-counter-' + roomId);
         
         if (!slides) return;
         
@@ -1405,6 +1523,12 @@ body {
             for (var i = 0; i < dots.length; i++) {
                 dots[i].classList.toggle('active', i === slideIndex);
             }
+        }
+
+        // Update counter
+        if (counter) {
+            var cur = counter.querySelector('.gr-cnt-cur');
+            if (cur) cur.textContent = slideIndex + 1;
         }
     };
 
@@ -1442,6 +1566,40 @@ body {
                     slideCarousel(parseInt(roomId), -1);
                 }
             }
+        }, { passive: true });
+    });
+
+    /* ── Function room carousel ── */
+    var frCarState = {};
+    window.frCarNav = function(id, dir) {
+        if (!frCarState[id]) frCarState[id] = 0;
+        var slides = document.getElementById('frslides-' + id);
+        if (!slides) return;
+        var total = slides.children.length;
+        frCarState[id] = (frCarState[id] + dir + total) % total;
+        frCarGo(id, frCarState[id]);
+    };
+    window.frCarGo = function(id, idx) {
+        frCarState[id] = idx;
+        var slides  = document.getElementById('frslides-' + id);
+        var dots    = document.getElementById('frdots-' + id);
+        var counter = document.getElementById('fr-counter-' + id);
+        if (slides) slides.style.transform = 'translateX(-' + (idx * 100) + '%)';
+        if (dots) Array.from(dots.children).forEach(function(d, i) { d.classList.toggle('active', i === idx); });
+        if (counter) {
+            var txt = counter.querySelector('.fr-cnt-txt');
+            if (txt) txt.textContent = idx + 1;
+        }
+    };
+
+    /* Touch swipe for function room carousels */
+    document.querySelectorAll('[id^="frslides-"]').forEach(function(el) {
+        var id = el.id.replace('frslides-', '');
+        var tx = 0;
+        el.parentElement.addEventListener('touchstart', function(e) { tx = e.changedTouches[0].screenX; }, { passive: true });
+        el.parentElement.addEventListener('touchend', function(e) {
+            var diff = tx - e.changedTouches[0].screenX;
+            if (Math.abs(diff) > 50) frCarNav(id, diff > 0 ? 1 : -1);
         }, { passive: true });
     });
 

@@ -9,8 +9,8 @@ $footer_settings = $site_info['settings'];
 
 if (empty($carousel_slides)) {
     $carousel_slides = [
-        ['title' => 'Welcome to BSU Hostel', 'subtitle' => 'The perfect venue for your events. Spacious function rooms and comfortable guest rooms for meetings, celebrations, and group stays. Reserve your space today.', 'button_text' => 'View Rooms', 'button_url' => 'rooms.php', 'image_path' => 'hostel/hostel2.png'],
-        ['title' => 'Book Your Function or Guest Room', 'subtitle' => 'Check availability and reserve your stay in minutes.', 'button_text' => 'Check Availability', 'button_url' => 'rooms.php', 'image_path' => 'rooms/IMG_19689.jfif'],
+        ['title' => 'Welcome to BSU Hostel', 'subtitle' => 'The perfect venue for your events. Spacious function rooms and comfortable guest rooms for meetings, celebrations, and group stays. Reserve your space today.', 'button_text' => 'View Rooms', 'button_url' => 'rooms_showcase.php', 'image_path' => 'hostel/hostel2.png'],
+        ['title' => 'Book Your Function or Guest Room', 'subtitle' => 'Check availability and reserve your stay in minutes.', 'button_text' => 'Check Availability', 'button_url' => 'rooms_showcase.php', 'image_path' => 'rooms/IMG_19689.jfif'],
         ['title' => 'Your Comfort, Our Priority', 'subtitle' => 'Modern amenities and a welcoming environment for every guest.', 'button_text' => 'See Amenities', 'button_url' => 'facilities.php', 'image_path' => 'rooms/IMG_85146.png'],
         ['title' => 'Stay With Us', 'subtitle' => 'Ideal for students, groups, and travelers visiting BSU.', 'button_text' => 'Get in Touch', 'button_url' => 'contact.php', 'image_path' => 'hostel/hostel2.png'],
     ];
@@ -56,7 +56,7 @@ $assets_base = $base . '/assets/images/';
                 <div class="carousel-caption">
                     <h1 class="animate__animated animate__fadeInDown float-element"><?= clean($slide['title']) ?></h1>
                     <p class="animate__animated animate__fadeInUp animate__delay-1s float-element-slow"><?= clean($slide['subtitle'] ?? '') ?></p>
-                    <a href="<?= $base ?>/<?= clean($slide['button_url'] ?? 'rooms.php') ?>" class="btn-view-rooms animate__animated animate__fadeInUp animate__delay-2s float-element-delayed"><?= clean($slide['button_text'] ?? 'View Rooms') ?></a>
+                    <a href="<?= $base ?>/<?= clean($slide['button_url'] ?? 'rooms_showcase.php') ?>" class="btn-view-rooms animate__animated animate__fadeInUp animate__delay-2s float-element-delayed"><?= clean($slide['button_text'] ?? 'View Rooms') ?></a>
                 </div>
             </div>
             <?php endforeach; ?>
@@ -197,7 +197,7 @@ $assets_base = $base . '/assets/images/';
                 <div class="footer-col">
                     <h5 class="footer-title">Quick Links</h5>
                     <a href="<?= $base ?>/" class="footer-link">Home</a>
-                    <a href="<?= $base ?>/rooms.php" class="footer-link">Rooms</a>
+                    <a href="<?= $base ?>/rooms_showcase.php" class="footer-link">Rooms</a>
                     <a href="<?= $base ?>/facilities.php" class="footer-link">Amenities</a>
                     <a href="<?= $base ?>/contact.php" class="footer-link">Contact</a>
                 </div>

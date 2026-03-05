@@ -1734,3 +1734,121 @@ Stack trace:
 [2026-03-03 14:22:31] Success! Inserted ID: 24
 [2026-03-03 14:22:31] Inserted activity_name: CTE Assembly
 [2026-03-03 14:22:31] Inserted 3 venue(s) into reservation_venues for reservation ID 24
+[2026-03-05 01:23:48] ========== START reservation_submit.php ==========
+[2026-03-05 08:23:48] RAW POST data: Array
+(
+    [last_name] => Jordan
+    [first_name] => Michael
+    [middle_initial] => K
+    [email] => geomarc789@gmail.com
+    [contact] => 09087547440
+    [office_type_id] => 1
+    [office_id] => 5
+    [event_type_id] => 5
+    [activity_name] => Technoprenuership Pitch
+    [participants] => 150
+    [banquet_style_id] => 3
+    [venue_ids] => Array
+        (
+            [0] => 1
+            [1] => 2
+            [2] => 3
+        )
+
+    [view_board_qty] => 1
+    [additional_instruction] => 
+    [action] => submit
+    [event_type] => Programs and Special Events
+    [venue_id] => 1
+    [facilities_schedules] => {"venues":[{"id":"1","name":"Function Room A","floor":"Ground Floor"},{"id":"2","name":"Function Room B","floor":"Ground Floor"},{"id":"3","name":"Function Room C","floor":"Ground Floor"}],"schedules":{"1":[{"date":"2026-03-06","start":"07:00","end":"17:00"}],"2":[{"date":"2026-03-06","start":"07:00","end":"17:00"}],"3":[{"date":"2026-03-06","start":"07:00","end":"17:00"}]}}
+    [miscellaneous_items] => {"basic_sound_system":{"speaker":2,"mic":2},"banquet_chairs":{"quantity":150},"view_board":{"requested":true},"rectangular_table":{"quantity":1}}
+    [terms_agreed_by] => Michael K. Jordan
+    [terms_position] => Technopreneurship Professor
+    [terms_date] => 
+)
+
+[2026-03-05 08:23:48] SPECIFIC CHECK - activity_name: 'Technoprenuership Pitch'
+[2026-03-05 08:23:48] SPECIFIC CHECK - event_type_id: '5'
+[2026-03-05 08:23:48] Generated numbers - booking_no: FAC-20260305-925, reservation_no: RES-20260305-161
+[2026-03-05 08:23:48] BEFORE CLEAN - activity_name: 'Technoprenuership Pitch'
+[2026-03-05 08:23:48] AFTER CLEAN - activity_name: 'Technoprenuership Pitch'
+[2026-03-05 08:23:48] event_type_id: 5
+[2026-03-05 08:23:48] FINAL activity_name: 'Technoprenuership Pitch'
+[2026-03-05 08:23:48] facilities_schedules decoded: Array
+(
+    [venues] => Array
+        (
+            [0] => Array
+                (
+                    [id] => 1
+                    [name] => Function Room A
+                    [floor] => Ground Floor
+                )
+
+            [1] => Array
+                (
+                    [id] => 2
+                    [name] => Function Room B
+                    [floor] => Ground Floor
+                )
+
+            [2] => Array
+                (
+                    [id] => 3
+                    [name] => Function Room C
+                    [floor] => Ground Floor
+                )
+
+        )
+
+    [schedules] => Array
+        (
+            [1] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-03-06
+                            [start] => 07:00
+                            [end] => 17:00
+                        )
+
+                )
+
+            [2] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-03-06
+                            [start] => 07:00
+                            [end] => 17:00
+                        )
+
+                )
+
+            [3] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-03-06
+                            [start] => 07:00
+                            [end] => 17:00
+                        )
+
+                )
+
+        )
+
+)
+
+[2026-03-05 08:23:48] Times - start_datetime: 2026-03-06 07:00, end_datetime: 2026-03-06 17:00
+[2026-03-05 08:23:48] Conflict check passed for all venues
+[2026-03-05 08:23:48] SQL: INSERT INTO facility_reservations (
+        booking_no, reservation_no, last_name, first_name, middle_initial, 
+        email, contact_number, office_type_id, office_id, external_office_name, 
+        activity_name, event_type_id, venue_id, venue_setup_id, banquet_style_id,
+        start_datetime, end_datetime, participants_count, miscellaneous_items, 
+        additional_instruction
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+[2026-03-05 08:23:48] Success! Inserted ID: 25
+[2026-03-05 08:23:48] Inserted activity_name: Technoprenuership Pitch
+[2026-03-05 08:23:48] Inserted 3 venue(s) into reservation_venues for reservation ID 25
