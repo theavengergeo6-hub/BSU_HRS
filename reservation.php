@@ -1,7 +1,7 @@
 <?php
 /**
- * BSU Hostel - Facility Reservation (6-step form)
- * Step 1: Info | 2: Rooms | 3: Schedule | 4: Terms | 5: Miscellaneous | 6: Summary
+ * BSU Hostel - Facility Reservation (7-step form)
+ * Step 0: Type | 1: Info | 2: Rooms | 3: Schedule | 4: Terms | 5: Miscellaneous | 6: Summary
  */
 $pageTitle = 'Reservation';
 require_once __DIR__ . '/inc/link.php';
@@ -57,6 +57,19 @@ if ($venues && $venues->num_rows > 0) {
         ['id' => 7, 'name' => 'Guest Room 2', 'floor' => '2nd Floor', 'capacity' => 2],
         ['id' => 8, 'name' => 'Guest Room 3', 'floor' => '2nd Floor', 'capacity' => 3],
         ['id' => 9, 'name' => 'Guest Room 4', 'floor' => '2nd Floor', 'capacity' => 2]
+    ];
+}
+
+// Add dormitory from rooms table
+$dormitory_query = $conn->query("SELECT id, name, description, adult_capacity as capacity FROM rooms WHERE id = 29 AND removed = 0");
+if ($dormitory_query && $dormitory_query->num_rows > 0) {
+    $dorm = $dormitory_query->fetch_assoc();
+    $guest_venues[] = [
+        'id' => 'dorm_' . $dorm['id'],
+        'name' => 'Dormitory',
+        'floor' => 'Ground Floor',
+        'capacity' => 24,
+        'description' => $dorm['description'] ?? 'Spacious dormitory accommodating up to 24 guests.'
     ];
 }
 
@@ -561,6 +574,205 @@ if ($selected_customer_type) {
     color: #666;
 }
 
+/* Guest Registration Form Styles */
+.guest-registration-form {
+    background: white;
+    border-radius: 16px;
+    padding: 2rem;
+    border: 1px solid #e9ecef;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+}
+
+.guest-form-section {
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.guest-form-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.guest-form-section h4 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #b71c1c;
+    margin-bottom: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.guest-form-section h4 i {
+    font-size: 1.2rem;
+}
+
+.guest-name-row {
+    display: grid;
+    grid-template-columns: 2fr 2fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+/* Dynamic Guest Cards Styling */
+.guests-container {
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.guest-card {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 12px;
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+}
+
+.guest-card:hover {
+    border-color: #b71c1c;
+    box-shadow: 0 4px 12px rgba(183,28,28,0.1);
+}
+
+.guest-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.guest-card-header h6 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin: 0;
+}
+
+.btn-remove-guest {
+    background: none;
+    border: none;
+    color: #dc3545;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0 0.5rem;
+    transition: all 0.2s ease;
+}
+
+.btn-remove-guest:hover {
+    color: #a71d2a;
+    transform: scale(1.2);
+}
+
+.btn-add-guests {
+    background: white;
+    border: 2px dashed #b71c1c;
+    color: #b71c1c;
+    border-radius: 12px;
+    padding: 1rem;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 100%;
+    margin-top: 1rem;
+}
+
+.btn-add-guests:hover {
+    background: #fff5f5;
+    border-color: #8b0000;
+    color: #8b0000;
+}
+
+.room-limit-badge {
+    display: inline-block;
+    background: #e9ecef;
+    color: #495057;
+    font-size: 0.75rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 50px;
+    margin-left: 1rem;
+}
+
+.other-guests-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.other-guest-item {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 1rem;
+    border: 1px solid #e9ecef;
+}
+
+.other-guest-item h5 {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.other-guest-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.other-guest-fields .form-group {
+    margin-bottom: 0;
+}
+
+.other-guest-fields .form-group label {
+    font-size: 0.7rem;
+    margin-bottom: 0.2rem;
+}
+
+.arrival-departure-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+}
+
+.time-grid-small {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+}
+
+.room-selector {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.data-privacy-box {
+    background: #f8f9fa;
+    border-left: 4px solid #b71c1c;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin: 2rem 0 1rem;
+    font-size: 0.9rem;
+    color: #495057;
+    line-height: 1.6;
+}
+
+.data-privacy-box strong {
+    color: #b71c1c;
+}
+
 @media (max-width: 768px) {
     .date-time-row {
         grid-template-columns: 1fr;
@@ -608,6 +820,108 @@ if ($selected_customer_type) {
     .btn-res {
         padding: 0.75rem 1.5rem;
     }
+    
+    .guest-name-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .other-guests-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .arrival-departure-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .room-selector {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Reservation Type Selector */
+.reservation-type-selector {
+    background: white;
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    border: 1px solid #e9ecef;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+}
+
+.type-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.5rem;
+    padding: 1.5rem;
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: 1rem;
+}
+
+.type-option:last-child {
+    margin-bottom: 0;
+}
+
+.type-option:hover {
+    border-color: #b71c1c;
+    background: #fff5f5;
+}
+
+.type-option.selected {
+    border-color: #b71c1c;
+    background: #fdeae8;
+}
+
+.type-radio {
+    margin-top: 0.3rem;
+}
+
+.type-radio input[type="radio"] {
+    width: 20px;
+    height: 20px;
+    accent-color: #b71c1c;
+}
+
+.type-content {
+    flex: 1;
+}
+
+.type-content h4 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+}
+
+.type-badge {
+    display: inline-block;
+    background: #e2d5f1;
+    color: #5e3c8b;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 0.2rem 0.8rem;
+    border-radius: 50px;
+    margin-left: 1rem;
+    vertical-align: middle;
+}
+
+.type-description {
+    color: #666;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    margin-bottom: 0.5rem;
+}
+
+.type-note {
+    color: #b71c1c;
+    font-size: 0.8rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
 }
 </style>
 
@@ -619,7 +933,8 @@ if ($selected_customer_type) {
 
             <div class="progress-steps" id="progressSteps">
                 <div class="progress-line" id="progressLine" style="width: 0%"></div>
-                <div class="step active" data-step="1"><span>1</span><div class="step-label">Info</div></div>
+                <div class="step active" data-step="0"><span>0</span><div class="step-label">Type</div></div>
+                <div class="step" data-step="1"><span>1</span><div class="step-label">Info</div></div>
                 <div class="step" data-step="2"><span>2</span><div class="step-label">Rooms</div></div>
                 <div class="step" data-step="3"><span>3</span><div class="step-label">Schedule</div></div>
                 <div class="step" data-step="4"><span>4</span><div class="step-label">Terms</div></div>
@@ -635,8 +950,52 @@ if ($selected_customer_type) {
             </div>
 
             <form id="reservationForm">
-                <!-- Step 1: Personal and Event Info -->
-                <div class="form-step active" id="step1Form">
+                <!-- Step 0: Reservation Type -->
+                <div class="form-step active" id="step0Form">
+                    <div class="form-header">
+                        <h3>Select Reservation Type</h3>
+                        <p>Choose the type of reservation you want to make</p>
+                    </div>
+                    
+                    <div class="reservation-type-selector">
+                        <div class="type-option" id="typeGuestOption" onclick="selectReservationType('guest')">
+                            <div class="type-radio">
+                                <input type="radio" name="reservation_type" id="typeGuest" value="guest">
+                            </div>
+                            <div class="type-content">
+                                <h4>Guest Room Booking</h4>
+                                <p class="type-description">For overnight stays and accommodations. Fill out the guest registration form with personal details, check-in/out dates, and guest information.</p>
+                                <div class="type-note">
+                                    <i class="bi bi-info-circle-fill"></i>
+                                    <span>Includes data privacy consent and guest registration form</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="type-option" id="typeFunctionOption" onclick="selectReservationType('function')">
+                            <div class="type-radio">
+                                <input type="radio" name="reservation_type" id="typeFunction" value="function">
+                            </div>
+                            <div class="type-content">
+                                <h4>Function Room Booking 
+                                </h4>
+                                <p class="type-description">For events, meetings, seminars, and other functions. Choose between pencil booking (tentative, valid for 1 week) or full reservation (official upon approval).</p>
+                                <div class="type-note">
+                                    <i class="bi bi-info-circle-fill"></i>
+                                    <span>Includes event details, venue selection, schedule, and miscellaneous items</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-buttons">
+                        <div></div>
+                        <button type="button" class="btn-res btn-next" onclick="saveAndGo(1)">Continue</button>
+                    </div>
+                </div>
+
+                <!-- Step 1: Personal and Event Info (for Function Rooms) -->
+                <div class="form-step" id="step1Form">
                     <div class="form-header"><h3>Reservation Information</h3><p>Enter your details and event information</p></div>
                     <div class="row">
                         <div class="col-md-4"><div class="form-group"><label>Last Name *</label><input type="text" class="form-control" name="last_name" id="last_name" required></div></div>
@@ -692,38 +1051,239 @@ if ($selected_customer_type) {
                     <input type="hidden" name="banquet_style_id" id="banquetStyleId" value="">
                     
                     <div class="form-buttons">
-                        <div></div>
+                        <button type="button" class="btn-res btn-prev" onclick="goToStep(0)">Back</button>
                         <button type="button" class="btn-res btn-next" onclick="saveAndGo(2)">Continue</button>
                     </div>
                 </div>
 
-                <!-- Step 2: Venue selection -->
+                <!-- Step 1G: Guest Registration Form (for Guest Rooms) -->
+                <div class="form-step" id="step1GForm" style="display: none;">
+                    <div class="form-header">
+                        <h3><i class="bi bi-person-badge me-2"></i>Guest Registration Form</h3>
+                        <p>Please fill out the guest information form</p>
+                    </div>
+                    
+                    <div class="guest-registration-form">
+                        <!-- Guest's Information -->
+                        <div class="guest-form-section">
+                            <h4><i class="bi bi-person-circle"></i> Principal Guest's Information</h4>
+                            <div class="guest-name-row">
+                                <div class="form-group">
+                                    <label>Last Name *</label>
+                                    <input type="text" class="form-control" name="guest_last_name" id="guest_last_name" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>First Name *</label>
+                                    <input type="text" class="form-control" name="guest_first_name" id="guest_first_name" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>M.I.</label>
+                                    <input type="text" class="form-control" name="guest_middle_initial" id="guest_middle_initial" maxlength="2">
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>Date of Birth *</label>
+                                        <input type="date" class="form-control" name="guest_dob" id="guest_dob" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="form-group">
+                                        <label>Address *</label>
+                                        <input type="text" class="form-control" name="guest_address" id="guest_address" placeholder="Street, City, Province" required>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Email Address *</label>
+                                        <input type="email" class="form-control" name="guest_email" id="guest_email" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Contact Number *</label>
+                                        <input type="tel" class="form-control" name="guest_contact" id="guest_contact" required>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Other Guest Names - Dynamic Cards -->
+                        <div class="guest-form-section">
+                            <h4><i class="bi bi-people-fill"></i> Other Guest Names</h4>
+                            <p class="small text-muted mb-2">Click "Add Guests" button to add more guests. Each room has a maximum capacity.</p>
+                            
+                            <div id="guests-container" class="guests-container">
+                                <!-- Guest cards will be dynamically added here -->
+                            </div>
+                            
+                            <button type="button" class="btn-add-guests" onclick="showGuestInputDialog()">
+                                <i class="bi bi-plus-circle"></i> Add Guests
+                            </button>
+                            
+                            <div class="mt-2">
+                                <small class="text-muted">
+                                    <i class="bi bi-info-circle"></i> 
+                                    <span id="roomLimitInfo">Select a room to see guest limits</span>
+                                </small>
+                            </div>
+                        </div>
+                        
+                        <!-- Arrival & Departure -->
+                        <div class="guest-form-section">
+                            <h4><i class="bi bi-calendar-check"></i> Stay Details</h4>
+                            
+                            <div class="arrival-departure-grid">
+                                <div>
+                                    <div class="form-group">
+                                        <label>Arrival Date *</label>
+                                        <input type="date" class="form-control" name="arrival_date" id="arrival_date" min="<?= date('Y-m-d') ?>" required>
+                                    </div>
+                                    <div class="time-grid-small">
+    <div class="form-group">
+        <label>Check-in Time *</label>
+        <select class="form-select" name="checkin_time" id="checkin_time" required>
+            <option value="">Select time</option>
+            <?php for ($h = 11; $h <= 23; $h++): 
+                $time = sprintf('%02d:00', $h);
+                $display = date('g:i A', strtotime($time));
+            ?>
+            <option value="<?= $time ?>"><?= $display ?></option>
+            <?php endfor; ?>
+        </select>
+        <small class="text-muted">Check-in: 11:00 AM - 11:00 PM</small>
+    </div>
+    <div class="form-group">
+        <label>Check-out Time *</label>
+        <select class="form-select" name="checkout_time" id="checkout_time" required>
+            <option value="">Select time</option>
+            <?php for ($h = 0; $h <= 12; $h++): 
+                $time = sprintf('%02d:00', $h);
+                $display = date('g:i A', strtotime($time));
+            ?>
+            <option value="<?= $time ?>"><?= $display ?></option>
+            <?php endfor; ?>
+        </select>
+        <small class="text-muted">Check-out: 12:00 AM - 12:00 PM</small>
+    </div>
+</div>
+                                </div>
+                                
+                                <div>
+                                    <div class="form-group">
+                                        <label>Departure Date *</label>
+                                        <input type="date" class="form-control" name="departure_date" id="departure_date" min="<?= date('Y-m-d', strtotime('+1 day')) ?>" required>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <div class="form-group">
+                                                <label>No. of Adults *</label>
+                                                <input type="number" class="form-control" name="adults_count" id="adults_count" min="1" max="10" value="1" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="form-group">
+                                                <label>No. of Kids *</label>
+                                                <input type="number" class="form-control" name="kids_count" id="kids_count" min="0" max="10" value="0" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Room Selection -->
+                        <div class="guest-form-section">
+                            <h4><i class="bi bi-door-open"></i> Room Selection</h4>
+                            
+                            <div class="room-selector">
+                                <div class="form-group">
+                                    <label>Room Type *</label>
+                                    <select class="form-select" name="guest_room_id" id="guest_room_id" required onchange="updateRoomCapacity(this)">
+                                        <option value="">Select Room</option>
+                                        <?php foreach ($guest_venues as $room): ?>
+                                        <option value="<?= $room['id'] ?>" data-capacity="<?= $room['capacity'] ?>" data-name="<?= htmlspecialchars($room['name']) ?>">
+                                            <?= htmlspecialchars($room['name']) ?> (Max <?= $room['capacity'] ?> guests)
+                                        </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Room Type</label>
+                                    <input type="text" class="form-control" name="room_type_display" id="room_type_display" readonly value="Guest Room">
+                                </div>
+                            </div>
+                            
+                            <div class="mt-3">
+                                <div class="form-group">
+                                    <label>Remarks / Special Arrangements</label>
+                                    <textarea class="form-control" name="guest_remarks" id="guest_remarks" rows="3" placeholder="Any special requests or arrangements...(Extra Beds, etc.)"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Registered By -->
+                        <div class="guest-form-section">
+                            <h4><i class="bi bi-pencil-square"></i> Registered By</h4>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Name of Person Registering *</label>
+                                        <input type="text" class="form-control" name="registered_by" id="registered_by" placeholder="Full name" required>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Data Privacy -->
+                        <div class="data-privacy-box">
+                            <p><strong>Data Privacy and Protection</strong></p>
+                            <p>During your stay, information will be collected about you and your preferences in order to provide you with the best possible service. The information will be retained to facilitate future stays at BatStateU ARASOF Hostel. If there are any questions regarding this data privacy, feel free to let us know at hostel.nasugbu@g.batstate-u.edu.ph</p>
+                            <p class="mb-0">By signing, you are expressly giving your consent to the collection and storage of your personal data as provided herein.</p>
+                        </div>
+                        
+                        <div class="form-check mt-3">
+                            <input class="form-check-input" type="checkbox" id="guestConsent" required>
+                            <label class="form-check-label" for="guestConsent">
+                                I have read and agree to the data privacy policy. I consent to the collection and storage of my personal information.
+                            </label>
+                        </div>
+                        
+                        <!-- Guest Signature -->
+                        <div class="row mt-4">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Principal Guest's Name & Signature *</label>
+                                    <input type="text" class="form-control" name="guest_signature" id="guest_signature" placeholder="Type your full name as digital signature" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Date</label>
+                                    <input type="text" class="form-control" name="guest_form_date" id="guest_form_date" value="<?= date('F j, Y') ?>" readonly>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-buttons">
+                        <button type="button" class="btn-res btn-prev" onclick="goToStep(0)">Back</button>
+                        <button type="button" class="btn-res btn-next" onclick="saveGuestAndGo(2)">Continue</button>
+                    </div>
+                </div>
+
+                <!-- Step 2: Venue selection (for Function Rooms only) -->
                 <div class="form-step" id="step2Form">
                     <div class="form-header"><h3>Select Venue</h3><p>Choose function rooms and/or guest rooms to use</p></div>
                     
                     <?php if (!empty($function_venues)): ?>
                     <h5 class="mt-3 mb-2">Function Rooms</h5>
                     <?php foreach ($function_venues as $venue): ?>
-                    <div class="room-select-card" 
-                        data-id="<?= $venue['id'] ?>" 
-                        data-name="<?= htmlspecialchars($venue['name']) ?>" 
-                        data-floor="<?= htmlspecialchars($venue['floor']) ?>" 
-                        data-capacity="<?= $venue['capacity'] ?>"
-                        onclick="toggleVenue(this)">
-                        <input type="checkbox" name="venue_ids[]" value="<?= $venue['id'] ?>" style="display:none">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <strong><?= htmlspecialchars($venue['name']) ?></strong>
-                            <span class="badge bg-light text-dark"><?= $venue['capacity'] ?> pax</span>
-                        </div>
-                        <small class="text-muted"><?= htmlspecialchars($venue['floor']) ?></small>
-                        <p class="small text-muted mt-1 mb-0"><?= htmlspecialchars($venue['description'] ?? '') ?></p>
-                    </div>
-                    <?php endforeach; ?>
-                    <?php endif; ?>
-                    
-                    <?php if (!empty($guest_venues)): ?>
-                    <h5 class="mt-4 mb-2">Guest Rooms</h5>
-                    <?php foreach ($guest_venues as $venue): ?>
                     <div class="room-select-card" 
                         data-id="<?= $venue['id'] ?>" 
                         data-name="<?= htmlspecialchars($venue['name']) ?>" 
@@ -749,7 +1309,7 @@ if ($selected_customer_type) {
                     </div>
                 </div>
 
-                <!-- Step 3: Schedule -->
+                <!-- Step 3: Schedule (for Function Rooms only) -->
                 <div class="form-step" id="step3Form">
                     <p class="mb-3"><strong>Add date and time for each selected facility (7:00 AM - 11:00 PM only).</strong></p>
                     <div id="scheduleFacilitiesContainer"></div>
@@ -783,6 +1343,12 @@ if ($selected_customer_type) {
                                 <input type="text" class="form-control" id="termsPosition" placeholder="e.g., Event Coordinator, Organization President">
                             </div>
                         </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Date</label>
+                                <input type="text" class="form-control" id="termsDate" value="<?= date('F j, Y') ?>" readonly>
+                            </div>
+                        </div>
                         
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" id="termsAgree" disabled>
@@ -798,7 +1364,7 @@ if ($selected_customer_type) {
                     </div>
                 </div>
 
-                <!-- Step 5: Miscellaneous Needed -->
+                <!-- Step 5: Miscellaneous Needed (for Function Rooms only) -->
                 <div class="form-step" id="step5Form">
                     <div class="form-header"><h3>Miscellaneous Needed</h3><p>Please check the items you need and specify quantities where applicable.</p></div>
                     <div class="misc-list">
@@ -981,10 +1547,22 @@ if ($selected_customer_type) {
 <script>
 var officesByType = <?= json_encode($offices_by_type) ?>;
 var baseUrl = '<?= $base ?>';
-var currentStep = 1;
+var currentStep = 0;
 var selectedVenues = [];
 var facilitySchedules = {};
 var timeModalContext = null;
+var reservationType = ''; // No default — user must choose
+
+// Guest limits per room
+var guestLimits = {
+    'Guest Room 1': 4,
+    'Guest Room 2': 5,
+    'Guest Room 3': 5,
+    'Guest Room 4': 8,
+    'Dormitory': 24
+};
+
+let guestCount = 0;
 
 // Misc limits configuration
 var miscLimits = {
@@ -1066,12 +1644,160 @@ for (var h = 7; h <= 23; h++) {
     }
 }
 
+// ========== GUEST CARD FUNCTIONS ==========
+function updateRoomCapacity(select) {
+    var selectedOption = select.options[select.selectedIndex];
+    var roomName = selectedOption.getAttribute('data-name') || '';
+    var capacity = parseInt(selectedOption.getAttribute('data-capacity') || '0');
+    
+    var limitInfo = document.getElementById('roomLimitInfo');
+    if (roomName && capacity) {
+        limitInfo.innerHTML = `<i class="bi bi-info-circle"></i> Selected: ${roomName} - Maximum ${capacity} guests allowed (including principal guest)`;
+    } else {
+        limitInfo.innerHTML = '<i class="bi bi-info-circle"></i> Select a room to see guest limits';
+    }
+    
+    // Validate existing guests against new room capacity
+    validateGuestCountAgainstCapacity();
+}
+
+function validateGuestCountAgainstCapacity() {
+    var roomSelect = document.getElementById('guest_room_id');
+    if (!roomSelect.value) return true;
+    
+    var selectedOption = roomSelect.options[roomSelect.selectedIndex];
+    var roomName = selectedOption.getAttribute('data-name') || '';
+    var capacity = parseInt(selectedOption.getAttribute('data-capacity') || '0');
+    
+    var currentGuests = document.querySelectorAll('.guest-card').length;
+    
+    if (currentGuests > capacity) {
+        showModalAlert('⚠️', 'Exceeds Capacity', 
+            `${roomName} only allows ${capacity} additional guests. You currently have ${currentGuests} guest(s). Please remove ${currentGuests - capacity} guest(s).`);
+        return false;
+    }
+    return true;
+}
+
+function showGuestInputDialog() {
+    var roomSelect = document.getElementById('guest_room_id');
+    if (!roomSelect.value) {
+        showModalAlert('🏠', 'Select Room First', 'Please select a room before adding guests.');
+        roomSelect.focus();
+        return;
+    }
+    
+    var selectedOption = roomSelect.options[roomSelect.selectedIndex];
+    var roomName = selectedOption.getAttribute('data-name') || '';
+    var capacity = parseInt(selectedOption.getAttribute('data-capacity') || '0');
+    var currentGuests = document.querySelectorAll('.guest-card').length;
+    var availableSlots = capacity - currentGuests;
+    
+    if (availableSlots <= 0) {
+        showModalAlert('⚠️', 'Maximum Reached', `${roomName} has reached maximum capacity (${capacity} guests).`);
+        return;
+    }
+    
+    var numGuests = prompt(`How many additional guests? (Maximum: ${availableSlots})`, '1');
+    
+    if (numGuests && !isNaN(numGuests) && numGuests > 0) {
+        var guestsToAdd = Math.min(parseInt(numGuests), availableSlots);
+        for (var i = 0; i < guestsToAdd; i++) {
+            addGuestCard();
+        }
+    }
+}
+
+function addGuestCard(guestData = null) {
+    var container = document.getElementById('guests-container');
+    guestCount++;
+    
+    var card = document.createElement('div');
+    card.className = 'guest-card';
+    card.dataset.guestId = guestCount;
+    card.innerHTML = `
+        <div class="guest-card-header">
+            <h6><i class="bi bi-person"></i> Guest #${guestCount}</h6>
+            <button type="button" class="btn-remove-guest" onclick="removeGuestCard(this)" title="Remove guest">
+                <i class="bi bi-trash"></i>
+            </button>
+        </div>
+        <div class="row">
+            <div class="col-md-6 mb-2">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" class="form-control" name="guest_names[]" value="${guestData?.name || ''}" required>
+                </div>
+            </div>
+            <div class="col-md-3 mb-2">
+                <div class="form-group">
+                    <label>Date of Birth</label>
+                    <input type="date" class="form-control" name="guest_dobs[]" value="${guestData?.dob || ''}" required>
+                </div>
+            </div>
+            <div class="col-md-3 mb-2">
+                <div class="form-group">
+                    <label>Age</label>
+                    <input type="number" class="form-control" name="guest_ages[]" value="${guestData?.age || ''}" min="0" max="120" required readonly>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    container.appendChild(card);
+    
+    // Add age calculation
+    var dobInput = card.querySelector('input[name="guest_dobs[]"]');
+    var ageInput = card.querySelector('input[name="guest_ages[]"]');
+    
+    dobInput.addEventListener('change', function() {
+        ageInput.value = calculateAge(this.value);
+    });
+    
+    saveFormData();
+}
+
+function removeGuestCard(button) {
+    if (confirm('Are you sure you want to remove this guest?')) {
+        var card = button.closest('.guest-card');
+        card.remove();
+        saveFormData();
+    }
+}
+
+function calculateAge(dob) {
+    if (!dob) return 0;
+    var birthDate = new Date(dob);
+    var today = new Date();
+    var age = today.getFullYear() - birthDate.getFullYear();
+    var monthDiff = today.getMonth() - birthDate.getMonth();
+    
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+    }
+    
+    return age;
+}
+
+// ========== RESERVATION TYPE FUNCTIONS ==========
+function selectReservationType(type) {
+    reservationType = type;
+    
+    // Update UI
+    document.querySelectorAll('.type-option').forEach(opt => opt.classList.remove('selected'));
+    document.getElementById('type' + type.charAt(0).toUpperCase() + type.slice(1) + 'Option').classList.add('selected');
+    document.getElementById('type' + type.charAt(0).toUpperCase() + type.slice(1)).checked = true;
+    
+    saveFormData();
+}
+
 // ========== SESSION STORAGE FUNCTIONS ==========
 function saveFormData() {
     console.log('saveFormData called');
     
     var formData = {
         step: currentStep,
+        reservationType: reservationType,
         personal: {
             last_name: document.getElementById('last_name')?.value || '',
             first_name: document.getElementById('first_name')?.value || '',
@@ -1090,6 +1816,16 @@ function saveFormData() {
             activity: document.getElementById('activity_name')?.value || '',
             participants: document.getElementById('participants')?.value || '1'
         },
+        guest: {
+            last_name: document.getElementById('guest_last_name')?.value || '',
+            first_name: document.getElementById('guest_first_name')?.value || '',
+            middle_initial: document.getElementById('guest_middle_initial')?.value || '',
+            dob: document.getElementById('guest_dob')?.value || '',
+            address: document.getElementById('guest_address')?.value || '',
+            email: document.getElementById('guest_email')?.value || '',
+            contact: document.getElementById('guest_contact')?.value || '',
+            other_guests: []
+        },
         venues: selectedVenues,
         schedules: facilitySchedules,
         banquet: {
@@ -1106,12 +1842,78 @@ function saveFormData() {
         misc: getMiscItemsJson()
     };
     
+    // Collect dynamic other guests
+    var guestCards = document.querySelectorAll('.guest-card');
+    guestCards.forEach(function(card, index) {
+        var nameInput = card.querySelector('input[name="guest_names[]"]');
+        var dobInput = card.querySelector('input[name="guest_dobs[]"]');
+        var ageInput = card.querySelector('input[name="guest_ages[]"]');
+        
+        if (nameInput && nameInput.value.trim()) {
+            formData.guest.other_guests.push({
+                name: nameInput.value,
+                dob: dobInput?.value || '',
+                age: ageInput?.value || ''
+            });
+        }
+    });
+    
     console.log('Saving form data:', formData);
     
     sessionStorage.setItem('reservationFormData', JSON.stringify(formData));
     sessionStorage.setItem('reservationStep', currentStep);
     
     checkForSavedData();
+}
+
+function saveGuestAndGo(n) {
+    if (!validateGuestForm()) return;
+    saveFormData();
+    goToStep(n);
+}
+
+function validateGuestForm() {
+    // Basic validation
+    var required = ['guest_last_name', 'guest_first_name', 'guest_dob', 'guest_address', 'guest_email', 'guest_contact', 'arrival_date', 'departure_date', 'checkin_time', 'checkout_time', 'adults_count', 'guest_room_id', 'registered_by', 'guest_signature'];
+    
+    for (var i = 0; i < required.length; i++) {
+        var el = document.getElementById(required[i]);
+        if (!el || !el.value.trim()) {
+            showModalAlert('⚠️', 'Required Field', 'Please fill in all required fields.');
+            el?.focus();
+            return false;
+        }
+    }
+    
+    // Check consent
+    if (!document.getElementById('guestConsent').checked) {
+        showModalAlert('📋', 'Consent Required', 'Please agree to the data privacy policy.');
+        return false;
+    }
+    
+    // Validate dates
+    var arrival = new Date(document.getElementById('arrival_date').value);
+    var departure = new Date(document.getElementById('departure_date').value);
+    if (departure <= arrival) {
+        showModalAlert('⚠️', 'Invalid Dates', 'Departure date must be after arrival date.');
+        return false;
+    }
+    
+    // Get room capacity
+    var roomSelect = document.getElementById('guest_room_id');
+    var selectedOption = roomSelect.options[roomSelect.selectedIndex];
+    var capacity = parseInt(selectedOption.getAttribute('data-capacity') || '2');
+    
+    // Calculate total guests (principal + other guests)
+    var totalGuests = 1; // Principal guest
+    totalGuests += document.querySelectorAll('.guest-card').length;
+    
+    if (totalGuests > capacity) {
+        showModalAlert('⚠️', 'Exceeds Capacity', `Total guests (${totalGuests}) exceeds room capacity (${capacity}). Please remove some guests.`);
+        return false;
+    }
+    
+    return true;
 }
 
 function loadFormData() {
@@ -1121,6 +1923,16 @@ function loadFormData() {
     try {
         var data = JSON.parse(saved);
         console.log('Loading form data:', data);
+        
+        // Set reservation type
+        if (data.reservationType) {
+            reservationType = data.reservationType;
+            var radio = document.getElementById('type' + reservationType.charAt(0).toUpperCase() + reservationType.slice(1));
+            if (radio) radio.checked = true;
+            document.querySelectorAll('.type-option').forEach(opt => opt.classList.remove('selected'));
+            var opt = document.getElementById('type' + reservationType.charAt(0).toUpperCase() + reservationType.slice(1) + 'Option');
+            if (opt) opt.classList.add('selected');
+        }
         
         if (data.personal) {
             setValue('last_name', data.personal.last_name);
@@ -1151,6 +1963,27 @@ function loadFormData() {
             setValue('eventTypeId', data.event.type);
             setValue('activity_name', data.event.activity);
             setValue('participants', data.event.participants);
+        }
+        
+        // Load guest data
+        if (data.guest) {
+            setValue('guest_last_name', data.guest.last_name);
+            setValue('guest_first_name', data.guest.first_name);
+            setValue('guest_middle_initial', data.guest.middle_initial);
+            setValue('guest_dob', data.guest.dob);
+            setValue('guest_address', data.guest.address);
+            setValue('guest_email', data.guest.email);
+            setValue('guest_contact', data.guest.contact);
+            
+            // Load other guests dynamically
+            if (data.guest.other_guests && data.guest.other_guests.length > 0) {
+                // Clear any existing cards first
+                document.getElementById('guests-container').innerHTML = '';
+                
+                data.guest.other_guests.forEach(function(guest) {
+                    addGuestCard(guest);
+                });
+            }
         }
         
         if (data.venues && data.venues.length > 0) {
@@ -1209,7 +2042,7 @@ function checkForSavedData() {
     var container = document.getElementById('resumeBookingContainer');
     
     if (container) {
-        if (step && step > 1 && data) {
+        if (step && step > 0 && data) {
             container.style.display = 'block';
         } else {
             container.style.display = 'none';
@@ -1230,11 +2063,32 @@ function saveAndGo(n) {
 }
 
 function goToStep(n) {
-    if (n < 1 || n > 6) return;
+    if (n < 0 || n > 6) return;
     
-    document.querySelectorAll('.form-step').forEach(function(s){ s.classList.remove('active'); });
-    document.getElementById('step' + n + 'Form').classList.add('active');
+    // Hide all form steps
+    document.querySelectorAll('.form-step').forEach(function(s){ s.classList.remove('active'); s.style.display = 'none'; });
     
+    // Show appropriate step based on reservation type
+    if (n === 1 && reservationType === 'guest') {
+        document.getElementById('step1GForm').style.display = 'block';
+        document.getElementById('step1GForm').classList.add('active');
+    } else if (n === 1) {
+        document.getElementById('step1Form').style.display = 'block';
+        document.getElementById('step1Form').classList.add('active');
+    } else if (n === 2 && reservationType === 'guest') {
+        // For guest reservations, skip to terms
+        goToStep(4);
+        return;
+    } else {
+        var stepId = 'step' + n + 'Form';
+        var stepEl = document.getElementById(stepId);
+        if (stepEl) {
+            stepEl.style.display = 'block';
+            stepEl.classList.add('active');
+        }
+    }
+    
+    // Update progress steps
     document.querySelectorAll('.progress-steps .step').forEach(function(s){
         var sn = parseInt(s.getAttribute('data-step'), 10);
         s.classList.remove('active', 'completed');
@@ -1242,10 +2096,10 @@ function goToStep(n) {
         if (sn === n) s.classList.add('active');
     });
     
-    document.getElementById('progressLine').style.width = ((n - 1) / 5 * 100) + '%';
+    document.getElementById('progressLine').style.width = (n / 6 * 100) + '%';
     currentStep = n;
     
-    if (n === 3) renderScheduleStep();
+    if (n === 3 && reservationType !== 'guest') renderScheduleStep();
     if (n === 4) loadTermsForStep4();
     if (n === 6) buildSummary();
     
@@ -1445,7 +2299,22 @@ function handleOfficeTypeChange() {
 // ========== VALIDATION ==========
 function validateStep(n) {
     console.log('Validating step:', n);
+    
+    if (n === 0) {
+        if (!reservationType) {
+            showModalAlert('⚠️', 'Select a Reservation Type', 'Please choose between Guest Room Booking or Function Room Reservation before continuing.');
+            return false;
+        }
+        return true;
+    }
+    
+    if (n === 1 && reservationType === 'guest') {
+        return validateGuestForm();
+    }
+    
     var step = document.getElementById('step' + n + 'Form');
+    if (!step) return true;
+    
     var req = step.querySelectorAll('[required]');
     
     for (var i = 0; i < req.length; i++) {
@@ -2342,6 +3211,84 @@ function buildSummary() {
     console.log('Facility schedules:', facilitySchedules);
     
     var f = document.getElementById('reservationForm');
+    
+    if (reservationType === 'guest') {
+        buildGuestSummary();
+    } else {
+        buildFunctionSummary();
+    }
+}
+
+function buildGuestSummary() {
+    var html = '<h6 class="text-danger mt-0 mb-2">Guest Information</h6>';
+    
+    // Principal Guest
+    var lastName = document.getElementById('guest_last_name')?.value || '';
+    var firstName = document.getElementById('guest_first_name')?.value || '';
+    var middleInit = document.getElementById('guest_middle_initial')?.value || '';
+    var fullName = firstName + ' ' + (middleInit ? middleInit + ' ' : '') + lastName;
+    
+    html += '<div class="summary-item"><strong>Principal Guest:</strong> ' + fullName + '</div>';
+    html += '<div class="summary-item"><strong>Email:</strong> ' + (document.getElementById('guest_email')?.value || '') + '</div>';
+    html += '<div class="summary-item"><strong>Contact:</strong> ' + (document.getElementById('guest_contact')?.value || '') + '</div>';
+    html += '<div class="summary-item"><strong>Address:</strong> ' + (document.getElementById('guest_address')?.value || '') + '</div>';
+    
+    // Other Guests
+    var guestCards = document.querySelectorAll('.guest-card');
+    if (guestCards.length > 0) {
+        html += '<h6 class="text-danger mt-3 mb-2">Other Guests</h6>';
+        guestCards.forEach(function(card, index) {
+            var name = card.querySelector('input[name="guest_names[]"]')?.value || '';
+            var age = card.querySelector('input[name="guest_ages[]"]')?.value || '';
+            if (name) {
+                html += '<div class="summary-item">Guest ' + (index + 1) + ': ' + name + ' (Age: ' + age + ')</div>';
+            }
+        });
+    }
+    
+    // Stay Details
+    html += '<h6 class="text-danger mt-3 mb-2">Stay Details</h6>';
+    var arrival = document.getElementById('arrival_date')?.value || '';
+    var departure = document.getElementById('departure_date')?.value || '';
+    var checkin = document.getElementById('checkin_time')?.value || '';
+    var checkout = document.getElementById('checkout_time')?.value || '';
+    
+    html += '<div class="summary-item"><strong>Arrival:</strong> ' + formatDateDisplay(arrival) + ' at ' + formatTime(checkin) + '</div>';
+    html += '<div class="summary-item"><strong>Departure:</strong> ' + formatDateDisplay(departure) + ' at ' + formatTime(checkout) + '</div>';
+    
+    var adults = document.getElementById('adults_count')?.value || '0';
+    var kids = document.getElementById('kids_count')?.value || '0';
+    html += '<div class="summary-item"><strong>Guests:</strong> ' + adults + ' Adults, ' + kids + ' Kids</div>';
+    
+    // Room
+    var roomSelect = document.getElementById('guest_room_id');
+    var roomName = roomSelect.options[roomSelect.selectedIndex]?.text || '';
+    html += '<div class="summary-item"><strong>Room:</strong> ' + roomName + '</div>';
+    
+    var remarks = document.getElementById('guest_remarks')?.value;
+    if (remarks) {
+        html += '<div class="summary-item"><strong>Remarks:</strong> ' + remarks + '</div>';
+    }
+    
+    // Registered By
+    html += '<h6 class="text-danger mt-3 mb-2">Registration Details</h6>';
+    html += '<div class="summary-item"><strong>Registered By:</strong> ' + (document.getElementById('registered_by')?.value || '') + '</div>';
+    html += '<div class="summary-item"><strong>Date Registered:</strong> ' + (document.getElementById('guest_form_date')?.value || '') + '</div>';
+    
+    // Terms
+    var termsName = document.getElementById('termsFullName')?.value || '';
+    if (termsName) {
+        html += '<h6 class="text-danger mt-3 mb-2">Terms Acknowledgment</h6>';
+        html += '<div class="summary-item"><strong>Agreed by:</strong> ' + termsName + '</div>';
+        html += '<div class="summary-item"><strong>Position:</strong> ' + (document.getElementById('termsPosition')?.value || '') + '</div>';
+        html += '<div class="summary-item"><strong>Date:</strong> ' + (document.getElementById('termsDate')?.value || '') + '</div>';
+    }
+    
+    document.getElementById('summaryBox').innerHTML = html;
+}
+
+function buildFunctionSummary() {
+    var f = document.getElementById('reservationForm');
     var ln = (f.querySelector('[name="last_name"]')?.value || '').trim();
     var fn = (f.querySelector('[name="first_name"]')?.value || '').trim();
     var mi = (f.querySelector('[name="middle_initial"]')?.value || '').trim();
@@ -2390,14 +3337,14 @@ function buildSummary() {
     if (termsName) {
         html += '<h6 class="text-danger mt-3 mb-2">Terms Acknowledgment</h6>';
         html += '<div class="summary-item"><strong>Agreed by:</strong> ' + termsName + '</div>';
+        html += '<div class="summary-item"><strong>Position:</strong> ' + (document.getElementById('termsPosition')?.value || '') + '</div>';
         html += '<div class="summary-item"><strong>Date:</strong> ' + (document.getElementById('termsDate')?.value || '') + '</div>';
     }
     
     var misc = getMiscItemsJson();
-    var miscKeys = Object.keys(misc);
-    if (miscKeys.length > 0) {
+    if (misc && Object.keys(misc).length > 0) {
         html += '<h6 class="text-danger mt-3 mb-2">Miscellaneous Items</h6>';
-        miscKeys.forEach(function(k) {
+        Object.keys(misc).forEach(function(k) {
             var v = misc[k];
             if (k === 'basic_sound_system') {
                 html += '<div class="summary-item"><strong>Basic Sound System:</strong> Speaker: ' + (v.speaker||0) + ', Mic: ' + (v.mic||0) + '</div>';
@@ -2442,10 +3389,21 @@ function closeConfirmModal() {
 
 function doSubmit() {
     console.log('doSubmit called');
-    console.log('Selected venues:', selectedVenues);
-    console.log('facilitySchedules before submit: ', facilitySchedules);
+    console.log('Reservation type:', reservationType);
     
     closeConfirmModal();
+    
+    if (reservationType === 'guest') {
+        submitGuestReservation();
+    } else {
+        submitFunctionReservation();
+    }
+}
+
+function submitFunctionReservation() {
+    console.log('Submitting function room reservation');
+    console.log('Selected venues:', selectedVenues);
+    console.log('facilitySchedules before submit: ', facilitySchedules);
     
     if (!selectedVenues || selectedVenues.length === 0) {
         showModalAlert('🏢', 'Venue Required', 'Please select at least one venue before submitting.');
@@ -2476,7 +3434,8 @@ function doSubmit() {
     var f = document.getElementById('reservationForm');
     var fd = new FormData(f);
     
-    fd.append('action', 'submit');
+    fd.append('action', 'submit_function');
+    fd.append('reservation_type', 'function');
     
     var etSel = document.getElementById('eventTypeId');
     fd.append('event_type', etSel?.options[etSel?.selectedIndex]?.text || '');
@@ -2522,14 +3481,85 @@ function doSubmit() {
         console.log(pair[0] + ':', pair[1]);
     }
     
+    submitToServer(fd, '<?= $base ?>/ajax/reservation_submit.php');
+}
+
+function submitGuestReservation() {
+    console.log('Submitting guest room reservation');
+    
+    // Validate guest form
+    if (!validateGuestForm()) return;
+    
+    var fd = new FormData();
+    fd.append('action', 'submit_guest');
+    fd.append('reservation_type', 'guest');
+    
+    // Principal Guest Info
+    fd.append('last_name', document.getElementById('guest_last_name').value);
+    fd.append('first_name', document.getElementById('guest_first_name').value);
+    fd.append('middle_initial', document.getElementById('guest_middle_initial').value || '');
+    fd.append('date_of_birth', document.getElementById('guest_dob').value);
+    fd.append('address', document.getElementById('guest_address').value);
+    fd.append('email', document.getElementById('guest_email').value);
+    fd.append('contact_number', document.getElementById('guest_contact').value);
+    
+    // Other Guests - Dynamic
+    var otherGuests = [];
+    var guestCards = document.querySelectorAll('.guest-card');
+    guestCards.forEach(function(card) {
+        var name = card.querySelector('input[name="guest_names[]"]')?.value || '';
+        var dob = card.querySelector('input[name="guest_dobs[]"]')?.value || '';
+        var age = card.querySelector('input[name="guest_ages[]"]')?.value || '';
+        
+        if (name) {
+            otherGuests.push({
+                name: name,
+                dob: dob,
+                age: age
+            });
+        }
+    });
+    fd.append('other_guests', JSON.stringify(otherGuests));
+    
+    // Stay Details
+    fd.append('arrival_date', document.getElementById('arrival_date').value);
+    fd.append('departure_date', document.getElementById('departure_date').value);
+    fd.append('checkin_time', document.getElementById('checkin_time').value);
+    fd.append('checkout_time', document.getElementById('checkout_time').value);
+    fd.append('adults_count', document.getElementById('adults_count').value);
+    fd.append('kids_count', document.getElementById('kids_count').value);
+    fd.append('room_id', document.getElementById('guest_room_id').value);
+    fd.append('room_type', 'Guest Room');
+    fd.append('remarks', document.getElementById('guest_remarks').value || '');
+    fd.append('registered_by', document.getElementById('registered_by').value);
+    
+    // Consent & Signature
+    fd.append('data_privacy_consent', document.getElementById('guestConsent').checked ? '1' : '0');
+    fd.append('digital_signature', document.getElementById('guest_signature').value);
+    fd.append('guest_form_date', document.getElementById('guest_form_date').value);
+    
+    // Terms acceptance (from step 4)
+    fd.append('terms_agreed_by', document.getElementById('termsFullName')?.value || '');
+    fd.append('terms_position', document.getElementById('termsPosition')?.value || '');
+    fd.append('terms_date', document.getElementById('termsDate')?.value || '');
+    
+    console.log('Guest FormData entries:');
+    for (var pair of fd.entries()) {
+        console.log(pair[0] + ':', pair[1]);
+    }
+    
+    submitToServer(fd, '<?= $base ?>/ajax/guest_reservation_submit.php');
+}
+
+function submitToServer(formData, url) {
     var btn = document.getElementById('btnSubmit');
     var originalText = btn.textContent;
     btn.disabled = true;
     btn.textContent = 'Submitting...';
     
-    fetch('<?= $base ?>/ajax/reservation_submit.php', { 
+    fetch(url, { 
         method: 'POST', 
-        body: fd 
+        body: formData 
     })
     .then(function(response) {
         console.log('Response status:', response.status);
@@ -2544,6 +3574,7 @@ function doSubmit() {
         if (data.success) {
             content.innerHTML = '<h4>✅ Success</h4>' +
                                '<p>' + (data.message || 'Reservation submitted successfully!') + '</p>' +
+                               '<p><strong>Booking No:</strong> ' + (data.booking_no || '') + '</p>' +
                                '<button type="button" class="btn-res btn-next mt-3" onclick="closeResultModal()">Close</button>';
             clearSavedData();
             
@@ -2585,6 +3616,15 @@ document.addEventListener('DOMContentLoaded', function() {
     
     loadBanquetStyles();
     
+    // Clear any stale session data so the user always starts at step 0
+    // and must choose their reservation type first.
+    // Only resume if the URL explicitly carries ?resume=1
+    var urlParams = new URLSearchParams(window.location.search);
+    if (!urlParams.get('resume')) {
+        sessionStorage.removeItem('reservationFormData');
+        sessionStorage.removeItem('reservationStep');
+    }
+    
     checkForSavedData();
     
     var savedStep = sessionStorage.getItem('reservationStep');
@@ -2593,7 +3633,7 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('Saved step:', savedStep);
     console.log('Saved data exists:', !!savedData);
     
-    if (savedStep && savedStep > 1 && savedData) {
+    if (savedStep && savedStep > 0 && savedData) {
         console.log('Loading saved data for step:', savedStep);
         loadFormData();
         
@@ -2681,6 +3721,11 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('Terms checkbox changed:', this.checked);
             saveFormData();
         });
+    }
+    
+    // Initialize guest card if none exist and we're on guest step
+    if (reservationType === 'guest' && document.getElementById('guests-container')?.children.length === 0) {
+        addGuestCard();
     }
 });
 </script>

@@ -72,6 +72,30 @@ $pencil_preview = $conn->query("
     ORDER BY r.start_datetime ASC
     LIMIT 3
 ");
+// Get guest reservation counts
+$guest_pending   = $conn->query("SELECT COUNT(*) as count FROM guest_reservations WHERE status = 'pending'")->fetch_assoc()['count'];
+$guest_confirmed = $conn->query("SELECT COUNT(*) as count FROM guest_reservations WHERE status = 'confirmed'")->fetch_assoc()['count'];
+$guest_cancelled = $conn->query("SELECT COUNT(*) as count FROM guest_reservations WHERE status = 'cancelled'")->fetch_assoc()['count'];
+$guest_today     = $conn->query("
+    SELECT COUNT(*) as count
+    FROM guest_reservations
+    WHERE status IN ('confirmed','pending')
+      AND check_in  <= CURDATE()
+      AND check_out > CURDATE()
+")->fetch_assoc()['count'];
+$guest_checkin_today  = $conn->query("SELECT COUNT(*) as count FROM guest_reservations WHERE status IN ('confirmed','pending') AND check_in  = CURDATE()")->fetch_assoc()['count'];
+$guest_checkout_today = $conn->query("SELECT COUNT(*) as count FROM guest_reservations WHERE status IN ('confirmed','pending') AND check_out = CURDATE()")->fetch_assoc()['count'];
+// Recent guest reservations for preview
+$guest_preview = $conn->query("
+    SELECT gr.*, v.name as room_name,
+           gr.check_in   AS arrival_date,
+           gr.check_out  AS departure_date
+    FROM guest_reservations gr
+    JOIN venues v ON gr.room_id = v.id
+    WHERE gr.status IN ('pending','confirmed')
+    ORDER BY gr.created_at DESC
+    LIMIT 4
+");
 ?>
 
 <style>
@@ -693,31 +717,32 @@ $pencil_preview = $conn->query("
                 <h3><i class="bi bi-lightning-charge" style="color: var(--bsu-red);"></i> Quick Actions</h3>
             </div>
             <div class="quick-actions-grid">
-                <a href="reservations.php?status=pending" class="quick-action-btn" style="background: #fff3cd; color: #856404;">
+                <a href="reservations.php?view=function&status=pending" class="quick-action-btn" style="background: #fff3cd; color: #856404;">
                     <i class="bi bi-hourglass-split"></i>
                     <div>Pending</div>
                     <small><?= $pending_count ?></small>
                 </a>
-                <a href="reservations.php?status=pencil_booked" class="quick-action-btn" style="background: #e2d5f1; color: #5e3c8b;">
+                <a href="reservations.php?view=function&status=pencil_booked" class="quick-action-btn" style="background: #e2d5f1; color: #5e3c8b;">
                     <i class="bi bi-pencil"></i>
                     <div>Pencil</div>
                     <small><?= $pencil_count ?></small>
                 </a>
-                <a href="reservations.php?status=approved" class="quick-action-btn" style="background: #d4edda; color: #155724;">
+                <a href="reservations.php?view=function&status=approved" class="quick-action-btn" style="background: #d4edda; color: #155724;">
                     <i class="bi bi-check-circle"></i>
                     <div>Approved</div>
                 </a>
-                <a href="reservations.php?status=cancelled" class="quick-action-btn" style="background: #f8d7da; color: #721c24;">
-                    <i class="bi bi-x-circle"></i>
-                    <div>Cancelled</div>
+                <a href="reservations.php?view=guest" class="quick-action-btn" style="background: #e2f0fb; color: #004085;">
+                    <i class="bi bi-door-open"></i>
+                    <div>Guest Rooms</div>
+                    <small><?= $guest_pending ?></small>
                 </a>
-                <a href="reservations.php" class="quick-action-btn" style="background: #e9ecef; color: #495057;">
+                <a href="reservations.php?view=function" class="quick-action-btn" style="background: #e9ecef; color: #495057;">
+                    <i class="bi bi-calendar3"></i>
+                    <div>Calendar</div>
+                </a>
+                <a href="guest_reservations.php" class="quick-action-btn" style="background: #cce5ff; color: #004085;">
                     <i class="bi bi-list-ul"></i>
-                    <div>All</div>
-                </a>
-                <a href="reservation.php" class="quick-action-btn" style="background: #cce5ff; color: #004085;">
-                    <i class="bi bi-plus-circle"></i>
-                    <div>New</div>
+                    <div>Guest List</div>
                 </a>
             </div>
             <div style="margin-top: 1rem; font-size: 0.7rem; color: #999; text-align: right; border-top: 1px solid #f0f0f0; padding-top: 0.75rem;">
@@ -725,7 +750,89 @@ $pencil_preview = $conn->query("
             </div>
         </div>
     </div>
-</div>
+
+    <!-- Guest Room Stats Row -->
+    <div class="dashboard-two-col" style="margin-bottom:1.5rem;">
+        <!-- Guest Room Summary Card -->
+        <div class="dashboard-card">
+            <div class="card-header">
+                <h3><i class="bi bi-door-open" style="color: var(--bsu-red);"></i> Guest Rooms Today</h3>
+                <a href="reservations.php?view=guest">View Calendar <i class="bi bi-arrow-right"></i></a>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;margin-bottom:1rem;">
+                <div style="text-align:center;padding:.75rem;background:#f8f9fa;border-radius:10px;">
+                    <div style="font-size:1.5rem;font-weight:700;color:#004085;"><?= $guest_today ?></div>
+                    <div style="font-size:0.72rem;color:#6c757d;font-weight:600;text-transform:uppercase;">Currently Staying</div>
+                </div>
+                <div style="text-align:center;padding:.75rem;background:#d4edda;border-radius:10px;">
+                    <div style="font-size:1.5rem;font-weight:700;color:#155724;"><?= $guest_checkin_today ?></div>
+                    <div style="font-size:0.72rem;color:#155724;font-weight:600;text-transform:uppercase;">Check-ins Today</div>
+                </div>
+                <div style="text-align:center;padding:.75rem;background:#f8d7da;border-radius:10px;">
+                    <div style="font-size:1.5rem;font-weight:700;color:#721c24;"><?= $guest_checkout_today ?></div>
+                    <div style="font-size:0.72rem;color:#721c24;font-weight:600;text-transform:uppercase;">Check-outs Today</div>
+                </div>
+            </div>
+            <div style="display:flex;gap:.5rem;flex-wrap:wrap;">
+                <a href="guest_reservations.php?status=pending" style="flex:1;min-width:120px;text-align:center;padding:.5rem;background:#fff3cd;color:#856404;border-radius:8px;text-decoration:none;font-size:.82rem;font-weight:600;">
+                    <i class="bi bi-hourglass-split d-block mb-1"></i>
+                    <?= $guest_pending ?> Pending
+                </a>
+                <a href="guest_reservations.php?status=confirmed" style="flex:1;min-width:120px;text-align:center;padding:.5rem;background:#d4edda;color:#155724;border-radius:8px;text-decoration:none;font-size:.82rem;font-weight:600;">
+                    <i class="bi bi-check-circle d-block mb-1"></i>
+                    <?= $guest_confirmed ?> Confirmed
+                </a>
+                <a href="guest_reservations.php?status=cancelled" style="flex:1;min-width:120px;text-align:center;padding:.5rem;background:#f8d7da;color:#721c24;border-radius:8px;text-decoration:none;font-size:.82rem;font-weight:600;">
+                    <i class="bi bi-x-circle d-block mb-1"></i>
+                    <?= $guest_cancelled ?> Cancelled
+                </a>
+            </div>
+        </div>
+
+        <!-- Recent Guest Reservations -->
+        <div class="dashboard-card">
+            <div class="card-header">
+                <h3><i class="bi bi-person-badge" style="color: var(--bsu-red);"></i> Recent Guest Bookings</h3>
+                <a href="guest_reservations.php">View All <i class="bi bi-arrow-right"></i></a>
+            </div>
+            <?php if ($guest_preview && $guest_preview->num_rows > 0): ?>
+                <ul class="pending-list">
+                    <?php while ($grow = $guest_preview->fetch_assoc()):
+                        $gStatusClass = $grow['status'] === 'confirmed' ? 'status-approved-small' : 'status-pending-small';
+                        $gStatusText  = strtoupper($grow['status']);
+                        $gNights = (strtotime($grow['departure_date']) - strtotime($grow['arrival_date'])) / 86400;
+                    ?>
+                    <li class="pending-item">
+                        <div class="pending-item-icon" style="background:#e2f0fb;color:#004085;">
+                            <i class="bi bi-door-open"></i>
+                        </div>
+                        <div class="pending-item-content">
+                            <div class="pending-item-title">
+                                <?= htmlspecialchars(substr($grow['guest_name'], 0, 22)) ?><?= strlen($grow['guest_name']) > 22 ? '…' : '' ?>
+                                <span class="status-badge-small <?= $gStatusClass ?>"><?= $gStatusText ?></span>
+                            </div>
+                            <div class="pending-item-meta">
+                                <span><i class="bi bi-door-open"></i> <?= htmlspecialchars(substr($grow['room_name'], 0, 14)) ?></span>
+                                <span><i class="bi bi-calendar-check"></i> <?= date('M d', strtotime($grow['arrival_date'])) ?></span>
+                                <span><i class="bi bi-moon-stars"></i> <?= (int)$gNights ?> night<?= $gNights!=1?'s':'' ?></span>
+                            </div>
+                        </div>
+                        <div class="pending-item-action">
+                            <a href="guest_reservation_details.php?id=<?= $grow['id'] ?>" title="View">
+                                <i class="bi bi-chevron-right"></i>
+                            </a>
+                        </div>
+                    </li>
+                    <?php endwhile; ?>
+                </ul>
+            <?php else: ?>
+                <div class="empty-state">
+                    <i class="bi bi-door-open"></i>
+                    <p>No recent guest bookings</p>
+                </div>
+            <?php endif; ?>
+        </div>
+    </div>
 
 <script>
 // Add ripple effect for cards

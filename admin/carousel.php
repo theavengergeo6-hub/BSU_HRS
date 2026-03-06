@@ -14,7 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $title = clean($_POST['title'] ?? '');
             $subtitle = clean($_POST['subtitle'] ?? '');
             $button_text = clean($_POST['button_text'] ?? 'View Rooms');
-            $button_url = clean($_POST['button_url'] ?? 'rooms.php');
+            $button_url = clean($_POST['button_url'] ?? 'rooms_showcase.php');
             $sort_order = (int)($_POST['sort_order'] ?? 0);
             
             // Handle image upload
