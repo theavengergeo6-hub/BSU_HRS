@@ -31,45 +31,44 @@ if (empty($office_types)) {
     $office_types = [['id'=>1,'name'=>'College'],['id'=>2,'name'=>'Office'],['id'=>3,'name'=>'Student Organization'],['id'=>4,'name'=>'External']];
 }
 
-$venues = $conn->query("SELECT id, name, floor, capacity, description FROM venues WHERE is_active = 1 ORDER BY name");
-$function_venues = [];
+// Update this query to get from guest_rooms and function_rooms tables
 $guest_venues = [];
+$function_venues = [];
 
-if ($venues && $venues->num_rows > 0) {
-    while ($venue = $venues->fetch_assoc()) {
-        if (stripos($venue['name'], 'Function') !== false) {
-            $function_venues[] = $venue;
-        } else {
-            $guest_venues[] = $venue;
-        }
+// Get function rooms from function_rooms table
+$func_rooms = $conn->query("SELECT id, room_name as name, floor, capacity_max as capacity, description FROM function_rooms WHERE is_active = 1 ORDER BY room_name");
+if ($func_rooms && $func_rooms->num_rows > 0) {
+    while ($room = $func_rooms->fetch_assoc()) {
+        $function_venues[] = $room;
     }
-} else {
-    // Fallback if no venues found
+}
+
+// Get guest rooms from guest_rooms table
+$guest_rooms = $conn->query("SELECT id, CONCAT(room_name, ' - ', room_number) as name, floor, max_guests as capacity, description FROM guest_rooms WHERE is_active = 1 ORDER BY room_name");
+if ($guest_rooms && $guest_rooms->num_rows > 0) {
+    while ($room = $guest_rooms->fetch_assoc()) {
+        $guest_venues[] = $room;
+    }
+}
+
+// Fallback if no venues found
+if (empty($function_venues)) {
     $function_venues = [
-        ['id' => 1, 'name' => 'Function Room A', 'floor' => 'Ground Floor', 'capacity' => 30],
-        ['id' => 2, 'name' => 'Function Room B', 'floor' => 'Ground Floor', 'capacity' => 40],
-        ['id' => 3, 'name' => 'Function Room C', 'floor' => 'Ground Floor', 'capacity' => 50],
-        ['id' => 4, 'name' => 'Function Room D', 'floor' => 'Ground Floor', 'capacity' => 20],
-        ['id' => 5, 'name' => 'Function Room E', 'floor' => 'Ground Floor', 'capacity' => 35]
-    ];
-    $guest_venues = [
-        ['id' => 6, 'name' => 'Guest Room 1', 'floor' => '2nd Floor', 'capacity' => 2],
-        ['id' => 7, 'name' => 'Guest Room 2', 'floor' => '2nd Floor', 'capacity' => 2],
-        ['id' => 8, 'name' => 'Guest Room 3', 'floor' => '2nd Floor', 'capacity' => 3],
-        ['id' => 9, 'name' => 'Guest Room 4', 'floor' => '2nd Floor', 'capacity' => 2]
+        ['id' => 1, 'name' => 'Function Room A', 'floor' => 'Ground Floor', 'capacity' => 40, 'description' => 'Spacious function room for meetings and events.'],
+        ['id' => 2, 'name' => 'Function Room B', 'floor' => 'Ground Floor', 'capacity' => 50, 'description' => 'Ideal for seminars and workshops.'],
+        ['id' => 3, 'name' => 'Function Room C', 'floor' => 'Ground Floor', 'capacity' => 60, 'description' => 'Largest function room with AV equipment.'],
+        ['id' => 4, 'name' => 'Function Room D', 'floor' => 'Ground Floor', 'capacity' => 30, 'description' => 'Small function room for intimate events.'],
+        ['id' => 5, 'name' => 'Function Room E', 'floor' => 'Ground Floor', 'capacity' => 45, 'description' => 'Versatile space for training and events.']
     ];
 }
 
-// Add dormitory from rooms table
-$dormitory_query = $conn->query("SELECT id, name, description, adult_capacity as capacity FROM rooms WHERE id = 29 AND removed = 0");
-if ($dormitory_query && $dormitory_query->num_rows > 0) {
-    $dorm = $dormitory_query->fetch_assoc();
-    $guest_venues[] = [
-        'id' => 'dorm_' . $dorm['id'],
-        'name' => 'Dormitory',
-        'floor' => 'Ground Floor',
-        'capacity' => 24,
-        'description' => $dorm['description'] ?? 'Spacious dormitory accommodating up to 24 guests.'
+if (empty($guest_venues)) {
+    $guest_venues = [
+        ['id' => 6, 'name' => 'Guest Room 1', 'floor' => '2nd Floor', 'capacity' => 4, 'description' => 'Comfortable guest room with queen bed.'],
+        ['id' => 7, 'name' => 'Guest Room 2', 'floor' => '2nd Floor', 'capacity' => 5, 'description' => 'Guest room with two twin beds.'],
+        ['id' => 8, 'name' => 'Guest Room 3', 'floor' => '2nd Floor', 'capacity' => 5, 'description' => 'Spacious family room with queen bed and single bed.'],
+        ['id' => 9, 'name' => 'Guest Room 4', 'floor' => '2nd Floor', 'capacity' => 8, 'description' => 'Deluxe room with king bed and sofa bed.'],
+        ['id' => 10, 'name' => 'Dormitory', 'floor' => 'Ground Floor', 'capacity' => 24, 'description' => 'Spacious dormitory with 12 bunk beds.']
     ];
 }
 
@@ -701,44 +700,6 @@ if ($selected_customer_type) {
     margin-left: 1rem;
 }
 
-.other-guests-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 1rem;
-    margin-top: 1rem;
-}
-
-.other-guest-item {
-    background: #f8f9fa;
-    border-radius: 12px;
-    padding: 1rem;
-    border: 1px solid #e9ecef;
-}
-
-.other-guest-item h5 {
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: #2c3e50;
-    margin-bottom: 0.75rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 1px solid #dee2e6;
-}
-
-.other-guest-fields {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-}
-
-.other-guest-fields .form-group {
-    margin-bottom: 0;
-}
-
-.other-guest-fields .form-group label {
-    font-size: 0.7rem;
-    margin-bottom: 0.2rem;
-}
-
 .arrival-departure-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -825,10 +786,6 @@ if ($selected_customer_type) {
         grid-template-columns: 1fr;
     }
     
-    .other-guests-grid {
-        grid-template-columns: 1fr;
-    }
-    
     .arrival-departure-grid {
         grid-template-columns: 1fr;
         gap: 1rem;
@@ -894,18 +851,6 @@ if ($selected_customer_type) {
     font-weight: 600;
     color: #2c3e50;
     margin-bottom: 0.5rem;
-}
-
-.type-badge {
-    display: inline-block;
-    background: #e2d5f1;
-    color: #5e3c8b;
-    font-size: 0.7rem;
-    font-weight: 700;
-    padding: 0.2rem 0.8rem;
-    border-radius: 50px;
-    margin-left: 1rem;
-    vertical-align: middle;
 }
 
 .type-description {
@@ -977,8 +922,7 @@ if ($selected_customer_type) {
                                 <input type="radio" name="reservation_type" id="typeFunction" value="function">
                             </div>
                             <div class="type-content">
-                                <h4>Function Room Booking 
-                                </h4>
+                                <h4>Function Room Booking</h4>
                                 <p class="type-description">For events, meetings, seminars, and other functions. Choose between pencil booking (tentative, valid for 1 week) or full reservation (official upon approval).</p>
                                 <div class="type-note">
                                     <i class="bi bi-info-circle-fill"></i>
@@ -1145,33 +1089,33 @@ if ($selected_customer_type) {
                                         <input type="date" class="form-control" name="arrival_date" id="arrival_date" min="<?= date('Y-m-d') ?>" required>
                                     </div>
                                     <div class="time-grid-small">
-    <div class="form-group">
-        <label>Check-in Time *</label>
-        <select class="form-select" name="checkin_time" id="checkin_time" required>
-            <option value="">Select time</option>
-            <?php for ($h = 11; $h <= 23; $h++): 
-                $time = sprintf('%02d:00', $h);
-                $display = date('g:i A', strtotime($time));
-            ?>
-            <option value="<?= $time ?>"><?= $display ?></option>
-            <?php endfor; ?>
-        </select>
-        <small class="text-muted">Check-in: 11:00 AM - 11:00 PM</small>
-    </div>
-    <div class="form-group">
-        <label>Check-out Time *</label>
-        <select class="form-select" name="checkout_time" id="checkout_time" required>
-            <option value="">Select time</option>
-            <?php for ($h = 0; $h <= 12; $h++): 
-                $time = sprintf('%02d:00', $h);
-                $display = date('g:i A', strtotime($time));
-            ?>
-            <option value="<?= $time ?>"><?= $display ?></option>
-            <?php endfor; ?>
-        </select>
-        <small class="text-muted">Check-out: 12:00 AM - 12:00 PM</small>
-    </div>
-</div>
+                                        <div class="form-group">
+                                            <label>Check-in Time *</label>
+                                            <select class="form-select" name="checkin_time" id="checkin_time" required>
+                                                <option value="">Select time</option>
+                                                <?php for ($h = 11; $h <= 23; $h++): 
+                                                    $time = sprintf('%02d:00', $h);
+                                                    $display = date('g:i A', strtotime($time));
+                                                ?>
+                                                <option value="<?= $time ?>"><?= $display ?></option>
+                                                <?php endfor; ?>
+                                            </select>
+                                            <small class="text-muted">Check-in: 11:00 AM - 11:00 PM</small>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Check-out Time *</label>
+                                            <select class="form-select" name="checkout_time" id="checkout_time" required>
+                                                <option value="">Select time</option>
+                                                <?php for ($h = 0; $h <= 12; $h++): 
+                                                    $time = sprintf('%02d:00', $h);
+                                                    $display = date('g:i A', strtotime($time));
+                                                ?>
+                                                <option value="<?= $time ?>"><?= $display ?></option>
+                                                <?php endfor; ?>
+                                            </select>
+                                            <small class="text-muted">Check-out: 12:00 AM - 12:00 PM</small>
+                                        </div>
+                                    </div>
                                 </div>
                                 
                                 <div>
@@ -1203,7 +1147,7 @@ if ($selected_customer_type) {
                             
                             <div class="room-selector">
                                 <div class="form-group">
-                                    <label>Room Type *</label>
+                                    <label>Room *</label>
                                     <select class="form-select" name="guest_room_id" id="guest_room_id" required onchange="updateRoomCapacity(this)">
                                         <option value="">Select Room</option>
                                         <?php foreach ($guest_venues as $room): ?>
@@ -1254,22 +1198,7 @@ if ($selected_customer_type) {
                             </label>
                         </div>
                         
-                        <!-- Guest Signature -->
-                        <div class="row mt-4">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label>Principal Guest's Name & Signature *</label>
-                                    <input type="text" class="form-control" name="guest_signature" id="guest_signature" placeholder="Type your full name as digital signature" required>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label>Date</label>
-                                    <input type="text" class="form-control" name="guest_form_date" id="guest_form_date" value="<?= date('F j, Y') ?>" readonly>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                        
                     
                     <div class="form-buttons">
                         <button type="button" class="btn-res btn-prev" onclick="goToStep(0)">Back</button>
@@ -1279,7 +1208,7 @@ if ($selected_customer_type) {
 
                 <!-- Step 2: Venue selection (for Function Rooms only) -->
                 <div class="form-step" id="step2Form">
-                    <div class="form-header"><h3>Select Venue</h3><p>Choose function rooms and/or guest rooms to use</p></div>
+                    <div class="form-header"><h3>Select Venue</h3><p>Choose function rooms to use</p></div>
                     
                     <?php if (!empty($function_venues)): ?>
                     <h5 class="mt-3 mb-2">Function Rooms</h5>
@@ -1287,7 +1216,7 @@ if ($selected_customer_type) {
                     <div class="room-select-card" 
                         data-id="<?= $venue['id'] ?>" 
                         data-name="<?= htmlspecialchars($venue['name']) ?>" 
-                        data-floor="<?= htmlspecialchars($venue['floor']) ?>" 
+                        data-floor="<?= htmlspecialchars($venue['floor'] ?? '') ?>" 
                         data-capacity="<?= $venue['capacity'] ?>"
                         onclick="toggleVenue(this)">
                         <input type="checkbox" name="venue_ids[]" value="<?= $venue['id'] ?>" style="display:none">
@@ -1295,7 +1224,7 @@ if ($selected_customer_type) {
                             <strong><?= htmlspecialchars($venue['name']) ?></strong>
                             <span class="badge bg-light text-dark"><?= $venue['capacity'] ?> pax</span>
                         </div>
-                        <small class="text-muted"><?= htmlspecialchars($venue['floor']) ?></small>
+                        <small class="text-muted"><?= htmlspecialchars($venue['floor'] ?? '') ?></small>
                         <p class="small text-muted mt-1 mb-0"><?= htmlspecialchars($venue['description'] ?? '') ?></p>
                     </div>
                     <?php endforeach; ?>
@@ -1380,7 +1309,7 @@ if ($selected_customer_type) {
                                     <label>Speakers:</label>
                                     <input type="number" class="form-control misc-qty misc-sound" data-field="speaker" 
                                            min="0" max="2" value="0" placeholder="0" disabled>
-                                    <span class="limit-hint">max 2  </span>
+                                    <span class="limit-hint">max 2</span>
                                 </div>
                                 <div class="misc-sub-item">
                                     <label>Microphones:</label>
@@ -1633,6 +1562,37 @@ var externalTerms = `1. The function room reservation in the hostel operates on 
 9. The use of laminated paper products such as food containers, paper cups, and paper plates is strictly discouraged. "Bring your food container" policy shall be implemented for "take out" food and bringing of personal sustainable tumbler/mug for water refilling is highly encouraged.
 
 10. The organizer must ensure that the function room is clean and damage-free after the activity.`;
+
+// NEW: Guest terms for fallback
+var guestTerms = `# HOSTEL ROOM GUIDELINES
+
+1. BatStateU_Hostel is a non-smoking area.  
+2. Standard Check-in time at 2:00 pm and 12:00 noon check out time.  
+3. The hostel is located at BatStateU_ARASOF - Nasugbu Campus. Maintaining good relationships with faculty and students must be observed. Be generally mindful by their presence as they move around the building.  
+4. Toned-down sounds between 7 AM until 6 PM are observed in consideration for the faculty and students during class hours.  
+5. No Curfew administered for all the guests, however perceive not to disturb others upon returning to the Hostel late at night.  
+6. Hostel Laundry Service for Php 100.00 per kilogram, inclusive of powder detergent w/ color protection and fabric softener. Housekeeping to assist with laundry provided with laundry bag.  
+7. Trash Bins are placed around the Hostel. Proper throwing of trash helps us maintain the cleanliness of the facilities for the guests as well as for the faculty and students.  
+8. Turning off the lights and air-conditioning as well as the faucet before leaving the Hostel room will help us conserve energy and water.  
+9. BatStateU_Hostel is not liable for any lost or damage of guest’s personal belongings.  
+10. Room Keys can be deposited at the reception. Any lost key will be charged accordingly.  
+11. Incidental charges will apply for any loss or damages at the Hostel property during the guest’s stay. Settlement must be done before check-out/departure and must be settled through cash.  
+12. The management reserves the right to refuse entry/stay to individuals violating Hotel policies and guidelines.  
+13. Hostel Housekeeping staff is authorized to enter your room with or without guests inside for a housekeeping operation.  
+
+---
+
+# PROHIBITED ACTS
+
+- Uncooked foods and cooking inside the Hostel room of prohibited.  
+- Deadly weapons and illegal drugs are STRICTLY PROHIBITED inside the hostel.  
+- Drinking inside the Hostel room is not allowed. Hostel Bar on the ground floor can be used for any alcoholic beverage consumption.  
+- Pets are not allowed inside the property.  
+- Only registered guests are allowed to stay in the Hostel room.  
+
+For further clarification and queries please feel free to contact us at 09287842104 or email us at **hostel.nasugbu@g.batstate-u.edu.ph**.  
+
+Thank you. We look forward in welcoming your group here at the Hostel!`;
 
 // Generate time slots from 7:00 AM to 11:00 PM (30-min intervals)
 var timeSlots = [];
@@ -1975,11 +1935,11 @@ function loadFormData() {
             setValue('guest_email', data.guest.email);
             setValue('guest_contact', data.guest.contact);
             
+            // Clear any existing cards first
+            document.getElementById('guests-container').innerHTML = '';
+            
             // Load other guests dynamically
             if (data.guest.other_guests && data.guest.other_guests.length > 0) {
-                // Clear any existing cards first
-                document.getElementById('guests-container').innerHTML = '';
-                
                 data.guest.other_guests.forEach(function(guest) {
                     addGuestCard(guest);
                 });
@@ -2100,7 +2060,13 @@ function goToStep(n) {
     currentStep = n;
     
     if (n === 3 && reservationType !== 'guest') renderScheduleStep();
-    if (n === 4) loadTermsForStep4();
+    if (n === 4) {
+        if (reservationType === 'guest') {
+            loadGuestTerms();
+        } else {
+            loadTermsForStep4();
+        }
+    }
     if (n === 6) buildSummary();
     
     saveFormData();
@@ -2111,6 +2077,121 @@ function goStep(n) {
 }
 
 // ========== TERMS AND CONDITIONS FUNCTIONS ==========
+// NEW: Load guest terms
+function loadGuestTerms() {
+    document.getElementById('termsContainer').innerHTML = '<div class="terms-content" style="min-height: 300px; display: flex; align-items: center; justify-content: center;"><div class="text-center"><div class="spinner-border text-danger" role="status" style="width: 3rem; height: 3rem;"><span class="visually-hidden">Loading...</span></div><p class="mt-3" style="color: #666;">Loading guest room guidelines...</p></div></div>';
+    document.getElementById('termsAgree').disabled = true;
+    document.getElementById('termsAgree').checked = false;
+    
+    // Try to fetch from database first
+    fetch(baseUrl + '/ajax/get_terms.php?customer_type=guest')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.terms) {
+                var termsHtml = '<div class="terms-header">' +
+                    '<h5>' + escapeHtml(data.terms.title) + '</h5>' +
+                    (data.terms.version ? '<p>Version: ' + escapeHtml(data.terms.version) + '</p>' : '') +
+                    '</div>' +
+                    '<div class="terms-content">' +
+                    '<pre>' + escapeHtml(data.terms.content) + '</pre>' +
+                    '</div>';
+                
+                document.getElementById('termsContainer').innerHTML = termsHtml;
+            } else {
+                showGuestFallbackTerms();
+            }
+            
+            setupGuestTermsScrollListener();
+        })
+        .catch(error => {
+            console.error('Error loading guest terms:', error);
+            showGuestFallbackTerms();
+            setupGuestTermsScrollListener();
+        });
+}
+
+// NEW: Show hardcoded guest terms as fallback
+function showGuestFallbackTerms() {
+    var termsHtml = '<div class="terms-header">' +
+        '<h5>HOSTEL ROOM GUIDELINES AND PROHIBITED ACTS</h5>' +
+        '<p>For Guest Room Bookings</p>' +
+        '</div>' +
+        '<div class="terms-content">' +
+        '<pre>' + guestTerms + '</pre>' +
+        '</div>';
+    
+    document.getElementById('termsContainer').innerHTML = termsHtml;
+}
+
+// NEW: Special scroll listener for guest terms
+function setupGuestTermsScrollListener() {
+    var termsContainer = document.querySelector('.terms-content');
+    if (!termsContainer) return;
+    
+    var termsAgree = document.getElementById('termsAgree');
+    var fullNameInput = document.getElementById('termsFullName');
+    
+    window.termsReached = false;
+    
+    function checkTermsScroll() {
+        if (window.termsReached) {
+            if (termsAgree) {
+                termsAgree.disabled = false;
+                termsAgree.style.opacity = '1';
+                termsAgree.style.cursor = 'pointer';
+            }
+            return;
+        }
+        
+        var st = termsContainer.scrollTop;
+        var sh = termsContainer.scrollHeight;
+        var ch = termsContainer.clientHeight;
+        
+        if (sh <= ch + 5 || st + ch >= sh - 20) {
+            window.termsReached = true;
+            if (termsAgree) {
+                termsAgree.disabled = false;
+                termsAgree.style.opacity = '1';
+                termsAgree.style.cursor = 'pointer';
+            }
+            
+            // Auto-fill with guest name
+            if (fullNameInput && fullNameInput.value === '') {
+                var firstName = document.getElementById('guest_first_name')?.value || '';
+                var lastName = document.getElementById('guest_last_name')?.value || '';
+                var middleInitial = document.getElementById('guest_middle_initial')?.value || '';
+                
+                var fullName = firstName + ' ' + (middleInitial ? middleInitial + ' ' : '') + lastName;
+                fullNameInput.value = fullName.trim();
+                
+                fullNameInput.style.background = '#fff3e0';
+                fullNameInput.style.borderColor = '#b71c1c';
+            }
+        }
+    }
+    
+    termsContainer.addEventListener('scroll', checkTermsScroll);
+    
+    var savedData = sessionStorage.getItem('reservationFormData');
+    if (savedData) {
+        try {
+            var data = JSON.parse(savedData);
+            if (data.terms) {
+                if (data.terms.fullName) setValue('termsFullName', data.terms.fullName);
+                if (data.terms.position) setValue('termsPosition', data.terms.position);
+                if (data.terms.date) setValue('termsDate', data.terms.date);
+            }
+        } catch (e) {}
+    }
+    
+    setTimeout(checkTermsScroll, 500);
+    
+    window.addEventListener('resize', function() {
+        setTimeout(checkTermsScroll, 100);
+    });
+}
+
+// Original function room terms loader
 function loadTermsForStep4() {
     var officeTypeSelect = document.getElementById('officeType');
     if (!officeTypeSelect) return;
@@ -2582,6 +2663,9 @@ function renderScheduleStep() {
         html += '<label>End Time *</label>';
         html += '<input type="text" class="form-control time-display" id="end-display-' + v.id + '" placeholder="Not set" readonly>';
         html += '</div>';
+        html += '<button type="button" class="btn-add-schedule" onclick="openTimeModal(\'' + v.id + '\', \'' + v.name + '\')">';
+        html += '<i class="bi bi-plus-circle"></i> Add';
+        html += '</button>';
         html += '</div>';
         html += '<div class="schedule-list" id="schedList-' + v.id + '"></div>';
         html += '<div class="selected-facilities-box">';
@@ -2594,19 +2678,6 @@ function renderScheduleStep() {
     
     selectedVenues.forEach(function(v) {
         updateScheduleList(v.id);
-    });
-    
-    selectedVenues.forEach(function(v) {
-        var datePicker = document.getElementById('date-picker-' + v.id);
-        if (datePicker) {
-            datePicker.addEventListener('click', function(e) {
-                e.preventDefault();
-                console.log('Date picker clicked for venue:', v.id);
-                openTimeModal(v.id, v.name);
-            });
-        } else {
-            console.error('Date picker not found for venue:', v.id);
-        }
     });
     
     console.log('Schedule step rendered successfully');
@@ -2670,11 +2741,6 @@ function populateTimeDropdowns(availableStarts, bookedSlots, venueId) {
             opt.textContent = displayTime + ' — Unavailable';
             opt.disabled = true;
             opt.style.color = '#aaa';
-            
-            // Check if this is 2:00 PM
-            if (slot === '14:00') {
-                console.log('2:00 PM is DISABLED in dropdown for venue', venueId);
-            }
         }
         startSel.appendChild(opt);
     });
@@ -2772,7 +2838,7 @@ function fetchAvailability(venueId, date, callback, generation) {
                     statusEl2.style.color = '#721c24';
                     statusEl2.innerHTML = '⚠ Could not check availability. All slots shown.';
                 }
-                callback({ success: true, booked_slots: [], available_starts: generateAllStarts() });
+                callback({ success: true, booked_slots: [], available_starts: [] });
             }
         })
         .catch(function(error) {
@@ -2784,13 +2850,11 @@ function fetchAvailability(venueId, date, callback, generation) {
                 statusEl2.style.color = '#721c24';
                 statusEl2.innerHTML = '⚠ Could not check availability. All slots shown.';
             }
-            callback({ success: true, booked_slots: [], available_starts: generateAllStarts() });
+            callback({ success: true, booked_slots: [], available_starts: [] });
         });
 }
 
 // Named handler references so we can cleanly remove them before adding new ones.
-// This avoids the clone-replace hack which caused stale async callbacks to still
-// fire against the live DOM after a new venue's modal had already opened.
 var _timeModalDateHandler = null;
 var _timeModalStartHandler = null;
 
@@ -2803,9 +2867,6 @@ function openTimeModal(venueId, venueName) {
         return; 
     }
 
-    // *** KEY FIX: bump the generation counter FIRST so any in-flight fetch
-    // for a previously-opened venue will see its generation is stale and abort
-    // before touching the DOM. ***
     timeModalGeneration++;
     var myGeneration = timeModalGeneration;
     console.log('Modal generation bumped to', myGeneration, 'for venue', venueId);
