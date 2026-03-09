@@ -1219,8 +1219,7 @@ if ($selected_customer_type) {
                                 I have read and agree to the data privacy policy. I consent to the collection and storage of my personal information.
                             </label>
                         </div>
-                        
-                        
+                    </div> <!-- Close guest-registration-form -->
                     
                     <div class="form-buttons">
                         <button type="button" class="btn-res btn-prev" onclick="goToStep(0)">Back</button>
