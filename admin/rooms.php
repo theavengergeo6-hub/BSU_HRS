@@ -248,18 +248,63 @@ $guest_venues = $conn->query("
            (SELECT id         FROM venue_images WHERE venue_id=v.id AND is_primary=1 LIMIT 1) as primary_img_id,
            (SELECT image_path FROM venue_images WHERE venue_id=v.id AND is_primary=1 LIMIT 1) as primary_image,
            (SELECT COUNT(*)   FROM venue_images WHERE venue_id=v.id) as image_count
-    FROM venues v WHERE v.is_active=1 AND v.name LIKE '%Guest%' ORDER BY v.name");
+    FROM venues v 
+    WHERE v.is_active=1 AND v.name NOT LIKE '%Function%' 
+    ORDER BY v.name");
 
 $venue_images_by_id = [];
 $vi_res = $conn->query("SELECT vi.* FROM venue_images vi JOIN venues v ON vi.venue_id=v.id ORDER BY vi.venue_id, vi.sort_order ASC, vi.is_primary DESC, vi.id ASC");
 if ($vi_res) while ($vi=$vi_res->fetch_assoc()) $venue_images_by_id[$vi['venue_id']][]=$vi;
 
 // Internal rooms
-$rooms_result = $conn->query("SELECT r.*,t.name as type_name FROM rooms r LEFT JOIN types_room t ON r.type_id=t.id ORDER BY t.name,r.name");
-$images_by_room=[];
-$ir=$conn->query("SELECT * FROM room_images ORDER BY room_id, is_primary DESC, id DESC");
-if($ir) while($img=$ir->fetch_assoc()) $images_by_room[$img['room_id']][]=$img;
-$types=$conn->query("SELECT id,name FROM types_room ORDER BY name");
+// Get guest rooms from new tables
+$guest_rooms_result = $conn->query("
+    SELECT 
+        id,
+        room_number,
+        room_name,
+        room_type as type_name,
+        capacity_adults,
+        capacity_children,
+        max_guests,
+        price_per_night,
+        floor,
+        is_active
+    FROM guest_rooms 
+    ORDER BY room_type, room_name
+");
+
+// Get function rooms
+$function_rooms_result = $conn->query("
+    SELECT 
+        id,
+        room_name,
+        floor,
+        capacity_max as capacity,
+        rate_per_day as price,
+        is_active
+    FROM function_rooms 
+    ORDER BY room_name
+");
+
+// Get images for guest rooms
+$images_by_room = [];
+$ir = $conn->query("SELECT * FROM guest_room_images ORDER BY guest_room_id, is_primary DESC, id DESC");
+if ($ir) {
+    while ($img = $ir->fetch_assoc()) {
+        $images_by_room[$img['guest_room_id']][] = $img;
+    }
+}
+
+// Room types are now handled by room_type enum, so you can either:
+// Option 1: Get distinct room types from guest_rooms
+$types_result = $conn->query("SELECT DISTINCT room_type as name FROM guest_rooms ORDER BY room_type");
+$types = [];
+if ($types_result) {
+    while ($row = $types_result->fetch_assoc()) {
+        $types[] = ['id' => $row['name'], 'name' => ucfirst($row['name'])];
+    }
+}
 ?>
 
 <style>
@@ -1253,7 +1298,7 @@ body {
                 $cnt    = count($vimgs);
                 $maxed  = $cnt >= 5;
         ?>
-        <div class="vpc">
+        <div class="vpc" data-venue-id="<?= $v['id'] ?>">
             <!-- Header -->
             <div class="vpc-head">
                 <div class="vpc-head-icon"><i class="bi bi-door-open"></i></div>
@@ -1329,19 +1374,17 @@ body {
                          onerror="this.style.opacity=.3">
                     <div class="sthumb-ov">
                         <?php if (!$vi['is_primary']): ?>
-                        <form method="POST" style="display:inline" onsubmit="return confirm('Set as showcase photo?')">
-                            <input type="hidden" name="venue_action" value="set_venue_primary">
-                            <input type="hidden" name="image_id" value="<?= $vi['id'] ?>">
-                            <button type="submit" class="sth" title="Set as showcase"><i class="bi bi-star"></i></button>
-                        </form>
+                        <button type="button" class="sth" title="Set as showcase"
+                                onclick="ajaxSetPrimary(<?= $vi['id'] ?>, <?= $v['id'] ?>)">
+                            <i class="bi bi-star"></i>
+                        </button>
                         <?php else: ?>
                         <span style="color:#fbbf24;font-size:.9rem"><i class="bi bi-star-fill"></i></span>
                         <?php endif; ?>
-                        <form method="POST" style="display:inline" onsubmit="return confirm('Delete this photo permanently?')">
-                            <input type="hidden" name="venue_action" value="delete_venue_image">
-                            <input type="hidden" name="image_id" value="<?= $vi['id'] ?>">
-                            <button type="submit" class="sth del"><i class="bi bi-trash"></i></button>
-                        </form>
+                        <button type="button" class="sth del"
+                                onclick="ajaxDeletePhoto(<?= $vi['id'] ?>, <?= $v['id'] ?>)">
+                            <i class="bi bi-trash"></i>
+                        </button>
                     </div>
                 </div>
                 <?php endforeach; ?>
@@ -1431,7 +1474,7 @@ body {
                 $maxed  = $cnt >= 5;
                 $avail  = (int)($v['is_available'] ?? 1);
         ?>
-        <div class="vpc" style="<?= $avail ? '' : 'opacity:.75' ?>">
+        <div class="vpc" data-venue-id="<?= $v['id'] ?>" style="<?= $avail ? '' : 'opacity:.75' ?>">
             <div class="vpc-head" style="<?= $avail ? '' : 'background:linear-gradient(120deg,#6b7280,#4b5563)' ?>">
                 <div class="vpc-head-icon"><i class="bi bi-moon-stars-fill"></i></div>
                 <div class="vpc-head-text">
@@ -1524,19 +1567,17 @@ body {
                          onerror="this.style.opacity=.3">
                     <div class="sthumb-ov">
                         <?php if (!$vi['is_primary']): ?>
-                        <form method="POST" style="display:inline" onsubmit="return confirm('Set as showcase?')">
-                            <input type="hidden" name="venue_action" value="set_venue_primary">
-                            <input type="hidden" name="image_id" value="<?= $vi['id'] ?>">
-                            <button type="submit" class="sth"><i class="bi bi-star"></i></button>
-                        </form>
+                        <button type="button" class="sth" title="Set as showcase"
+                                onclick="ajaxSetPrimary(<?= $vi['id'] ?>, <?= $v['id'] ?>)">
+                            <i class="bi bi-star"></i>
+                        </button>
                         <?php else: ?>
                         <span style="color:#fbbf24;font-size:.9rem"><i class="bi bi-star-fill"></i></span>
                         <?php endif; ?>
-                        <form method="POST" style="display:inline" onsubmit="return confirm('Delete photo permanently?')">
-                            <input type="hidden" name="venue_action" value="delete_venue_image">
-                            <input type="hidden" name="image_id" value="<?= $vi['id'] ?>">
-                            <button type="submit" class="sth del"><i class="bi bi-trash"></i></button>
-                        </form>
+                        <button type="button" class="sth del"
+                                onclick="ajaxDeletePhoto(<?= $vi['id'] ?>, <?= $v['id'] ?>)">
+                            <i class="bi bi-trash"></i>
+                        </button>
                     </div>
                 </div>
                 <?php endforeach; ?>
@@ -2041,8 +2082,102 @@ function refreshVenueCard(venueId) {
     });
 }
 
-/* ── Reset upload zone after successful upload ── */
-function resetUploadZone(venueId) {
+/* ════════════════════════════════════════════════════════════
+   AJAX PHOTO OPERATIONS — no full-page reload
+   ════════════════════════════════════════════════════════════ */
+
+/**
+ * Post a venue_action to the same page via fetch and return parsed JSON result.
+ * The PHP handlers already echo nothing useful for non-reorder actions, so we
+ * parse the returned HTML to pull out the alert message and the updated card.
+ */
+function _venuePost(formData) {
+    return fetch(window.location.href, { method: 'POST', body: formData })
+           .then(function(r) { return r.text(); });
+}
+
+/** Re-render just one .vpc card by parsing the full-page HTML response */
+function _refreshCardFromHtml(html, venueId) {
+    var parser = new DOMParser();
+    var doc = parser.parseFromString(html, 'text/html');
+    var newCard = doc.querySelector('.vpc[data-venue-id="' + venueId + '"]');
+    var oldCard = document.querySelector('.vpc[data-venue-id="' + venueId + '"]');
+    if (newCard && oldCard) {
+        // Preserve scroll position
+        var scrollY = window.scrollY;
+        oldCard.outerHTML = newCard.outerHTML;
+        window.scrollTo(0, scrollY);
+    }
+}
+
+/** Delete a venue image via AJAX */
+function ajaxDeletePhoto(imageId, venueId) {
+    if (!confirm('Delete this photo permanently?')) return;
+
+    var fd = new FormData();
+    fd.append('venue_action', 'delete_venue_image');
+    fd.append('image_id', imageId);
+
+    _venuePost(fd).then(function(html) {
+        _refreshCardFromHtml(html, venueId);
+        showNotification('Photo deleted.', 'success');
+    }).catch(function() {
+        showNotification('Delete failed — please try again.', 'danger');
+    });
+}
+
+/** Set a venue image as the primary showcase photo via AJAX */
+function ajaxSetPrimary(imageId, venueId) {
+    if (!confirm('Set this as the showcase photo?')) return;
+
+    var fd = new FormData();
+    fd.append('venue_action', 'set_venue_primary');
+    fd.append('image_id', imageId);
+
+    _venuePost(fd).then(function(html) {
+        _refreshCardFromHtml(html, venueId);
+        showNotification('Showcase photo updated!', 'success');
+    }).catch(function() {
+        showNotification('Could not update showcase photo.', 'danger');
+    });
+}
+
+/** Override quickReplace to use AJAX instead of form submit */
+function quickReplace(input, venueId, oldImgId) {
+    var file = input.files && input.files[0];
+    if (!file) return;
+    var ext = file.name.split('.').pop().toLowerCase();
+    if (!['jpg','jpeg','png','gif','webp'].includes(ext)) {
+        alert('Only JPG, PNG, GIF, WEBP allowed.');
+        input.value = '';
+        return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+        alert('File must be under 5 MB.');
+        input.value = '';
+        return;
+    }
+    if (!confirm('Replace the current showcase photo?\nThe old photo will be permanently deleted.')) {
+        input.value = '';
+        return;
+    }
+
+    var fd = new FormData();
+    fd.append('venue_action', 'replace_primary');
+    fd.append('venue_id', venueId);
+    fd.append('old_image_id', oldImgId);
+    fd.append('venue_image', file);
+
+    showNotification('Replacing photo…', 'success');
+    _venuePost(fd).then(function(html) {
+        _refreshCardFromHtml(html, venueId);
+        showNotification('Showcase photo replaced!', 'success');
+    }).catch(function() {
+        showNotification('Replace failed — please try again.', 'danger');
+    });
+}
+
+
     const preview = document.getElementById('vp_' + venueId);
     const inner = document.getElementById('vzi_' + venueId);
     const thumb = document.getElementById('vpt_' + venueId);
@@ -2059,7 +2194,6 @@ function resetUploadZone(venueId) {
         zone.style.borderColor = '#d1d5db';
         zone.style.background = '#fafafa';
     }
-}
 
 
 </script>

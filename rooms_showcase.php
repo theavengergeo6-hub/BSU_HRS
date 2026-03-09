@@ -30,7 +30,8 @@ if ($fr_imgs_res) {
     }
 }
 
-// Get all guest rooms — only show those that are active AND available for booking
+// Get all guest rooms — exclude function rooms so Dormitory and any future
+// non-"Guest" accommodation names are automatically included.
 $guest_rooms = $conn->query("
     SELECT v.*, 
            (SELECT image_path FROM venue_images WHERE venue_id = v.id AND is_primary = 1 LIMIT 1) as primary_image,
@@ -38,7 +39,7 @@ $guest_rooms = $conn->query("
     FROM venues v
     WHERE v.is_active  = 1 
     AND   COALESCE(v.is_available, 1) = 1
-    AND   v.name LIKE '%Guest%'
+    AND   v.name NOT LIKE '%Function%'
     ORDER BY v.name
 ");
 

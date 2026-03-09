@@ -31,44 +31,59 @@ if (empty($office_types)) {
     $office_types = [['id'=>1,'name'=>'College'],['id'=>2,'name'=>'Office'],['id'=>3,'name'=>'Student Organization'],['id'=>4,'name'=>'External']];
 }
 
-// Update this query to get from guest_rooms and function_rooms tables
+// Get venues from the venues table
 $guest_venues = [];
 $function_venues = [];
+$guest_venues    = [];
 
-// Get function rooms from function_rooms table
-$func_rooms = $conn->query("SELECT id, room_name as name, floor, capacity_max as capacity, description FROM function_rooms WHERE is_active = 1 ORDER BY room_name");
-if ($func_rooms && $func_rooms->num_rows > 0) {
-    while ($room = $func_rooms->fetch_assoc()) {
-        $function_venues[] = $room;
+// ── Function rooms: from venues table (name LIKE '%Function%') ──────────────
+$func_q = $conn->query("
+    SELECT id, name, floor, capacity, description, price
+    FROM   venues
+    WHERE  is_active = 1
+    AND    name LIKE '%Function%'
+    ORDER  BY name
+");
+if ($func_q && $func_q->num_rows > 0) {
+    while ($row = $func_q->fetch_assoc()) {
+        $function_venues[] = $row;
     }
 }
 
-// Get guest rooms from guest_rooms table
-$guest_rooms = $conn->query("SELECT id, CONCAT(room_name, ' - ', room_number) as name, floor, max_guests as capacity, description FROM guest_rooms WHERE is_active = 1 ORDER BY room_name");
-if ($guest_rooms && $guest_rooms->num_rows > 0) {
-    while ($room = $guest_rooms->fetch_assoc()) {
-        $guest_venues[] = $room;
+// ── Guest / accommodation rooms: from venues table (NOT Function) ────────────
+$guest_q = $conn->query("
+    SELECT id, name, floor, capacity, description, price,
+           extra_bed_available, extra_bed_price
+    FROM   venues
+    WHERE  is_active = 1
+    AND    COALESCE(is_available, 1) = 1
+    AND    name NOT LIKE '%Function%'
+    ORDER  BY name
+");
+if ($guest_q && $guest_q->num_rows > 0) {
+    while ($row = $guest_q->fetch_assoc()) {
+        $guest_venues[] = $row;
     }
 }
 
-// Fallback if no venues found
+// ── Fallbacks if DB is empty or query failed ─────────────────────────────────
 if (empty($function_venues)) {
     $function_venues = [
-        ['id' => 1, 'name' => 'Function Room A', 'floor' => 'Ground Floor', 'capacity' => 40, 'description' => 'Spacious function room for meetings and events.'],
-        ['id' => 2, 'name' => 'Function Room B', 'floor' => 'Ground Floor', 'capacity' => 50, 'description' => 'Ideal for seminars and workshops.'],
-        ['id' => 3, 'name' => 'Function Room C', 'floor' => 'Ground Floor', 'capacity' => 60, 'description' => 'Largest function room with AV equipment.'],
-        ['id' => 4, 'name' => 'Function Room D', 'floor' => 'Ground Floor', 'capacity' => 30, 'description' => 'Small function room for intimate events.'],
-        ['id' => 5, 'name' => 'Function Room E', 'floor' => 'Ground Floor', 'capacity' => 45, 'description' => 'Versatile space for training and events.']
+        ['id'=>1,'name'=>'Function Room A','floor'=>'Ground Floor','capacity'=>40,'description'=>'Spacious function room for meetings and events.','price'=>5000],
+        ['id'=>2,'name'=>'Function Room B','floor'=>'Ground Floor','capacity'=>40,'description'=>'Ideal for seminars and workshops.','price'=>5000],
+        ['id'=>3,'name'=>'Function Room C','floor'=>'Ground Floor','capacity'=>40,'description'=>'Largest function room with AV equipment.','price'=>5000],
+        ['id'=>4,'name'=>'Function Room D','floor'=>'Ground Floor','capacity'=>40,'description'=>'Small function room for intimate events.','price'=>5000],
+        ['id'=>5,'name'=>'Function Room E','floor'=>'Ground Floor','capacity'=>40,'description'=>'Versatile space for training and events.','price'=>5000],
     ];
 }
 
 if (empty($guest_venues)) {
     $guest_venues = [
-        ['id' => 6, 'name' => 'Guest Room 1', 'floor' => '2nd Floor', 'capacity' => 4, 'description' => 'Comfortable guest room with queen bed.'],
-        ['id' => 7, 'name' => 'Guest Room 2', 'floor' => '2nd Floor', 'capacity' => 5, 'description' => 'Guest room with two twin beds.'],
-        ['id' => 8, 'name' => 'Guest Room 3', 'floor' => '2nd Floor', 'capacity' => 5, 'description' => 'Spacious family room with queen bed and single bed.'],
-        ['id' => 9, 'name' => 'Guest Room 4', 'floor' => '2nd Floor', 'capacity' => 8, 'description' => 'Deluxe room with king bed and sofa bed.'],
-        ['id' => 10, 'name' => 'Dormitory', 'floor' => 'Ground Floor', 'capacity' => 24, 'description' => 'Spacious dormitory with 12 bunk beds.']
+        ['id'=>6, 'name'=>'Guest Room 1','floor'=>'2nd Floor','capacity'=>2,'description'=>'Comfortable guest room with queen bed.','price'=>5000,'extra_bed_available'=>1,'extra_bed_price'=>500],
+        ['id'=>7, 'name'=>'Guest Room 2','floor'=>'2nd Floor','capacity'=>2,'description'=>'Guest room with city view.','price'=>2500,'extra_bed_available'=>1,'extra_bed_price'=>500],
+        ['id'=>8, 'name'=>'Guest Room 3','floor'=>'2nd Floor','capacity'=>3,'description'=>'Spacious guest room for small families.','price'=>2500,'extra_bed_available'=>1,'extra_bed_price'=>500],
+        ['id'=>9, 'name'=>'Guest Room 4','floor'=>'2nd Floor','capacity'=>2,'description'=>'Cozy room for couples or solo travelers.','price'=>2500,'extra_bed_available'=>1,'extra_bed_price'=>500],
+        ['id'=>10,'name'=>'Dormitory',   'floor'=>'Ground Floor','capacity'=>24,'description'=>'Spacious dormitory with 12 bunk beds.','price'=>8000,'extra_bed_available'=>0,'extra_bed_price'=>0],
     ];
 }
 
@@ -888,9 +903,16 @@ if ($selected_customer_type) {
             </div>
 
             <div id="resumeBookingContainer" style="display: none; margin-bottom: 1rem;">
-                <div class="alert alert-info d-flex justify-content-between align-items-center">
-                    <span><i class="bi bi-arrow-repeat me-2"></i> You have an incomplete reservation from your last session.</span>
-                    <button type="button" class="btn-outline-danger" onclick="clearSavedData()">Start Fresh</button>
+                <div class="alert alert-info d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <span><i class="bi bi-arrow-repeat me-2"></i> <span class="resume-msg">You have an incomplete reservation from your last session.</span></span>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-sm btn-primary" onclick="resumeSavedSession()">
+                            <i class="bi bi-play-fill me-1"></i> Resume
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="clearSavedData()">
+                            <i class="bi bi-trash me-1"></i> Start Fresh
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -1218,11 +1240,15 @@ if ($selected_customer_type) {
                         data-name="<?= htmlspecialchars($venue['name']) ?>" 
                         data-floor="<?= htmlspecialchars($venue['floor'] ?? '') ?>" 
                         data-capacity="<?= $venue['capacity'] ?>"
+                        data-price="<?= !empty($venue['price']) ? (float)$venue['price'] : 0 ?>"
                         onclick="toggleVenue(this)">
                         <input type="checkbox" name="venue_ids[]" value="<?= $venue['id'] ?>" style="display:none">
-                        <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-1">
                             <strong><?= htmlspecialchars($venue['name']) ?></strong>
-                            <span class="badge bg-light text-dark"><?= $venue['capacity'] ?> pax</span>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="venue-price-badge badge" style="display:none; font-size:0.78rem; padding:0.35em 0.65em;"></span>
+                                <span class="badge bg-light text-dark"><?= $venue['capacity'] ?> pax</span>
+                            </div>
                         </div>
                         <small class="text-muted"><?= htmlspecialchars($venue['floor'] ?? '') ?></small>
                         <p class="small text-muted mt-1 mb-0"><?= htmlspecialchars($venue['description'] ?? '') ?></p>
@@ -1784,6 +1810,16 @@ function saveFormData() {
             address: document.getElementById('guest_address')?.value || '',
             email: document.getElementById('guest_email')?.value || '',
             contact: document.getElementById('guest_contact')?.value || '',
+            arrival_date: document.getElementById('arrival_date')?.value || '',
+            departure_date: document.getElementById('departure_date')?.value || '',
+            checkin_time: document.getElementById('checkin_time')?.value || '',
+            checkout_time: document.getElementById('checkout_time')?.value || '',
+            adults_count: document.getElementById('adults_count')?.value || '',
+            kids_count: document.getElementById('kids_count')?.value || '',
+            guest_room_id: document.getElementById('guest_room_id')?.value || '',
+            registered_by: document.getElementById('registered_by')?.value || '',
+            guest_signature: document.getElementById('guest_signature')?.value || '',
+            consent: document.getElementById('guestConsent')?.checked || false,
             other_guests: []
         },
         venues: selectedVenues,
@@ -1934,6 +1970,17 @@ function loadFormData() {
             setValue('guest_address', data.guest.address);
             setValue('guest_email', data.guest.email);
             setValue('guest_contact', data.guest.contact);
+            setValue('arrival_date', data.guest.arrival_date);
+            setValue('departure_date', data.guest.departure_date);
+            setValue('checkin_time', data.guest.checkin_time);
+            setValue('checkout_time', data.guest.checkout_time);
+            setValue('adults_count', data.guest.adults_count);
+            setValue('kids_count', data.guest.kids_count);
+            setValue('guest_room_id', data.guest.guest_room_id);
+            setValue('registered_by', data.guest.registered_by);
+            setValue('guest_signature', data.guest.guest_signature);
+            var consentBox = document.getElementById('guestConsent');
+            if (consentBox && data.guest.consent) consentBox.checked = true;
             
             // Clear any existing cards first
             document.getElementById('guests-container').innerHTML = '';
@@ -2002,12 +2049,30 @@ function checkForSavedData() {
     var container = document.getElementById('resumeBookingContainer');
     
     if (container) {
-        if (step && step > 0 && data) {
+        if (step && parseInt(step, 10) > 0 && data) {
+            var stepLabels = ['Type','Info','Rooms','Schedule','Terms','Misc','Summary'];
+            var label = stepLabels[parseInt(step, 10)] || ('Step ' + step);
+            var msgEl = container.querySelector('.resume-msg');
+            if (msgEl) msgEl.textContent = 'You have an incomplete reservation from your last session (saved at: ' + label + ').';
             container.style.display = 'block';
         } else {
             container.style.display = 'none';
         }
     }
+}
+
+function resumeSavedSession() {
+    var savedStep = sessionStorage.getItem('reservationStep');
+    var savedData  = sessionStorage.getItem('reservationFormData');
+    if (!savedStep || !savedData) return;
+    // Hide the banner immediately
+    var container = document.getElementById('resumeBookingContainer');
+    if (container) container.style.display = 'none';
+    // Restore all fields, then navigate to the saved step
+    loadFormData();
+    setTimeout(function() {
+        goToStep(parseInt(savedStep, 10));
+    }, 400);
 }
 
 function clearSavedData() {
@@ -2060,6 +2125,7 @@ function goToStep(n) {
     currentStep = n;
     
     if (n === 3 && reservationType !== 'guest') renderScheduleStep();
+    if (n === 2 && reservationType !== 'guest') updateVenuePriceBadges();
     if (n === 4) {
         if (reservationType === 'guest') {
             loadGuestTerms();
@@ -2375,6 +2441,7 @@ function handleOfficeTypeChange() {
     }
     
     saveFormData();
+    updateVenuePriceBadges();
 }
 
 // ========== VALIDATION ==========
@@ -2627,6 +2694,30 @@ function toggleVenue(el) {
         selectedVenues = selectedVenues.filter(v => v.id != venueId);
     }
     saveFormData();
+}
+
+/* ── Show pricing on venue cards based on internal vs external office type ── */
+function updateVenuePriceBadges() {
+    var select = document.getElementById('officeType');
+    var isExternal = false;
+    if (select && select.value) {
+        var opt = select.options[select.selectedIndex];
+        isExternal = (opt && opt.getAttribute('data-name') === 'External');
+    }
+    document.querySelectorAll('.room-select-card').forEach(function(card) {
+        var badge = card.querySelector('.venue-price-badge');
+        if (!badge) return;
+        if (!select || !select.value) { badge.style.display = 'none'; return; }
+        var price = parseFloat(card.getAttribute('data-price') || '0');
+        badge.style.display = 'inline-flex';
+        if (isExternal) {
+            badge.style.background = '#b71c1c'; badge.style.color = 'white';
+            badge.textContent = price > 0 ? '₱' + price.toLocaleString('en-PH') + ' (External Rate)' : 'Rate on Request';
+        } else {
+            badge.style.background = '#d4edda'; badge.style.color = '#155724';
+            badge.textContent = 'Free for Internal Use';
+        }
+    });
 }
 
 function renderScheduleStep() {
@@ -3677,31 +3768,10 @@ document.addEventListener('DOMContentLoaded', function() {
     
     loadBanquetStyles();
     
-    // Clear any stale session data so the user always starts at step 0
-    // and must choose their reservation type first.
-    // Only resume if the URL explicitly carries ?resume=1
-    var urlParams = new URLSearchParams(window.location.search);
-    if (!urlParams.get('resume')) {
-        sessionStorage.removeItem('reservationFormData');
-        sessionStorage.removeItem('reservationStep');
-    }
-    
+    // Show the resume banner if saved data exists — do NOT auto-restore or auto-advance.
+    // The user must explicitly click "Resume" to continue where they left off,
+    // or "Start Fresh" to clear the session and start over.
     checkForSavedData();
-    
-    var savedStep = sessionStorage.getItem('reservationStep');
-    var savedData = sessionStorage.getItem('reservationFormData');
-    
-    console.log('Saved step:', savedStep);
-    console.log('Saved data exists:', !!savedData);
-    
-    if (savedStep && savedStep > 0 && savedData) {
-        console.log('Loading saved data for step:', savedStep);
-        loadFormData();
-        
-        setTimeout(function() {
-            goToStep(parseInt(savedStep));
-        }, 500);
-    }
     
     var officeType = document.getElementById('officeType');
     if (officeType) {

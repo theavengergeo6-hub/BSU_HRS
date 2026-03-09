@@ -64,6 +64,7 @@ $pending_preview = $conn->query("
 ");
 
 // Get pencil booked reservations for quick view
+// Get pencil booked reservations for quick view
 $pencil_preview = $conn->query("
     SELECT r.*, v.name as venue_name
     FROM facility_reservations r
@@ -72,32 +73,56 @@ $pencil_preview = $conn->query("
     ORDER BY r.start_datetime ASC
     LIMIT 3
 ");
-// Get guest reservation counts
-$guest_pending   = $conn->query("SELECT COUNT(*) as count FROM guest_reservations WHERE status = 'pending'")->fetch_assoc()['count'];
-$guest_confirmed = $conn->query("SELECT COUNT(*) as count FROM guest_reservations WHERE status = 'confirmed'")->fetch_assoc()['count'];
-$guest_cancelled = $conn->query("SELECT COUNT(*) as count FROM guest_reservations WHERE status = 'cancelled'")->fetch_assoc()['count'];
-$guest_today     = $conn->query("
+
+// Get guest reservation counts from new guest_room_reservations table
+$guest_pending = $conn->query("SELECT COUNT(*) as count FROM guest_room_reservations WHERE status = 'pending' AND deleted = 0")->fetch_assoc()['count'] ?? 0;
+$guest_confirmed = $conn->query("SELECT COUNT(*) as count FROM guest_room_reservations WHERE status = 'confirmed' AND deleted = 0")->fetch_assoc()['count'] ?? 0;
+$guest_cancelled = $conn->query("SELECT COUNT(*) as count FROM guest_room_reservations WHERE status = 'cancelled' AND deleted = 0")->fetch_assoc()['count'] ?? 0;
+
+// Guests currently staying (checked in)
+$guest_today = $conn->query("
     SELECT COUNT(*) as count
-    FROM guest_reservations
-    WHERE status IN ('confirmed','pending')
-      AND check_in  <= CURDATE()
-      AND check_out > CURDATE()
-")->fetch_assoc()['count'];
-$guest_checkin_today  = $conn->query("SELECT COUNT(*) as count FROM guest_reservations WHERE status IN ('confirmed','pending') AND check_in  = CURDATE()")->fetch_assoc()['count'];
-$guest_checkout_today = $conn->query("SELECT COUNT(*) as count FROM guest_reservations WHERE status IN ('confirmed','pending') AND check_out = CURDATE()")->fetch_assoc()['count'];
+    FROM guest_room_reservations
+    WHERE status IN ('confirmed', 'checked_in')
+    AND check_in_date <= CURDATE()
+    AND check_out_date > CURDATE()
+    AND deleted = 0
+")->fetch_assoc()['count'] ?? 0;
+
+// Check-ins today
+$guest_checkin_today = $conn->query("
+    SELECT COUNT(*) as count 
+    FROM guest_room_reservations 
+    WHERE status IN ('confirmed', 'pending') 
+    AND check_in_date = CURDATE()
+    AND deleted = 0
+")->fetch_assoc()['count'] ?? 0;
+
+// Check-outs today
+$guest_checkout_today = $conn->query("
+    SELECT COUNT(*) as count 
+    FROM guest_room_reservations 
+    WHERE status IN ('confirmed', 'checked_in') 
+    AND check_out_date = CURDATE()
+    AND deleted = 0
+")->fetch_assoc()['count'] ?? 0;
+
 // Recent guest reservations for preview
 $guest_preview = $conn->query("
-    SELECT gr.*, v.name as room_name,
-           gr.check_in   AS arrival_date,
-           gr.check_out  AS departure_date
-    FROM guest_reservations gr
-    JOIN venues v ON gr.room_id = v.id
-    WHERE gr.status IN ('pending','confirmed')
+    SELECT 
+        gr.*, 
+        g.room_name,
+        gr.check_in_date AS arrival_date,
+        gr.check_out_date AS departure_date
+    FROM guest_room_reservations gr
+    JOIN guest_rooms g ON gr.guest_room_id = g.id
+    WHERE gr.status IN ('pending', 'confirmed', 'checked_in')
+    AND gr.deleted = 0
     ORDER BY gr.created_at DESC
     LIMIT 4
 ");
-?>
 
+?>
 <style>
 /* Dashboard Redesign - Fixed Layout */
 :root {
