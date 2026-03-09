@@ -828,6 +828,15 @@ body {
                 <div class="rd-card-body">
                     <?php
                     $misc_items = json_decode($reservation['miscellaneous_items'], true);
+                    $pricing_client_type = $misc_items['_client_type'] ?? null;
+                    $pricing_total_amount = $misc_items['_estimated_total'] ?? null;
+                    $pricing_breakdown = $misc_items['_price_breakdown'] ?? null;
+                    
+                    // Remove internal pricing fields from regular misc items early
+                    if (is_array($misc_items)) {
+                        unset($misc_items['_client_type'], $misc_items['_estimated_total'], $misc_items['_price_breakdown']);
+                    }
+
                     if (json_last_error() === JSON_ERROR_NONE && !empty($misc_items)):
                     ?>
                         <div class="misc-chip-list">
@@ -837,6 +846,7 @@ body {
                             if (is_array($item)) {
                                 $parts = [];
                                 foreach ($item as $sk => $sv) {
+                                    if (is_array($sv)) continue; // safeguard
                                     if ($sk === 'requested' && $sv === true) $parts[] = 'Yes';
                                     else $parts[] = ucfirst($sk) . ': ' . htmlspecialchars($sv);
                                 }
@@ -859,6 +869,57 @@ body {
                     <?php endif; ?>
                 </div>
             </div>
+
+            <!-- Card: Rental Cost Breakdown (External Only) -->
+            <?php if ($pricing_client_type === 'External' && $pricing_breakdown): ?>
+            <div class="rd-card" style="border-left: 4px solid var(--red);">
+                <div class="rd-card-header" style="background:#fffcfc;">
+                    <div class="ch-icon"><i class="bi bi-receipt"></i></div>
+                    <div class="ch-title">Rental Cost Breakdown</div>
+                </div>
+                <div class="rd-card-body">
+                    <div style="background: linear-gradient(135deg, #fff5f5, #ffe8e8); border-radius: 10px; padding: 1.25rem;">
+                        <div style="display: flex; flex-direction: column; gap: 0.6rem;">
+                            <?php foreach ($pricing_breakdown as $pb): ?>
+                                <div style="display: flex; justify-content: space-between; font-size: 0.85rem; border-bottom: 1px dashed #f5c6cb; padding-bottom: 0.6rem;">
+                                    <?php if (isset($pb['venue_id'])): 
+                                        $vname = ''; 
+                                        foreach ($all_venues as $v) if ($v['id'] == $pb['venue_id']) { $vname = $v['name']; break; }
+                                    ?>
+                                        <span>
+                                            <strong><?= htmlspecialchars($vname) ?></strong><br>
+                                            <span style="color:var(--text-sub); font-size:0.75rem;">
+                                                <?= date("M j, Y", strtotime($pb['date'])) ?> (<?= $pb['hours'] ?>h, <?= htmlspecialchars($pb['rate_type']) ?>)
+                                            </span>
+                                        </span>
+                                    <?php else: ?>
+                                        <span><strong><?= htmlspecialchars($pb['rate_type']) ?></strong></span>
+                                    <?php endif; ?>
+                                    <strong style="color: var(--text-main);">₱<?= number_format($pb['cost'], 2) ?></strong>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-top: 1rem; padding-top: 1rem; border-top: 2px solid #f5c6cb;">
+                            <strong style="color: var(--red-dark); font-size: 1rem;">Total Amount</strong>
+                            <strong style="color: var(--red); font-size: 1.2rem;">₱<?= number_format($pricing_total_amount, 2) ?></strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <?php elseif ($reservation['office_type_name'] !== 'External'): ?>
+            <div class="rd-card" style="border-left: 4px solid #166534;">
+                <div class="rd-card-header" style="background:#f0fdf4;">
+                    <div class="ch-icon" style="background:#dcfce7; color:#166534;"><i class="bi bi-patch-check"></i></div>
+                    <div class="ch-title" style="color:#166534;">Internal Booking</div>
+                </div>
+                <div class="rd-card-body">
+                    <div style="display:flex; align-items:center; gap: 1rem; color:#166534; font-weight:500;">
+                        <i class="bi bi-info-circle fs-4"></i>
+                        <span>This is an internal university reservation. The use of function rooms is <strong style="text-transform:uppercase;">free of charge</strong>.</span>
+                    </div>
+                </div>
+            </div>
+            <?php endif; ?>
 
             <!-- Card 5: Instructions -->
             <div class="rd-card">

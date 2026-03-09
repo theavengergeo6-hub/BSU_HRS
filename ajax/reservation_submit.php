@@ -198,8 +198,71 @@ try {
     write_log("Conflict check passed for all venues");
 
     // Prepare miscellaneous items
-    $miscellaneous_items = $_POST['miscellaneous_items'] ?? '{}';
-    
+    $miscellaneous_items_raw = $_POST['miscellaneous_items'] ?? '{}';
+    $misc_data = json_decode($miscellaneous_items_raw, true) ?: [];
+
+    // ── Price calculation for External clients ─────────────────────────────
+    $estimated_total    = 0;
+    $price_breakdown    = [];
+    $has_sound_system   = isset($misc_data['basic_sound_system']);
+
+    if ($office_type_name === 'External') {
+        // Fetch rates from the first selected venue
+        $rates_row = null;
+        if ($venue_id) {
+            $rq = $conn->query("SELECT half_day_rate, whole_day_rate, extension_rate, sound_system_fee
+                                FROM venues WHERE id = $venue_id LIMIT 1");
+            if ($rq) $rates_row = $rq->fetch_assoc();
+        }
+        $rate_half  = (float)($rates_row['half_day_rate']    ?? 2000);
+        $rate_whole = (float)($rates_row['whole_day_rate']   ?? 3000);
+        $rate_ext   = (float)($rates_row['extension_rate']   ?? 400);
+        $rate_sound = (float)($rates_row['sound_system_fee'] ?? 1500);
+
+        foreach ($schedules as $vid => $vscheds) {
+            foreach ($vscheds as $sched) {
+                $startTs = strtotime($sched['date'] . ' ' . $sched['start']);
+                $endTs   = strtotime($sched['date'] . ' ' . $sched['end']);
+                if ($endTs <= $startTs) $endTs += 86400; // overnight
+                $hours = ($endTs - $startTs) / 3600;
+
+                if ($hours <= 4) {
+                    $type = 'Half Day';  $cost = $rate_half;
+                } elseif ($hours <= 8) {
+                    $type = 'Whole Day'; $cost = $rate_whole;
+                } else {
+                    $overH = ceil($hours - 8);
+                    $type  = 'Whole Day + ' . $overH . 'h Extension';
+                    $cost  = $rate_whole + ($overH * $rate_ext);
+                }
+
+                $price_breakdown[] = [
+                    'venue_id'  => (int)$vid,
+                    'date'      => $sched['date'],
+                    'start'     => $sched['start'],
+                    'end'       => $sched['end'],
+                    'hours'     => round($hours, 2),
+                    'rate_type' => $type,
+                    'cost'      => $cost,
+                ];
+                $estimated_total += $cost;
+            }
+        }
+
+        if ($has_sound_system) {
+            $estimated_total += $rate_sound;
+            $price_breakdown[] = ['rate_type' => 'Sound System', 'cost' => $rate_sound];
+        }
+
+        // Embed pricing data into miscellaneous items JSON for storage
+        $misc_data['_price_breakdown'] = $price_breakdown;
+        $misc_data['_estimated_total'] = $estimated_total;
+        $misc_data['_client_type']     = 'External';
+        write_log("External pricing total: $estimated_total");
+    }
+
+    $miscellaneous_items = json_encode($misc_data);
+
     // Insert into database
     $sql = "INSERT INTO facility_reservations (
         booking_no, reservation_no, last_name, first_name, middle_initial, 

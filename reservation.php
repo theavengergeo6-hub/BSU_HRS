@@ -38,7 +38,11 @@ $guest_venues    = [];
 
 // ── Function rooms: from venues table (name LIKE '%Function%') ──────────────
 $func_q = $conn->query("
-    SELECT id, name, floor, capacity, description, price
+    SELECT id, name, floor, capacity, description, price,
+           COALESCE(half_day_rate, 2000)    AS half_day_rate,
+           COALESCE(whole_day_rate, 3000)   AS whole_day_rate,
+           COALESCE(extension_rate, 400)    AS extension_rate,
+           COALESCE(sound_system_fee, 1500) AS sound_system_fee
     FROM   venues
     WHERE  is_active = 1
     AND    name LIKE '%Function%'
@@ -69,11 +73,11 @@ if ($guest_q && $guest_q->num_rows > 0) {
 // ── Fallbacks if DB is empty or query failed ─────────────────────────────────
 if (empty($function_venues)) {
     $function_venues = [
-        ['id'=>1,'name'=>'Function Room A','floor'=>'Ground Floor','capacity'=>40,'description'=>'Spacious function room for meetings and events.','price'=>5000],
-        ['id'=>2,'name'=>'Function Room B','floor'=>'Ground Floor','capacity'=>40,'description'=>'Ideal for seminars and workshops.','price'=>5000],
-        ['id'=>3,'name'=>'Function Room C','floor'=>'Ground Floor','capacity'=>40,'description'=>'Largest function room with AV equipment.','price'=>5000],
-        ['id'=>4,'name'=>'Function Room D','floor'=>'Ground Floor','capacity'=>40,'description'=>'Small function room for intimate events.','price'=>5000],
-        ['id'=>5,'name'=>'Function Room E','floor'=>'Ground Floor','capacity'=>40,'description'=>'Versatile space for training and events.','price'=>5000],
+        ['id'=>1,'name'=>'Function Room A','floor'=>'Ground Floor','capacity'=>40,'description'=>'Spacious function room for meetings and events.','price'=>0,'half_day_rate'=>2000,'whole_day_rate'=>3000,'extension_rate'=>400,'sound_system_fee'=>1500],
+        ['id'=>2,'name'=>'Function Room B','floor'=>'Ground Floor','capacity'=>40,'description'=>'Ideal for seminars and workshops.','price'=>0,'half_day_rate'=>2000,'whole_day_rate'=>3000,'extension_rate'=>400,'sound_system_fee'=>1500],
+        ['id'=>3,'name'=>'Function Room C','floor'=>'Ground Floor','capacity'=>40,'description'=>'Largest function room with AV equipment.','price'=>0,'half_day_rate'=>2000,'whole_day_rate'=>3000,'extension_rate'=>400,'sound_system_fee'=>1500],
+        ['id'=>4,'name'=>'Function Room D','floor'=>'Ground Floor','capacity'=>40,'description'=>'Small function room for intimate events.','price'=>0,'half_day_rate'=>2000,'whole_day_rate'=>3000,'extension_rate'=>400,'sound_system_fee'=>1500],
+        ['id'=>5,'name'=>'Function Room E','floor'=>'Ground Floor','capacity'=>40,'description'=>'Versatile space for training and events.','price'=>0,'half_day_rate'=>2000,'whole_day_rate'=>3000,'extension_rate'=>400,'sound_system_fee'=>1500],
     ];
 }
 
@@ -883,6 +887,12 @@ if ($selected_customer_type) {
     align-items: center;
     gap: 0.3rem;
 }
+
+/* Enforced Reservation Card Size (Bypass Cache) */
+.reservation-card {
+    max-width: 900px !important;
+    margin: 0 auto !important;
+}
 </style>
 
 <main class="reservation-page">
@@ -970,7 +980,7 @@ if ($selected_customer_type) {
                     </div>
                     <div class="row">
                         <div class="col-md-6"><div class="form-group"><label>Email *</label><input type="email" class="form-control" name="email" id="email" required></div></div>
-                        <div class="col-md-6"><div class="form-group"><label>Contact Number *</label><input type="tel" class="form-control" name="contact" id="contact" required></div></div>
+                        <div class="col-md-6"><div class="form-group"><label>Contact Number *</label><input type="tel" class="form-control" name="contact" id="contact" maxlength="11" pattern="[0-9]{11}" required></div></div>
                     </div>
                     <hr>
                     <div class="row">
@@ -1073,7 +1083,7 @@ if ($selected_customer_type) {
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label>Contact Number *</label>
-                                        <input type="tel" class="form-control" name="guest_contact" id="guest_contact" required>
+                                        <input type="tel" class="form-control" name="guest_contact" id="guest_contact" maxlength="11" pattern ="[0-9]{11}" required>
                                     </div>
                                 </div>
                             </div>
@@ -1155,7 +1165,7 @@ if ($selected_customer_type) {
                                         <div class="col-6">
                                             <div class="form-group">
                                                 <label>No. of Kids *</label>
-                                                <input type="number" class="form-control" name="kids_count" id="kids_count" min="0" max="10" value="0" required>
+                                                <input type="number" class="form-control" name="kids_count" id="kids_count" min="0" max="10" value="0">
                                             </div>
                                         </div>
                                     </div>
@@ -1179,10 +1189,6 @@ if ($selected_customer_type) {
                                         <?php endforeach; ?>
                                     </select>
                                 </div>
-                                <div class="form-group">
-                                    <label>Room Type</label>
-                                    <input type="text" class="form-control" name="room_type_display" id="room_type_display" readonly value="Guest Room">
-                                </div>
                             </div>
                             
                             <div class="mt-3">
@@ -1196,14 +1202,17 @@ if ($selected_customer_type) {
                         <!-- Registered By -->
                         <div class="guest-form-section">
                             <h4><i class="bi bi-pencil-square"></i> Registered By</h4>
-                            <div class="row">
-                                <div class="col-md-6">
+                            <div class="row mb-3">
+                                <div class="col-md-12">
                                     <div class="form-group">
                                         <label>Name of Person Registering *</label>
-                                        <input type="text" class="form-control" name="registered_by" id="registered_by" placeholder="Full name" required>
+                                        <input type="text" class="form-control" name="registered_by" id="registered_by" placeholder="Full name of the person filling out this form" required>
                                     </div>
                                 </div>
                             </div>
+                            <!-- Digital Signature and Date removed -->
+                            <input type="hidden" id="guest_signature" value="">
+                            <input type="hidden" id="guest_form_date" value="<?= date('Y-m-d') ?>">
                         </div>
                         
                         <!-- Data Privacy -->
@@ -1223,29 +1232,109 @@ if ($selected_customer_type) {
                     
                     <div class="form-buttons">
                         <button type="button" class="btn-res btn-prev" onclick="goToStep(0)">Back</button>
-                        <button type="button" class="btn-res btn-next" onclick="saveGuestAndGo(2)">Continue</button>
+                        <button type="button" class="btn-res btn-next" onclick="saveGuestAndGo(4)">Continue</button>
                     </div>
                 </div>
+
 
                 <!-- Step 2: Venue selection (for Function Rooms only) -->
                 <div class="form-step" id="step2Form">
                     <div class="form-header"><h3>Select Venue</h3><p>Choose function rooms to use</p></div>
-                    
+
+                    <!-- Pricing info box — shown only for External --------------------------->
+                    <div id="externalPricingBox" style="display:none; margin-bottom:1.25rem;">
+                        <div style="background:linear-gradient(135deg,#fff5f5,#ffe8e8);border:1.5px solid #f5c6cb;border-radius:12px;padding:1rem 1.2rem;">
+                            <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.75rem;">
+                                <span style="background:#b71c1c;color:white;border-radius:8px;padding:.3rem .6rem;font-size:.78rem;font-weight:700;">💰 External Client Rates</span>
+                                <small style="color:#721c24;font-size:.72rem;">Rates apply per event, regardless of which rooms are selected.</small>
+                            </div>
+                            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:.75rem;margin-bottom:.9rem;">
+                                <div id="priceCard_half"  style="background:white;border:1.5px solid #f5c6cb;border-radius:10px;padding:.75rem;text-align:center;">
+                                    <div style="font-size:.75rem;color:#888;margin-bottom:.2rem;">⏱ Half Day (up to 4 hrs)</div>
+                                    <div style="font-size:1.35rem;font-weight:800;color:#b71c1c;" id="display_half_day">₱2,000.00</div>
+                                    <div style="font-size:.68rem;color:#aaa;">Incl. aircon, tables &amp; chairs, restrooms, parking</div>
+                                </div>
+                                <div id="priceCard_whole" style="background:white;border:1.5px solid #f5c6cb;border-radius:10px;padding:.75rem;text-align:center;">
+                                    <div style="font-size:.75rem;color:#888;margin-bottom:.2rem;">🌅 Whole Day (up to 8 hrs)</div>
+                                    <div style="font-size:1.35rem;font-weight:800;color:#b71c1c;" id="display_whole_day">₱3,000.00</div>
+                                    <div style="font-size:.68rem;color:#aaa;">Incl. aircon, tables &amp; chairs, restrooms, parking</div>
+                                </div>
+                                <div id="priceCard_ext"   style="background:white;border:1.5px solid #f5c6cb;border-radius:10px;padding:.75rem;text-align:center;">
+                                    <div style="font-size:.75rem;color:#888;margin-bottom:.2rem;">⏰ Extension (per hour)</div>
+                                    <div style="font-size:1.35rem;font-weight:800;color:#b71c1c;" id="display_ext_rate">₱400.00</div>
+                                    <div style="font-size:.68rem;color:#aaa;">Beyond the rented period</div>
+                                </div>
+                                <div id="priceCard_sound" style="background:white;border:1.5px solid #f5c6cb;border-radius:10px;padding:.75rem;text-align:center;">
+                                    <div style="font-size:.75rem;color:#888;margin-bottom:.2rem;">🔊 Basic Sound System</div>
+                                    <div style="font-size:1.35rem;font-weight:800;color:#b71c1c;" id="display_sound_fee">₱1,500.00</div>
+                                    <div style="font-size:.68rem;color:#aaa;">2 wireless mics &amp; speakers (optional)</div>
+                                </div>
+                            </div>
+                            <!-- Important notes -->
+                            <details style="border-top:1px solid #f5c6cb;padding-top:.75rem;cursor:pointer;">
+                                <summary style="font-size:.78rem;font-weight:700;color:#8b0000;list-style:none;display:flex;align-items:center;gap:.4rem;">
+                                    <i class="bi bi-info-circle-fill"></i> Important Policies &amp; Notes <span style="font-size:.7rem;opacity:.7;">(click to expand)</span>
+                                </summary>
+                                <ul style="margin:.6rem 0 0 .5rem;padding-left:1rem;font-size:.76rem;color:#555;line-height:1.9;">
+                                    <li>Payment must be <strong>settled before the day of the event</strong></li>
+                                    <li>Additional fees apply for overtime work on <strong>weekends &amp; evening events on weekdays</strong></li>
+                                    <li>Air-conditioning is turned on <strong>30 minutes before</strong> scheduled event</li>
+                                    <li>Advance setup subject to approval (AC off during setup)</li>
+                                    <li><strong>No Wi-Fi</strong> service included</li>
+                                    <li>Balloons and adhesives <strong>not allowed</strong></li>
+                                    <li><strong>No disposable water bottles</strong></li>
+                                    <li>Buffet-style food arrangement <strong>only</strong></li>
+                                    <li>No single-use plastics</li>
+                                    <li>No tarpaulins (per OUP Memorandum)</li>
+                                    <li>Proper waste segregation required</li>
+                                </ul>
+                            </details>
+                        </div>
+                    </div>
+
+                    <!-- Internal notice -->
+                    <div id="internalPricingBox" style="display:none;margin-bottom:1.25rem;">
+                        <div style="background:linear-gradient(135deg,#f0fff4,#c6f6d5);border:1.5px solid #9ae6b4;border-radius:12px;padding:.85rem 1.2rem;display:flex;align-items:center;gap:.75rem;">
+                            <i class="bi bi-check-circle-fill" style="color:#16a34a;font-size:1.4rem;flex-shrink:0;"></i>
+                            <div>
+                                <strong style="color:#14532d;font-size:.88rem;">Free for Internal University Use</strong>
+                                <div style="font-size:.75rem;color:#166534;margin-top:.1rem;">Function rooms are available at no charge for university colleges, offices, and student organizations.</div>
+                            </div>
+                        </div>
+                    </div>
+
                     <?php if (!empty($function_venues)): ?>
                     <h5 class="mt-3 mb-2">Function Rooms</h5>
+                    <?php
+                    // Use rates from first venue for display (all function rooms share same rate panel)
+                    $firstVenue = $function_venues[0];
+                    $phd  = number_format($firstVenue['half_day_rate'], 2);
+                    $pwd  = number_format($firstVenue['whole_day_rate'], 2);
+                    $per  = number_format($firstVenue['extension_rate'], 2);
+                    $psf  = number_format($firstVenue['sound_system_fee'], 2);
+                    ?>
+                    <!-- Pricing data embedded for JS -->
+                    <div id="venuePricingData"
+                         data-half-day="<?= (float)$firstVenue['half_day_rate'] ?>"
+                         data-whole-day="<?= (float)$firstVenue['whole_day_rate'] ?>"
+                         data-extension="<?= (float)$firstVenue['extension_rate'] ?>"
+                         data-sound-fee="<?= (float)$firstVenue['sound_system_fee'] ?>"
+                         style="display:none;"></div>
                     <?php foreach ($function_venues as $venue): ?>
-                    <div class="room-select-card" 
-                        data-id="<?= $venue['id'] ?>" 
-                        data-name="<?= htmlspecialchars($venue['name']) ?>" 
-                        data-floor="<?= htmlspecialchars($venue['floor'] ?? '') ?>" 
+                    <div class="room-select-card"
+                        data-id="<?= $venue['id'] ?>"
+                        data-name="<?= htmlspecialchars($venue['name']) ?>"
+                        data-floor="<?= htmlspecialchars($venue['floor'] ?? '') ?>"
                         data-capacity="<?= $venue['capacity'] ?>"
-                        data-price="<?= !empty($venue['price']) ? (float)$venue['price'] : 0 ?>"
+                        data-half-day="<?= (float)$venue['half_day_rate'] ?>"
+                        data-whole-day="<?= (float)$venue['whole_day_rate'] ?>"
+                        data-extension="<?= (float)$venue['extension_rate'] ?>"
+                        data-sound-fee="<?= (float)$venue['sound_system_fee'] ?>"
                         onclick="toggleVenue(this)">
                         <input type="checkbox" name="venue_ids[]" value="<?= $venue['id'] ?>" style="display:none">
                         <div class="d-flex justify-content-between align-items-center flex-wrap gap-1">
                             <strong><?= htmlspecialchars($venue['name']) ?></strong>
                             <div class="d-flex align-items-center gap-2">
-                                <span class="venue-price-badge badge" style="display:none; font-size:0.78rem; padding:0.35em 0.65em;"></span>
                                 <span class="badge bg-light text-dark"><?= $venue['capacity'] ?> pax</span>
                             </div>
                         </div>
@@ -1254,9 +1343,9 @@ if ($selected_customer_type) {
                     </div>
                     <?php endforeach; ?>
                     <?php endif; ?>
-                    
+
                     <p class="text-danger small mt-2" id="venueError" style="display:none">Please select at least one venue.</p>
-                    
+
                     <div class="form-buttons">
                         <button type="button" class="btn-res btn-prev" onclick="goToStep(1)">Back</button>
                         <button type="button" class="btn-res btn-next" onclick="saveAndGo(3)">Continue</button>
@@ -1267,12 +1356,23 @@ if ($selected_customer_type) {
                 <div class="form-step" id="step3Form">
                     <p class="mb-3"><strong>Add date and time for each selected facility (7:00 AM - 11:00 PM only).</strong></p>
                     <div id="scheduleFacilitiesContainer"></div>
+                    <!-- Live pricing summary for external clients -->
+                    <div id="priceSummaryBox" style="display:none;margin-top:1rem;border:1.5px solid #f5c6cb;border-radius:12px;background:linear-gradient(135deg,#fff5f5,#ffe8e8);padding:1rem 1.2rem;">
+                        <div style="font-size:.82rem;font-weight:700;color:#8b0000;margin-bottom:.6rem;"><i class="bi bi-calculator me-1"></i>Estimated Cost Breakdown</div>
+                        <div id="priceSummaryLines" style="font-size:.8rem;color:#555;line-height:2;"></div>
+                        <div style="border-top:1px solid #f5c6cb;margin-top:.6rem;padding-top:.6rem;display:flex;justify-content:space-between;align-items:center;">
+                            <strong style="color:#8b0000;font-size:.85rem;">Estimated Total</strong>
+                            <strong style="color:#b71c1c;font-size:1.1rem;" id="priceSummaryTotal">₱0.00</strong>
+                        </div>
+                        <div style="font-size:.7rem;color:#888;margin-top:.4rem;"><i class="bi bi-info-circle me-1"></i>Sound system fee added at checkout if selected. Actual bill may vary.</div>
+                    </div>
                     <p class="text-danger small mt-2" id="scheduleError" style="display:none">Please add at least one schedule for each selected facility.</p>
                     <div class="form-buttons">
                         <button type="button" class="btn-res btn-prev" onclick="goToStep(2)">Back</button>
                         <button type="button" class="btn-res btn-next" onclick="saveAndGo(4)">Continue</button>
                     </div>
                 </div>
+
 
                 <!-- Step 4: Terms -->
                 <div class="form-step" id="step4Form">
@@ -1285,32 +1385,16 @@ if ($selected_customer_type) {
                         <!-- Content will be loaded here -->
                     </div>
                     
-                    <div class="signature-section">
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Full Name *</label>
-                                <input type="text" class="form-control" id="termsFullName" placeholder="Enter your full name" required>
-                                <small class="text-muted">Type your full name as digital signature</small>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Designation/Position</label>
-                                <input type="text" class="form-control" id="termsPosition" placeholder="e.g., Event Coordinator, Organization President">
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Date</label>
-                                <input type="text" class="form-control" id="termsDate" value="<?= date('F j, Y') ?>" readonly>
-                            </div>
-                        </div>
-                        
-                        <div class="form-check">
+                    <input type="hidden" id="termsFullName" value="">
+                    <input type="hidden" id="termsPosition" value="">
+                    <input type="hidden" id="termsDate" value="<?= date('F j, Y') ?>">
+
+                    <div class="form-check mt-3">
                             <input class="form-check-input" type="checkbox" id="termsAgree" disabled>
                             <label class="form-check-label" for="termsAgree">
                                 I have read, understood, and agree to abide by the terms and conditions above. I acknowledge that failure to comply may result in penalties or affect future reservation privileges.
                             </label>
                         </div>
-                    </div>
                     
                     <div class="form-buttons">
                         <button type="button" class="btn-res btn-prev" onclick="goToStep(3)">Back</button>
@@ -1493,6 +1577,43 @@ if ($selected_customer_type) {
     </div>
 </div>
 
+<!-- Guest Count Input Modal -->
+<div class="res-modal" id="guestCountModal">
+    <div class="modal-box" style="max-width:420px; padding:2rem 1.75rem;">
+        <div style="font-size:2rem; margin-bottom:0.5rem; text-align:center;">&#128101;</div>
+        <h4 style="margin-bottom:0.25rem; font-size:1.1rem; color:#2c3e50; text-align:center;">Add Additional Guests</h4>
+        <p id="guestCountInfo" style="color:#555; font-size:0.9rem; margin-bottom:1.25rem; text-align:center; line-height:1.5;"></p>
+        <div style="margin-bottom:1.25rem;">
+            <label style="font-size:0.875rem; font-weight:600; color:#2c3e50; display:block; margin-bottom:0.5rem;">Number of guests to add</label>
+            <div style="display:flex; align-items:center; gap:0.75rem;">
+                <button type="button" onclick="guestCountStep(-1)" style="width:38px;height:38px;border-radius:50%;border:2px solid #b71c1c;background:white;color:#b71c1c;font-size:1.25rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;">&#8722;</button>
+                <input type="number" id="guestCountInput" min="1" max="99" value="1"
+                    style="flex:1;text-align:center;font-size:1.25rem;font-weight:700;border:2px solid #dee2e6;border-radius:8px;padding:0.4rem 0.5rem;color:#2c3e50;outline:none;"
+                    oninput="clampGuestCount()">
+                <button type="button" onclick="guestCountStep(1)" style="width:38px;height:38px;border-radius:50%;border:2px solid #b71c1c;background:#b71c1c;color:white;font-size:1.25rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;">+</button>
+            </div>
+            <p id="guestCountSlots" style="font-size:0.8rem;color:#888;margin-top:0.5rem;text-align:center;"></p>
+        </div>
+        <div style="display:flex;gap:0.75rem;justify-content:flex-end;">
+            <button type="button" class="btn-res btn-prev" onclick="closeGuestCountModal()">Cancel</button>
+            <button type="button" class="btn-res btn-next" onclick="confirmGuestCount()">Add Guests</button>
+        </div>
+    </div>
+</div>
+
+<!-- Guest Remove Confirm Modal -->
+<div class="res-modal" id="guestRemoveModal">
+    <div class="modal-box" style="max-width:400px;padding:2rem 1.75rem;text-align:center;">
+        <div style="font-size:2.5rem;margin-bottom:0.75rem;">&#128465;</div>
+        <h4 style="margin-bottom:0.5rem;font-size:1.1rem;color:#2c3e50;">Remove Guest?</h4>
+        <p id="guestRemoveName" style="color:#555;font-size:0.95rem;margin-bottom:1.5rem;line-height:1.6;"></p>
+        <div style="display:flex;gap:0.75rem;justify-content:center;">
+            <button type="button" class="btn-res btn-prev" onclick="closeGuestRemoveModal()">Cancel</button>
+            <button type="button" class="btn-res btn-next" style="background:#b71c1c;" onclick="confirmGuestRemove()">Yes, Remove</button>
+        </div>
+    </div>
+</div>
+
 <!-- Result Modal -->
 <div class="res-modal" id="resultModal">
     <div class="modal-box" id="resultContent"></div>
@@ -1619,6 +1740,111 @@ For further clarification and queries please feel free to contact us at 09287842
 
 Thank you. We look forward in welcoming your group here at the Hostel!`;
 
+// ========== PRICING UTILITIES ==========
+function formatPHP(num) {
+    return '₱' + parseFloat(num).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function isExternalOffice() {
+    var ot = document.getElementById('officeType');
+    if (!ot) return false;
+    var opt = ot.options[ot.selectedIndex];
+    return opt && opt.getAttribute('data-name') === 'External';
+}
+
+function getVenueRates() {
+    var data = document.getElementById('venuePricingData');
+    if (!data) return { halfDay: 2000, wholeDay: 3000, extension: 400, soundFee: 1500 };
+    return {
+        halfDay: parseFloat(data.getAttribute('data-half-day')) || 2000,
+        wholeDay: parseFloat(data.getAttribute('data-whole-day')) || 3000,
+        extension: parseFloat(data.getAttribute('data-extension')) || 400,
+        soundFee: parseFloat(data.getAttribute('data-sound-fee')) || 1500
+    };
+}
+
+function calcVenueCost(hours, rates) {
+    if (hours <= 0) return { cost: 0, type: 'Invalid' };
+    if (hours <= 4) return { cost: rates.halfDay, type: 'Half Day' };
+    if (hours <= 8) return { cost: rates.wholeDay, type: 'Whole Day' };
+    var extHours = Math.ceil(hours - 8);
+    return { cost: rates.wholeDay + (extHours * rates.extension), type: 'Whole Day + ' + extHours + 'hr Ext.' };
+}
+
+function updateVenuePriceBadges() {
+    var isExt = isExternalOffice();
+    var extBox = document.getElementById('externalPricingBox');
+    var intBox = document.getElementById('internalPricingBox');
+    
+    if (extBox) extBox.style.display = isExt ? 'block' : 'none';
+    if (intBox) intBox.style.display = isExt ? 'none' : 'block';
+    
+    if (isExt) {
+        var rates = getVenueRates();
+        var dh = document.getElementById('display_half_day');
+        var dw = document.getElementById('display_whole_day');
+        var de = document.getElementById('display_ext_rate');
+        var ds = document.getElementById('display_sound_fee');
+        if (dh) dh.textContent = formatPHP(rates.halfDay);
+        if (dw) dw.textContent = formatPHP(rates.wholeDay);
+        if (de) de.textContent = formatPHP(rates.extension);
+        if (ds) ds.textContent = formatPHP(rates.soundFee);
+    }
+}
+
+function updateSchedulePriceSummary() {
+    var summaryBox = document.getElementById('priceSummaryBox');     if (!summaryBox) return;
+    if (!isExternalOffice() || Object.keys(facilitySchedules).length === 0) {
+        summaryBox.style.display = 'none';
+        return;
+    }
+    
+    var rates = getVenueRates();
+    var linesHtml = '';
+    var totalCost = 0;
+    var hasSchedules = false;
+    
+    for (var vid in facilitySchedules) {
+        var schedules = facilitySchedules[vid];
+        if (!schedules || schedules.length === 0) continue;
+        hasSchedules = true;
+        
+        var venue = selectedVenues.find(v => v.id == vid);
+        var venueName = venue ? venue.name : 'Venue';
+        
+        schedules.forEach(function(s) {
+            var sm = timeToMins(s.start);
+            var em = timeToMins(s.end);
+            var hrs = (em - sm) / 60;
+            var calc = calcVenueCost(hrs, rates);
+            totalCost += calc.cost;
+            var displayDate = s.date; // or formatted
+            
+            linesHtml += '<div style="display:flex;justify-content:space-between;padding:.2rem 0;border-bottom:1px solid #ffe8e8;">' +
+                         '<span>' + venueName + ' ('+hrs.toFixed(1)+'h - ' + calc.type + ')</span>' +
+                         '<strong>' + formatPHP(calc.cost) + '</strong></div>';
+        });
+    }
+    
+    if (!hasSchedules) {
+        summaryBox.style.display = 'none';
+        return;
+    }
+    
+    summaryBox.style.display = 'block';
+    
+    var misc = getMiscItemsJson();
+    if (misc && misc['basic_sound_system']) {
+        totalCost += rates.soundFee;
+        linesHtml += '<div style="display:flex;justify-content:space-between;padding:.2rem 0;border-bottom:1px solid #ffe8e8;color:#b71c1c;">' +
+                     '<span>🔊 Basic Sound System</span>' +
+                     '<strong>' + formatPHP(rates.soundFee) + '</strong></div>';
+    }
+    
+    document.getElementById('priceSummaryLines').innerHTML = linesHtml;
+    document.getElementById('priceSummaryTotal').textContent = formatPHP(totalCost);
+}
+
 // Generate time slots from 7:00 AM to 11:00 PM (30-min intervals)
 var timeSlots = [];
 for (var h = 7; h <= 23; h++) {
@@ -1637,28 +1863,24 @@ function updateRoomCapacity(select) {
     
     var limitInfo = document.getElementById('roomLimitInfo');
     if (roomName && capacity) {
-        limitInfo.innerHTML = `<i class="bi bi-info-circle"></i> Selected: ${roomName} - Maximum ${capacity} guests allowed (including principal guest)`;
+        limitInfo.innerHTML = `<i class="bi bi-info-circle"></i> Selected: ${roomName} — Max ${capacity} total (1 principal + ${Math.max(0,capacity-1)} additional guest${Math.max(0,capacity-1)!==1?'s':''})`;
     } else {
         limitInfo.innerHTML = '<i class="bi bi-info-circle"></i> Select a room to see guest limits';
     }
-    
-    // Validate existing guests against new room capacity
     validateGuestCountAgainstCapacity();
 }
 
 function validateGuestCountAgainstCapacity() {
     var roomSelect = document.getElementById('guest_room_id');
     if (!roomSelect.value) return true;
-    
     var selectedOption = roomSelect.options[roomSelect.selectedIndex];
     var roomName = selectedOption.getAttribute('data-name') || '';
     var capacity = parseInt(selectedOption.getAttribute('data-capacity') || '0');
-    
+    var maxAdditional = Math.max(0, capacity - 1);
     var currentGuests = document.querySelectorAll('.guest-card').length;
-    
-    if (currentGuests > capacity) {
-        showModalAlert('⚠️', 'Exceeds Capacity', 
-            `${roomName} only allows ${capacity} additional guests. You currently have ${currentGuests} guest(s). Please remove ${currentGuests - capacity} guest(s).`);
+    if (currentGuests > maxAdditional) {
+        showModalAlert('⚠️', 'Exceeds Capacity',
+            `${roomName} allows ${capacity} total (1 principal + ${maxAdditional} additional). Please remove ${currentGuests - maxAdditional} guest(s).`);
         return false;
     }
     return true;
@@ -1671,26 +1893,53 @@ function showGuestInputDialog() {
         roomSelect.focus();
         return;
     }
-    
     var selectedOption = roomSelect.options[roomSelect.selectedIndex];
     var roomName = selectedOption.getAttribute('data-name') || '';
     var capacity = parseInt(selectedOption.getAttribute('data-capacity') || '0');
+    var maxAdditional = Math.max(0, capacity - 1);
     var currentGuests = document.querySelectorAll('.guest-card').length;
-    var availableSlots = capacity - currentGuests;
-    
+    var availableSlots = maxAdditional - currentGuests;
     if (availableSlots <= 0) {
-        showModalAlert('⚠️', 'Maximum Reached', `${roomName} has reached maximum capacity (${capacity} guests).`);
+        showModalAlert('⚠️', 'Maximum Reached',
+            `${roomName} is full (${capacity} total: 1 principal + ${maxAdditional} additional). No more guests can be added.`);
         return;
     }
-    
-    var numGuests = prompt(`How many additional guests? (Maximum: ${availableSlots})`, '1');
-    
-    if (numGuests && !isNaN(numGuests) && numGuests > 0) {
-        var guestsToAdd = Math.min(parseInt(numGuests), availableSlots);
-        for (var i = 0; i < guestsToAdd; i++) {
-            addGuestCard();
-        }
-    }
+    window._guestDialogSlots = availableSlots;
+    document.getElementById('guestCountInfo').textContent =
+        `${roomName} — ${currentGuests} of ${maxAdditional} additional slot${maxAdditional!==1?'s':''} used.`;
+    document.getElementById('guestCountSlots').textContent =
+        `You can add up to ${availableSlots} more guest${availableSlots!==1?'s':''}.`;
+    var input = document.getElementById('guestCountInput');
+    input.max = availableSlots;
+    input.value = 1;
+    document.getElementById('guestCountModal').classList.add('show');
+    setTimeout(function() { input.focus(); input.select(); }, 100);
+}
+
+function guestCountStep(delta) {
+    var input = document.getElementById('guestCountInput');
+    var val = parseInt(input.value) || 1;
+    var max = parseInt(input.max) || 1;
+    input.value = Math.min(max, Math.max(1, val + delta));
+}
+
+function clampGuestCount() {
+    var input = document.getElementById('guestCountInput');
+    var val = parseInt(input.value) || 1;
+    var max = parseInt(input.max) || 1;
+    if (val < 1) input.value = 1;
+    if (val > max) input.value = max;
+}
+
+function closeGuestCountModal() {
+    document.getElementById('guestCountModal').classList.remove('show');
+}
+
+function confirmGuestCount() {
+    var input = document.getElementById('guestCountInput');
+    var n = Math.min(parseInt(input.value) || 1, window._guestDialogSlots || 1);
+    closeGuestCountModal();
+    for (var i = 0; i < n; i++) { addGuestCard(); }
 }
 
 function addGuestCard(guestData = null) {
@@ -1743,11 +1992,27 @@ function addGuestCard(guestData = null) {
 }
 
 function removeGuestCard(button) {
-    if (confirm('Are you sure you want to remove this guest?')) {
-        var card = button.closest('.guest-card');
-        card.remove();
+    var card = button.closest('.guest-card');
+    var nameInput = card.querySelector('input[name="guest_names[]"]');
+    var guestName = (nameInput && nameInput.value.trim()) ? nameInput.value.trim() : 'this guest';
+    window._pendingRemoveCard = card;
+    document.getElementById('guestRemoveName').textContent =
+        `Are you sure you want to remove "${guestName}" from the guest list?`;
+    document.getElementById('guestRemoveModal').classList.add('show');
+}
+
+function closeGuestRemoveModal() {
+    document.getElementById('guestRemoveModal').classList.remove('show');
+    window._pendingRemoveCard = null;
+}
+
+function confirmGuestRemove() {
+    if (window._pendingRemoveCard) {
+        window._pendingRemoveCard.remove();
+        window._pendingRemoveCard = null;
         saveFormData();
     }
+    closeGuestRemoveModal();
 }
 
 function calculateAge(dob) {
@@ -1869,7 +2134,7 @@ function saveGuestAndGo(n) {
 
 function validateGuestForm() {
     // Basic validation
-    var required = ['guest_last_name', 'guest_first_name', 'guest_dob', 'guest_address', 'guest_email', 'guest_contact', 'arrival_date', 'departure_date', 'checkin_time', 'checkout_time', 'adults_count', 'guest_room_id', 'registered_by', 'guest_signature'];
+    var required = ['guest_last_name', 'guest_first_name', 'guest_dob', 'guest_address', 'guest_email', 'guest_contact', 'arrival_date', 'departure_date', 'checkin_time', 'checkout_time', 'adults_count', 'guest_room_id', 'registered_by'];
     
     for (var i = 0; i < required.length; i++) {
         var el = document.getElementById(required[i]);
@@ -2089,6 +2354,17 @@ function saveAndGo(n) {
 function goToStep(n) {
     if (n < 0 || n > 6) return;
     
+    // REDIRECTION LOGIC FOR GUEST ROOM BOOKINGS (Skip Steps 2, 3, and 5)
+    if (typeof reservationType !== 'undefined' && reservationType === 'guest') {
+        if (n === 2 || n === 3) {
+            // Forward from Step 1G -> Step 4, or Backward from Step 4 -> Step 1G
+            n = (n > (typeof currentStep !== 'undefined' ? currentStep : 0)) ? 4 : 1;
+        } else if (n === 5) {
+            // Forward from Step 4 -> Step 6, or Backward from Step 6 -> Step 4
+            n = (n > (typeof currentStep !== 'undefined' ? currentStep : 0)) ? 6 : 4;
+        }
+    }
+    
     // Hide all form steps
     document.querySelectorAll('.form-step').forEach(function(s){ s.classList.remove('active'); s.style.display = 'none'; });
     
@@ -2124,7 +2400,12 @@ function goToStep(n) {
     currentStep = n;
     
     if (n === 3 && reservationType !== 'guest') renderScheduleStep();
-    if (n === 2 && reservationType !== 'guest') updateVenuePriceBadges();
+    if (n === 2 && reservationType !== 'guest') {
+        updateVenuePricingDisplay();
+    }
+    if (n === 3 && reservationType !== 'guest') {
+        updateSchedulePriceSummary();
+    }
     if (n === 4) {
         if (reservationType === 'guest') {
             loadGuestTerms();
@@ -2135,7 +2416,150 @@ function goToStep(n) {
     if (n === 6) buildSummary();
     
     saveFormData();
+
+    // Scroll back to top to ensure the next step content is visible
+    setTimeout(function() {
+        const formContainer = document.querySelector('.reservation-card');
+        if (formContainer) {
+            const yOffset = -80; 
+            const y = formContainer.getBoundingClientRect().top + window.pageYOffset + yOffset;
+            window.scrollTo({top: y, behavior: 'smooth'});
+        } else {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    }, 50);
 }
+
+/* ──────────────────────────────────────────────────────────────
+   PRICING HELPERS
+   ────────────────────────────────────────────────────────────── */
+
+/** Returns true if the currently selected officeType is "External" */
+function isExternalOffice() {
+    var sel = document.getElementById('officeType');
+    if (!sel || !sel.value) return false;
+    var opt = sel.options[sel.selectedIndex];
+    return opt && opt.getAttribute('data-name') === 'External';
+}
+
+/** Get the rate values from the embedded PHP data element */
+function getVenueRates() {
+    var el = document.getElementById('venuePricingData');
+    if (!el) return { halfDay: 2000, wholeDay: 3000, extension: 400, soundFee: 1500 };
+    return {
+        halfDay:   parseFloat(el.getAttribute('data-half-day'))  || 2000,
+        wholeDay:  parseFloat(el.getAttribute('data-whole-day')) || 3000,
+        extension: parseFloat(el.getAttribute('data-extension')) || 400,
+        soundFee:  parseFloat(el.getAttribute('data-sound-fee')) || 1500
+    };
+}
+
+/** Format Philippine Peso */
+function formatPHP(amount) {
+    return '₱' + parseFloat(amount).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+/**
+ * Calculate the venue-rental cost for a given duration in decimal hours.
+ * < 4h  → half-day rate
+ * 4–8h  → whole-day rate
+ * > 8h  → whole-day + extension for each additional hour (ceiling)
+ */
+function calcVenueCost(hours, rates) {
+    var type, cost;
+    if (hours <= 4) {
+        type = 'Half Day';
+        cost = rates.halfDay;
+    } else if (hours <= 8) {
+        type = 'Whole Day';
+        cost = rates.wholeDay;
+    } else {
+        var overHours = Math.ceil(hours - 8);
+        type = 'Whole Day + ' + overHours + 'h Extension';
+        cost = rates.wholeDay + (overHours * rates.extension);
+    }
+    return { type: type, cost: cost };
+}
+
+/** Show / hide pricing info box in Step 2 based on office type. Also update displayed rate values. */
+function updateVenuePricingDisplay() {
+    var extBox  = document.getElementById('externalPricingBox');
+    var intBox  = document.getElementById('internalPricingBox');
+    if (!extBox || !intBox) return;
+
+    var isExt = isExternalOffice();
+    extBox.style.display = isExt ? 'block' : 'none';
+    intBox.style.display = (!isExt) ? 'block' : 'none';
+
+    if (isExt) {
+        var rates = getVenueRates();
+        var hd = document.getElementById('display_half_day');
+        var wd = document.getElementById('display_whole_day');
+        var er = document.getElementById('display_ext_rate');
+        var sf = document.getElementById('display_sound_fee');
+        if (hd) hd.textContent = formatPHP(rates.halfDay);
+        if (wd) wd.textContent = formatPHP(rates.wholeDay);
+        if (er) er.textContent = formatPHP(rates.extension);
+        if (sf) sf.textContent = formatPHP(rates.soundFee);
+    }
+}
+
+/** Build / refresh the live cost summary in Step 3 (External only). */
+function updateSchedulePriceSummary() {
+    var box = document.getElementById('priceSummaryBox');
+    var linesEl = document.getElementById('priceSummaryLines');
+    var totalEl = document.getElementById('priceSummaryTotal');
+    if (!box || !linesEl || !totalEl) return;
+
+    if (!isExternalOffice()) {
+        box.style.display = 'none';
+        return;
+    }
+
+    var rates = getVenueRates();
+    var lines = '';
+    var grandTotal = 0;
+    var hasSchedules = false;
+
+    // Loop over selected venues and their schedules
+    Object.keys(facilitySchedules || {}).forEach(function(vid) {
+        var scheds = facilitySchedules[vid];
+        if (!scheds || scheds.length === 0) return;
+        // Find the venue name
+        var venueObj = (selectedVenues || []).find(function(v){ return String(v.id) === String(vid); });
+        var vname = venueObj ? venueObj.name : 'Venue #' + vid;
+
+        scheds.forEach(function(sched) {
+            if (!sched.start || !sched.end) return;
+            hasSchedules = true;
+            // Compute hours
+            var startParts = sched.start.split(':').map(Number);
+            var endParts   = sched.end.split(':').map(Number);
+            var startMins  = startParts[0] * 60 + (startParts[1] || 0);
+            var endMins    = endParts[0]   * 60 + (endParts[1]   || 0);
+            if (endMins <= startMins) endMins += 24 * 60; // overnight
+            var hours = (endMins - startMins) / 60;
+
+            var calc = calcVenueCost(hours, rates);
+            grandTotal += calc.cost;
+
+            lines += '<div style="display:flex;justify-content:space-between;">' +
+                     '<span>' + escapeHtml(vname) + ' — ' + escapeHtml(sched.date || '') + ' (' + hours.toFixed(1) + 'h, ' + calc.type + ')</span>' +
+                     '<strong style="color:#b71c1c;">' + formatPHP(calc.cost) + '</strong>' +
+                     '</div>';
+        });
+    });
+
+    if (!hasSchedules) {
+        box.style.display = 'none';
+        return;
+    }
+
+    linesEl.innerHTML = lines;
+    totalEl.textContent = formatPHP(grandTotal);
+    box.style.display = 'block';
+}
+
 
 function goStep(n) {
     saveAndGo(n);
@@ -2536,10 +2960,13 @@ function validateStep(n) {
             return false; 
         }
         
-        if (!document.getElementById('termsFullName').value.trim()) {
-            showModalAlert('✍️', 'Signature Required', 'Please enter your full name as digital signature.');
-            document.getElementById('termsFullName').focus();
-            return false;
+        if (reservationType !== 'guest') {
+            var fnEl = document.getElementById('termsFullName');
+            if (fnEl && !fnEl.value.trim()) {
+                showModalAlert('✍️', 'Signature Required', 'Please enter your full name as digital signature.');
+                fnEl.focus();
+                return false;
+            }
         }
     }
     
@@ -3315,6 +3742,11 @@ function updateScheduleList(venueId) {
     if (countEl) {
         countEl.textContent = schedules.length;
     }
+
+    // Refresh live pricing summary for external clients
+    if (typeof updateSchedulePriceSummary === 'function') {
+        updateSchedulePriceSummary();
+    }
 }
 
 function removeSchedule(venueId, index) {
@@ -3493,6 +3925,7 @@ function buildFunctionSummary() {
     }
     
     var misc = getMiscItemsJson();
+    var hasSoundSystem = misc && misc['basic_sound_system'] !== undefined;
     if (misc && Object.keys(misc).length > 0) {
         html += '<h6 class="text-danger mt-3 mb-2">Miscellaneous Items</h6>';
         Object.keys(misc).forEach(function(k) {
@@ -3506,6 +3939,55 @@ function buildFunctionSummary() {
                 html += '<div class="summary-item"><strong>' + label + ':</strong> ' + (v.quantity||0) + ' pcs</div>';
             }
         });
+    }
+    
+    // ── Cost Breakdown (External clients only) ──────────────────────────
+    if (isExternalOffice()) {
+        var rates = getVenueRates();
+        var summaryLines = '';
+        var sumTotal = 0;
+        var hasSched = false;
+
+        for (var cvid in facilitySchedules) {
+            var cVenue = selectedVenues.find(function(v){ return v.id == cvid; });
+            var cName = cVenue ? cVenue.name : 'Venue';
+            (facilitySchedules[cvid] || []).forEach(function(cs) {
+                if (!cs.start || !cs.end) return;
+                hasSched = true;
+                var sp = cs.start.split(':').map(Number);
+                var ep = cs.end.split(':').map(Number);
+                var sm = sp[0]*60 + (sp[1]||0);
+                var em = ep[0]*60 + (ep[1]||0);
+                if (em <= sm) em += 24*60;
+                var hrs = (em - sm) / 60;
+                var calc = calcVenueCost(hrs, rates);
+                sumTotal += calc.cost;
+                summaryLines += '<div style="display:flex;justify-content:space-between;font-size:.82rem;padding:.2rem 0;">' +
+                    '<span>' + escapeHtml(cName) + ' — ' + escapeHtml(cs.date||'') + ' (' + hrs.toFixed(1) + 'h, ' + calc.type + ')</span>' +
+                    '<strong style="color:#b71c1c;">' + formatPHP(calc.cost) + '</strong></div>';
+            });
+        }
+
+        if (hasSched) {
+            var soundFeeNote = '';
+            if (hasSoundSystem) {
+                sumTotal += rates.soundFee;
+                soundFeeNote = '<div style="display:flex;justify-content:space-between;font-size:.82rem;padding:.2rem 0;">' +
+                    '<span>🔊 Basic Sound System</span>' +
+                    '<strong style="color:#b71c1c;">' + formatPHP(rates.soundFee) + '</strong></div>';
+            }
+
+            html += '<h6 class="text-danger mt-3 mb-2">💰 Cost Breakdown</h6>';
+            html += '<div style="background:linear-gradient(135deg,#fff5f5,#ffe8e8);border:1.5px solid #f5c6cb;border-radius:10px;padding:.85rem 1rem;margin-top:.5rem;">';
+            html += summaryLines;
+            html += soundFeeNote;
+            html += '<div style="border-top:1px dashed #f5c6cb;margin:.5rem 0;"></div>';
+            html += '<div style="display:flex;justify-content:space-between;font-size:.9rem;">' +
+                    '<strong style="color:#8b0000;">Total Amount Due</strong>' +
+                    '<strong style="color:#b71c1c;font-size:1.1rem;">' + formatPHP(sumTotal) + '</strong></div>';
+            html += '<div style="font-size:.72rem;color:#b71c1c;margin-top:.5rem;"><i class="bi bi-exclamation-circle me-1"></i>Payment must be settled <strong>before the day of the event.</strong></div>';
+            html += '</div>';
+        }
     }
     
     var banquetId = document.getElementById('banquetStyleId')?.value;
@@ -3686,8 +4168,8 @@ function submitGuestReservation() {
     
     // Consent & Signature
     fd.append('data_privacy_consent', document.getElementById('guestConsent').checked ? '1' : '0');
-    fd.append('digital_signature', document.getElementById('guest_signature').value);
-    fd.append('guest_form_date', document.getElementById('guest_form_date').value);
+    fd.append('digital_signature', document.getElementById('guest_signature')?.value || '');
+    fd.append('guest_form_date', document.getElementById('guest_form_date')?.value || '<?= date("Y-m-d") ?>');
     
     // Terms acceptance (from step 4)
     fd.append('terms_agreed_by', document.getElementById('termsFullName')?.value || '');
@@ -3723,15 +4205,12 @@ function submitToServer(formData, url) {
         content.className = 'modal-box';
         
         if (data.success) {
-            content.innerHTML = '<h4>✅ Success</h4>' +
-                               '<p>' + (data.message || 'Reservation submitted successfully!') + '</p>' +
-                               '<p><strong>Booking No:</strong> ' + (data.booking_no || '') + '</p>' +
-                               '<button type="button" class="btn-res btn-next mt-3" onclick="closeResultModal()">Close</button>';
+            content.innerHTML = '<h4>✅ Reservation Submitted!</h4>' +
+                               '<p>' + (data.message || 'Your reservation has been submitted successfully!') + '</p>' +
+                               (data.booking_no ? '<p><strong>Booking No:</strong> ' + data.booking_no + '</p>' : '') +
+                               '<p class="text-muted" style="font-size:0.875rem;">You will be notified once your reservation is confirmed.</p>' +
+                               '<button type="button" class="btn-res btn-next mt-3" onclick="closeResultModal(); window.location.href=\'index.php\'">OK, Go to Home</button>';
             clearSavedData();
-            
-            setTimeout(function() {
-                window.location.href = 'index.php';
-            }, 2000);
         } else {
             content.innerHTML = '<h4>❌ Error</h4>' +
                                '<p>' + (data.message || 'An error occurred.') + '</p>' +
@@ -3758,6 +4237,8 @@ function closeResultModal() {
 }
 
 document.getElementById('resultModal')?.addEventListener('click', function(e) { if (e.target === this) closeResultModal(); });
+document.getElementById('guestCountModal')?.addEventListener('click', function(e) { if (e.target === this) closeGuestCountModal(); });
+document.getElementById('guestRemoveModal')?.addEventListener('click', function(e) { if (e.target === this) closeGuestRemoveModal(); });
 document.getElementById('banquetModal')?.addEventListener('click', function(e) { if (e.target === this) closeBanquetModal(); });
 document.getElementById('confirmModal')?.addEventListener('click', function(e) { if (e.target === this) closeConfirmModal(); });
 document.getElementById('timeSlotModal')?.addEventListener('click', function(e) { if (e.target === this) closeTimeModal(); });
@@ -3767,10 +4248,10 @@ document.addEventListener('DOMContentLoaded', function() {
     
     loadBanquetStyles();
     
-    // Show the resume banner if saved data exists — do NOT auto-restore or auto-advance.
-    // The user must explicitly click "Resume" to continue where they left off,
-    // or "Start Fresh" to clear the session and start over.
-    checkForSavedData();
+    // Automatically resume session to prevent data loss on accidental refresh
+    if (sessionStorage.getItem('reservationFormData') && sessionStorage.getItem('reservationStep')) {
+        resumeSavedSession();
+    }
     
     var officeType = document.getElementById('officeType');
     if (officeType) {
@@ -3817,6 +4298,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
             saveFormData();
+            if (typeof updateSchedulePriceSummary === 'function') {
+                updateSchedulePriceSummary();
+            }
         });
     });
     

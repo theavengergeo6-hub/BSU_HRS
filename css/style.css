@@ -1270,6 +1270,8 @@ a.text-primary, .text-primary {
     border-radius: 16px; 
     box-shadow: 0 4px 20px rgba(0,0,0,0.08); 
     padding: 2rem; 
+    max-width: 900px;
+    margin: 0 auto;
 }
 
 .reservation-page h1 { 

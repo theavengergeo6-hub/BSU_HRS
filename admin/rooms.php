@@ -35,20 +35,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['venue_action'])) {
         }
     }
 
-    // ── Update venue settings (price, extra bed, capacity) ─────────
+    // ── Update venue settings (price, extra bed, capacity, function room rates) ──
     elseif ($venue_action === 'update_venue_settings') {
+        // Detect AJAX
+        $is_ajax = isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
+
         $venue_id          = (int)($_POST['venue_id']   ?? 0);
+        $capacity          = (int)($_POST['capacity']   ?? 0);
+        // Function room rate fields
+        $half_day_rate     = (float)($_POST['half_day_rate']    ?? 2000);
+        $whole_day_rate    = (float)($_POST['whole_day_rate']   ?? 3000);
+        $extension_rate    = (float)($_POST['extension_rate']   ?? 400);
+        $sound_system_fee  = (float)($_POST['sound_system_fee'] ?? 1500);
+        // Guest room fields
         $price             = (float)($_POST['price']    ?? 0);
         $extra_bed_avail   = isset($_POST['extra_bed_available']) ? 1 : 0;
         $extra_bed_price   = (float)($_POST['extra_bed_price']  ?? 500);
-        $capacity          = (int)($_POST['capacity']   ?? 0);
+
         if ($venue_id) {
-            $stmt = $conn->prepare("UPDATE venues SET price=?, extra_bed_available=?, extra_bed_price=?, capacity=? WHERE id=?");
-            $stmt->bind_param("diidi", $price, $extra_bed_avail, $extra_bed_price, $capacity, $venue_id);
-            $stmt->execute()
-                ? $message = '<div class="alert alert-success alert-dismissible fade show"><i class="bi bi-check-circle me-2"></i>Room settings saved. <button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>'
-                : $message = '<div class="alert alert-danger alert-dismissible fade show">Save failed: '.$conn->error.' <button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>';
+            $stmt = $conn->prepare("UPDATE venues
+                SET price=?, extra_bed_available=?, extra_bed_price=?, capacity=?,
+                    half_day_rate=?, whole_day_rate=?, extension_rate=?, sound_system_fee=?
+                WHERE id=?");
+            $stmt->bind_param("diididdi", $price, $extra_bed_avail, $extra_bed_price, $capacity,
+                $half_day_rate, $whole_day_rate, $extension_rate, $sound_system_fee, $venue_id);
+            $ok = $stmt->execute();
             $stmt->close();
+
+            if ($is_ajax) {
+                header('Content-Type: application/json');
+                echo json_encode(['success' => $ok, 'message' => $ok ? 'Settings saved!' : $conn->error]);
+                exit;
+            }
+            $message = $ok
+                ? '<div class="alert alert-success alert-dismissible fade show"><i class="bi bi-check-circle me-2"></i>Room settings saved. <button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>'
+                : '<div class="alert alert-danger alert-dismissible fade show">Save failed: '.$conn->error.' <button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>';
         }
     }
 
@@ -1391,25 +1412,45 @@ body {
             </div>
             <?php endif; ?>
 
-            <!-- Settings: price -->
+            <!-- Settings: function room pricing -->
             <div class="vpc-settings" id="settings_<?= $v['id'] ?>">
-                <form method="POST">
-                    <input type="hidden" name="venue_action" value="update_venue_settings">
-                    <input type="hidden" name="venue_id" value="<?= $v['id'] ?>">
-                    <div class="settings-row">
-                        <div>
-                            <label>Room Hire Fee (₱)</label>
-                            <input type="number" name="price" min="0" step="100"
-                                   value="<?= htmlspecialchars($v['price'] ?? '') ?>" placeholder="e.g. 5000">
-                        </div>
-                        <div>
-                            <label>Capacity</label>
-                            <input type="number" name="capacity" min="1"
-                                   value="<?= htmlspecialchars($v['capacity'] ?? '') ?>">
-                        </div>
+                <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#b71c1c;margin-bottom:.6rem;">External Client Rates</div>
+                <div class="settings-row">
+                    <div>
+                        <label>Half Day Rate — 4 hrs (₱)</label>
+                        <input type="number" id="hdr_<?= $v['id'] ?>" min="0" step="50"
+                               value="<?= htmlspecialchars((string)($v['half_day_rate'] ?? 2000)) ?>" placeholder="2000">
                     </div>
-                    <button type="submit" class="btn-settings-save w-100"><i class="bi bi-floppy me-1"></i> Save</button>
-                </form>
+                    <div>
+                        <label>Whole Day Rate — 8 hrs (₱)</label>
+                        <input type="number" id="wdr_<?= $v['id'] ?>" min="0" step="50"
+                               value="<?= htmlspecialchars((string)($v['whole_day_rate'] ?? 3000)) ?>" placeholder="3000">
+                    </div>
+                </div>
+                <div class="settings-row">
+                    <div>
+                        <label>Extension Rate — per hour (₱)</label>
+                        <input type="number" id="exr_<?= $v['id'] ?>" min="0" step="50"
+                               value="<?= htmlspecialchars((string)($v['extension_rate'] ?? 400)) ?>" placeholder="400">
+                    </div>
+                    <div>
+                        <label>Sound System Fee (₱)</label>
+                        <input type="number" id="ssr_<?= $v['id'] ?>" min="0" step="50"
+                               value="<?= htmlspecialchars((string)($v['sound_system_fee'] ?? 1500)) ?>" placeholder="1500">
+                    </div>
+                </div>
+                <div class="settings-row">
+                    <div>
+                        <label>Capacity (pax)</label>
+                        <input type="number" id="cap_<?= $v['id'] ?>" min="1"
+                               value="<?= htmlspecialchars((string)($v['capacity'] ?? '')) ?>">
+                    </div>
+                    <div></div>
+                </div>
+                <button type="button" class="btn-settings-save w-100"
+                        onclick="saveVenueSettings(<?= $v['id'] ?>)">
+                    <i class="bi bi-floppy me-1"></i> Save Settings
+                </button>
             </div>
 
             <!-- Upload zone -->
@@ -2195,6 +2236,37 @@ function quickReplace(input, venueId, oldImgId) {
         zone.style.background = '#fafafa';
     }
 
+
+/* ── Save function room pricing settings via AJAX ── */
+function saveVenueSettings(id) {
+    var btn = document.querySelector('#settings_' + id + ' .btn-settings-save');
+    var orig = btn ? btn.innerHTML : '';
+    if (btn) { btn.innerHTML = '<i class="bi bi-hourglass-split me-1"></i> Saving…'; btn.disabled = true; }
+
+    var fd = new FormData();
+    fd.append('venue_action', 'update_venue_settings');
+    fd.append('venue_id',       id);
+    fd.append('half_day_rate',   document.getElementById('hdr_' + id)?.value || 2000);
+    fd.append('whole_day_rate',  document.getElementById('wdr_' + id)?.value || 3000);
+    fd.append('extension_rate',  document.getElementById('exr_' + id)?.value || 400);
+    fd.append('sound_system_fee',document.getElementById('ssr_' + id)?.value || 1500);
+    fd.append('capacity',        document.getElementById('cap_' + id)?.value || 0);
+
+    fetch(window.location.href, {
+        method: 'POST',
+        body: fd,
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+        if (btn) { btn.innerHTML = orig; btn.disabled = false; }
+        showNotification(data.success ? '✅ Settings saved!' : '❌ ' + data.message, data.success ? 'success' : 'danger');
+    })
+    .catch(function() {
+        if (btn) { btn.innerHTML = orig; btn.disabled = false; }
+        showNotification('❌ Save failed — please try again.', 'danger');
+    });
+}
 
 </script>
 
