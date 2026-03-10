@@ -697,7 +697,7 @@ $guest_preview = $conn->query("
         <div class="dashboard-card">
             <div class="card-header">
                 <h3><i class="bi bi-calendar-check" style="color: var(--bsu-red);"></i> Next 5 Days</h3>
-                <a href="calendar.php">View Calendar <i class="bi bi-arrow-right"></i></a>
+                <a href="reservations.php">View Calendar <i class="bi bi-arrow-right"></i></a>
             </div>
             
             <?php if ($upcoming && $upcoming->num_rows > 0): ?>

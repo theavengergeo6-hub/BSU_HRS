@@ -81,7 +81,12 @@ $total_count = $pending_count + $pencil_count;
     border: 2px solid transparent;
 }
 
-.status-tab.pending-tab {
+.status-tab {
+    background: rgb(255, 183, 183);
+    color:rgba(128, 85, 85, 0.94);
+}
+
+.pending-tab{
     background: #fff3cd;
     color: #856404;
 }
@@ -628,7 +633,7 @@ $total_count = $pending_count + $pencil_count;
 
     <!-- Status Tabs -->
     <div class="status-tabs">
-        <div class="status-tab pending-tab active" onclick="filterReservations('all')">
+        <div class="status-tab active" onclick="filterReservations('all')">
             All <span class="count"><?= $total_count ?></span>
         </div>
         <div class="status-tab pending-tab" onclick="filterReservations('pending')">
