@@ -42,6 +42,7 @@ try {
     $remarks        = clean($_POST['remarks']        ?? '');
     $registered_by  = clean($_POST['registered_by'] ?? '');
     $data_privacy   = (int)($_POST['data_privacy_consent'] ?? 0);
+    $digital_signature = $_POST['digital_signature'] ?? '';
 
     $guest_name = trim($first_name . ($middle_initial ? ' ' . $middle_initial . '.' : '') . ' ' . $last_name);
     $num_guests = max(1, $adults_count + $kids_count);
@@ -81,37 +82,72 @@ try {
     }
     $chk->close();
 
-    $special_requests = json_encode([
-        'registered_by' => $registered_by,
-        'dob'           => $date_of_birth,
-        'address'       => $address,
-        'adults'        => $adults_count,
-        'kids'          => $kids_count,
-        'checkin_time'  => $checkin_time,
-        'checkout_time' => $checkout_time,
-        'other_guests'  => json_decode($other_guests, true) ?: [],
-        'data_privacy'  => $data_privacy,
-        'remarks'       => $remarks,
-    ]);
+    // Normalize other guests JSON
+    $other_guests_json = '[]';
+    $decoded_other = json_decode($other_guests, true);
+    if (is_array($decoded_other)) {
+        $other_guests_json = json_encode($decoded_other, JSON_UNESCAPED_UNICODE);
+    }
 
-    // Corrected INSERT statement with proper column names from the schema.
+    // Pricing (basic): room price per night * nights (+ extra beds not handled here)
+    $room_price_per_night = 0.00;
+    $rp = $conn->prepare("SELECT price_per_night FROM guest_rooms WHERE id = ? LIMIT 1");
+    if ($rp) {
+        $rp->bind_param('i', $room_id);
+        $rp->execute();
+        $rpr = $rp->get_result()->fetch_assoc();
+        if ($rpr && isset($rpr['price_per_night'])) $room_price_per_night = (float)$rpr['price_per_night'];
+        $rp->close();
+    }
+    $nights = (int)((strtotime($departure_date) - strtotime($arrival_date)) / 86400);
+    if ($nights < 1) $nights = 1;
+    $subtotal = $room_price_per_night * $nights;
+    $total_amount = $subtotal;
+
+    // Booking number must exist (FK/UI expects this)
+    $booking_no = 'GBK-' . date('Ymd') . '-' . str_pad((string)random_int(1, 9999), 4, '0', STR_PAD_LEFT);
+
+    // Insert into the actual guest_room_reservations schema columns.
     $ins = $conn->prepare(
         "INSERT INTO guest_room_reservations
-            (guest_name, guest_email, guest_contact, guest_room_id, check_in_date, check_out_date, total_guests,
-             special_requests, status)
-         VALUES (?,?,?,?,?,?,?,?,'pending')"
+            (booking_no, guest_name, guest_email, guest_contact, guest_address, guest_dob,
+             check_in_date, check_out_date, check_in_time, check_out_time,
+             adults_count, children_count, total_guests, guest_room_id,
+             room_price_per_night, subtotal, total_amount,
+             other_guests, special_requests,
+             terms_accepted_by, data_privacy_consent, digital_signature,
+             status)
+         VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,'pending')"
     );
     if (!$ins) jsonOut(['success' => false, 'message' => 'DB prepare error: ' . $conn->error]);
 
-    $ins->bind_param("sssissis",
-        $guest_name, $email, $contact_number, $room_id,
-        $arrival_date, $departure_date, $num_guests,
-        $special_requests
+    $ins->bind_param(
+        "ssssssssssiiiidddsssis",
+        $booking_no,           // s
+        $guest_name,           // s
+        $email,                // s
+        $contact_number,       // s
+        $address,              // s
+        $date_of_birth,        // s (date as string)
+        $arrival_date,         // s
+        $departure_date,       // s
+        $checkin_time,         // s
+        $checkout_time,        // s
+        $adults_count,         // i
+        $kids_count,           // i
+        $num_guests,           // i
+        $room_id,              // i
+        $room_price_per_night, // d
+        $subtotal,             // d
+        $total_amount,         // d
+        $other_guests_json,    // s
+        $remarks,              // s
+        $registered_by,        // s (terms_accepted_by)
+        $data_privacy,         // i
+        $digital_signature     // s
     );
 
     if ($ins->execute()) {
-        $new_id     = $conn->insert_id;
-        $booking_no = 'GBK-'.date('Ymd').'-'.str_pad($new_id, 4, '0', STR_PAD_LEFT);
         jsonOut(['success' => true, 'message' => 'Guest reservation submitted successfully! You will be notified once it is confirmed.', 'booking_no' => $booking_no]);
     } else {
         // Correctly report the error from the statement, not the connection

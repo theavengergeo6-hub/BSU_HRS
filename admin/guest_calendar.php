@@ -14,43 +14,53 @@ $end_date   = date('Y-m-t', strtotime($start_date));
 // Get guest reservation counts for stats
 $total_month = $conn->query("
     SELECT COUNT(*) as c 
-    FROM guest_reservations 
-    WHERE MONTH(arrival_date)=$month AND YEAR(arrival_date)=$year
+    FROM guest_room_reservations
+    WHERE deleted = 0
+      AND MONTH(check_in_date)=$month AND YEAR(check_in_date)=$year
 ")->fetch_assoc()['c'];
 
 $confirmed_month = $conn->query("
     SELECT COUNT(*) as c 
-    FROM guest_reservations 
-    WHERE status='confirmed' 
-    AND MONTH(arrival_date)=$month AND YEAR(arrival_date)=$year
+    FROM guest_room_reservations
+    WHERE deleted = 0
+      AND status='confirmed' 
+      AND MONTH(check_in_date)=$month AND YEAR(check_in_date)=$year
 ")->fetch_assoc()['c'];
 
 $pending_month = $conn->query("
     SELECT COUNT(*) as c 
-    FROM guest_reservations 
-    WHERE status='pending' 
-    AND MONTH(arrival_date)=$month AND YEAR(arrival_date)=$year
+    FROM guest_room_reservations
+    WHERE deleted = 0
+      AND status='pending' 
+      AND MONTH(check_in_date)=$month AND YEAR(check_in_date)=$year
 ")->fetch_assoc()['c'];
 
 $completed_month = $conn->query("
     SELECT COUNT(*) as c 
-    FROM guest_reservations 
-    WHERE status='completed' 
-    AND MONTH(arrival_date)=$month AND YEAR(arrival_date)=$year
+    FROM guest_room_reservations
+    WHERE deleted = 0
+      AND status='checked_out'
+      AND MONTH(check_in_date)=$month AND YEAR(check_in_date)=$year
 ")->fetch_assoc()['c'];
 
 // Get all guest reservations for the month
 $guest_reservations = $conn->query("
-    SELECT gr.*, v.name as venue_name, v.floor,
-           DATE(gr.arrival_date) as start_date,
-           DATE(gr.departure_date) as end_date,
-           CONCAT(gr.last_name, ', ', gr.first_name) as guest_name
-    FROM guest_reservations gr
-    JOIN venues v ON gr.room_id = v.id
-    WHERE (MONTH(gr.arrival_date) = $month OR MONTH(gr.departure_date) = $month)
-    AND (YEAR(gr.arrival_date) = $year OR YEAR(gr.departure_date) = $year)
-    AND gr.status IN ('confirmed', 'pending')
-    ORDER BY gr.arrival_date ASC
+    SELECT 
+        gr.*,
+        g.room_name as venue_name,
+        g.floor,
+        DATE(gr.check_in_date)  as start_date,
+        DATE(gr.check_out_date) as end_date,
+        gr.guest_name as guest_name,
+        gr.check_in_date  as arrival_date,
+        gr.check_out_date as departure_date
+    FROM guest_room_reservations gr
+    JOIN guest_rooms g ON gr.guest_room_id = g.id
+    WHERE gr.deleted = 0
+      AND (MONTH(gr.check_in_date) = $month OR MONTH(gr.check_out_date) = $month)
+      AND (YEAR(gr.check_in_date) = $year OR YEAR(gr.check_out_date) = $year)
+    AND gr.status IN ('confirmed', 'checked_in', 'pending')
+    ORDER BY gr.check_in_date ASC
 ");
 
 // Group reservations by date
@@ -282,7 +292,7 @@ function showGuestEvents(date) {
                     <div class="event-detail-item"><i class="bi bi-building"></i><span>${escapeHtml(event.venue_name)} (${escapeHtml(event.floor)})</span></div>
                     <div class="event-detail-item"><i class="bi bi-calendar"></i><span>Arrival: ${formatDate(event.arrival_date)}</span></div>
                     <div class="event-detail-item"><i class="bi bi-calendar-check"></i><span>Departure: ${formatDate(event.departure_date)}</span></div>
-                    <div class="event-detail-item"><i class="bi bi-people"></i><span>${event.adults_count} Adult(s), ${event.kids_count} Kid(s)</span></div>
+                    <div class="event-detail-item"><i class="bi bi-people"></i><span>${event.adults_count} Adult(s), ${event.children_count} Kid(s)</span></div>
                 </div>
                 <div class="view-link"><a href="guest_reservation_details.php?id=${event.id}">View Details <i class="bi bi-arrow-right"></i></a></div>
             </div>

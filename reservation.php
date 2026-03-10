@@ -1217,7 +1217,19 @@ if ($selected_customer_type) {
                                     </div>
                                 </div>
                             </div>
-                            <!-- Digital Signature and Date removed -->
+                            <!-- Digital Signature (draw) -->
+                            <div class="signature-section">
+                                <label class="form-label">Digital Signature *</label>
+                                <div class="signature-pad" id="guestSignatureWrap">
+                                    <canvas id="guestSignaturePad" aria-label="Draw your signature"></canvas>
+                                </div>
+                                <div class="signature-actions">
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" id="guestSigClear">
+                                        <i class="bi bi-eraser"></i> Clear
+                                    </button>
+                                    <small class="text-muted">Use your finger (mobile) or mouse (PC) to sign.</small>
+                                </div>
+                            </div>
                             <input type="hidden" id="guest_signature" value="">
                             <input type="hidden" id="guest_form_date" value="<?= date('Y-m-d') ?>">
                         </div>
@@ -4165,6 +4177,13 @@ function submitGuestReservation() {
     
     // Validate guest form
     if (!validateGuestForm()) return;
+
+    // Require a drawn signature
+    var sigVal = document.getElementById('guest_signature')?.value || '';
+    if (!sigVal) {
+        showModalAlert('✍️', 'Signature Required', 'Please draw your digital signature before submitting.');
+        return;
+    }
     
     var fd = new FormData();
     fd.append('action', 'submit_guest');
@@ -4211,7 +4230,7 @@ function submitGuestReservation() {
     
     // Consent & Signature
     fd.append('data_privacy_consent', document.getElementById('guestConsent').checked ? '1' : '0');
-    fd.append('digital_signature', document.getElementById('guest_signature')?.value || '');
+    fd.append('digital_signature', sigVal);
     fd.append('guest_form_date', document.getElementById('guest_form_date')?.value || '<?= date("Y-m-d") ?>');
     
     // Terms acceptance (from step 4)
@@ -4226,6 +4245,124 @@ function submitGuestReservation() {
     
     submitToServer(fd, '<?= $base ?>/ajax/guest_reservation_submit.php');
 }
+
+/* ── Guest signature pad ────────────────────────────────────────────────── */
+function initGuestSignaturePad() {
+    var canvas = document.getElementById('guestSignaturePad');
+    var wrap = document.getElementById('guestSignatureWrap');
+    var hidden = document.getElementById('guest_signature');
+    var clearBtn = document.getElementById('guestSigClear');
+    if (!canvas || !wrap || !hidden) return;
+
+    var ctx = canvas.getContext('2d');
+    var drawing = false;
+    var hasInk = false;
+    var last = { x: 0, y: 0 };
+
+    function resizeCanvas() {
+        var rect = wrap.getBoundingClientRect();
+        var dpr = window.devicePixelRatio || 1;
+        var w = Math.max(280, Math.floor(rect.width));
+        var h = 160;
+
+        var img = null;
+        if (hasInk) {
+            try { img = new Image(); img.src = canvas.toDataURL('image/png'); } catch (e) { img = null; }
+        }
+
+        canvas.width = Math.floor(w * dpr);
+        canvas.height = Math.floor(h * dpr);
+        canvas.style.width = w + 'px';
+        canvas.style.height = h + 'px';
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+        // background
+        ctx.fillStyle = '#fff';
+        ctx.fillRect(0, 0, w, h);
+        ctx.lineWidth = 2.2;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.strokeStyle = '#111';
+
+        if (img) {
+            img.onload = function () {
+                ctx.drawImage(img, 0, 0, w, h);
+            };
+        }
+    }
+
+    function getPos(ev) {
+        var r = canvas.getBoundingClientRect();
+        var x = 0, y = 0;
+        if (ev.touches && ev.touches.length) {
+            x = ev.touches[0].clientX;
+            y = ev.touches[0].clientY;
+        } else {
+            x = ev.clientX;
+            y = ev.clientY;
+        }
+        return { x: x - r.left, y: y - r.top };
+    }
+
+    function start(ev) {
+        ev.preventDefault();
+        drawing = true;
+        last = getPos(ev);
+    }
+    function move(ev) {
+        if (!drawing) return;
+        ev.preventDefault();
+        var p = getPos(ev);
+        ctx.beginPath();
+        ctx.moveTo(last.x, last.y);
+        ctx.lineTo(p.x, p.y);
+        ctx.stroke();
+        last = p;
+        hasInk = true;
+    }
+    function end() {
+        if (!drawing) return;
+        drawing = false;
+        if (hasInk) {
+            try { hidden.value = canvas.toDataURL('image/png'); } catch (e) { /* ignore */ }
+        }
+    }
+    function clear() {
+        hasInk = false;
+        hidden.value = '';
+        resizeCanvas();
+    }
+
+    // pointer events (best), fallback to mouse/touch
+    if (window.PointerEvent) {
+        canvas.addEventListener('pointerdown', start);
+        canvas.addEventListener('pointermove', move);
+        canvas.addEventListener('pointerup', end);
+        canvas.addEventListener('pointercancel', end);
+        canvas.style.touchAction = 'none';
+    } else {
+        canvas.addEventListener('mousedown', start);
+        canvas.addEventListener('mousemove', move);
+        document.addEventListener('mouseup', end);
+        canvas.addEventListener('touchstart', start, { passive: false });
+        canvas.addEventListener('touchmove', move, { passive: false });
+        canvas.addEventListener('touchend', end);
+        canvas.addEventListener('touchcancel', end);
+    }
+
+    if (clearBtn) clearBtn.addEventListener('click', clear);
+
+    resizeCanvas();
+    window.addEventListener('resize', function () {
+        // debounce-ish
+        clearTimeout(initGuestSignaturePad._t);
+        initGuestSignaturePad._t = setTimeout(resizeCanvas, 120);
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    initGuestSignaturePad();
+});
 
 function submitToServer(formData, url) {
     var btn = document.getElementById('btnSubmit');
@@ -4248,16 +4385,20 @@ function submitToServer(formData, url) {
         content.className = 'modal-box';
         
         if (data.success) {
-            content.innerHTML = '<h4>✅ Reservation Submitted!</h4>' +
-                               '<p>' + (data.message || 'Your reservation has been submitted successfully!') + '</p>' +
-                               (data.booking_no ? '<p><strong>Booking No:</strong> ' + data.booking_no + '</p>' : '') +
-                               '<p class="text-muted" style="font-size:0.875rem;">You will be notified once your reservation is confirmed.</p>' +
-                               '<button type="button" class="btn-res btn-next mt-3" onclick="closeResultModal(); window.location.href=\'index.php\'">OK, Go to Home</button>';
+            content.innerHTML =
+                '<button type="button" class="modal-close-btn" onclick="closeResultModal()">&times;</button>' +
+                '<h4>✅ Reservation Submitted!</h4>' +
+                '<p>' + (data.message || 'Your reservation has been submitted successfully!') + '</p>' +
+                (data.booking_no ? '<p><strong>Booking No:</strong> ' + data.booking_no + '</p>' : '') +
+                '<p class="text-muted" style="font-size:0.875rem;">You will be notified once your reservation is confirmed.</p>' +
+                '<button type="button" class="btn-res btn-next mt-3" onclick="closeResultModal(); window.location.href=\'index.php\';">OK, Go to Home</button>';
             clearSavedData();
         } else {
-            content.innerHTML = '<h4>❌ Error</h4>' +
-                               '<p>' + (data.message || 'An error occurred.') + '</p>' +
-                               '<button type="button" class="btn-res btn-next mt-3" onclick="closeResultModal()">Close</button>';
+            content.innerHTML =
+                '<button type="button" class="modal-close-btn" onclick="closeResultModal()">&times;</button>' +
+                '<h4>❌ Error</h4>' +
+                '<p>' + (data.message || 'An error occurred.') + '</p>' +
+                '<button type="button" class="btn-res btn-next mt-3" onclick="closeResultModal()">Close</button>';
         }
         
         document.getElementById('resultModal').classList.add('show');
@@ -4279,7 +4420,7 @@ function closeResultModal() {
     document.getElementById('resultModal').classList.remove('show');
 }
 
-document.getElementById('resultModal')?.addEventListener('click', function(e) { if (e.target === this) closeResultModal(); });
+// Do NOT close result modal on backdrop click so users have time to read it.
 document.getElementById('guestCountModal')?.addEventListener('click', function(e) { if (e.target === this) closeGuestCountModal(); });
 document.getElementById('guestRemoveModal')?.addEventListener('click', function(e) { if (e.target === this) closeGuestRemoveModal(); });
 document.getElementById('banquetModal')?.addEventListener('click', function(e) { if (e.target === this) closeBanquetModal(); });

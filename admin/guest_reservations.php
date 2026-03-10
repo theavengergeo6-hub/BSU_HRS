@@ -3,15 +3,21 @@ $pageTitle = 'Guest Reservations';
 require_once __DIR__ . '/inc/header.php';
 
 // Get filter parameters
-$status_filter = isset($_GET['status']) ? $_GET['status'] : '';
+$status_filter_raw = isset($_GET['status']) ? $_GET['status'] : '';
+$status_filter = ($status_filter_raw === 'completed') ? 'checked_out' : $status_filter_raw;
 $date_filter = isset($_GET['date']) ? $_GET['date'] : '';
 $search = isset($_GET['search']) ? clean($_GET['search']) : '';
 
 // Build query with filters
-$query = "SELECT gr.*, v.name as room_name, v.floor 
-          FROM guest_reservations gr
-          JOIN venues v ON gr.room_id = v.id
-          WHERE 1=1";
+$query = "SELECT 
+              gr.*,
+              g.room_name,
+              g.floor,
+              gr.check_in_date AS arrival_date,
+              gr.check_out_date AS departure_date
+          FROM guest_room_reservations gr
+          JOIN guest_rooms g ON gr.guest_room_id = g.id
+          WHERE gr.deleted = 0";
 
 $params = [];
 $types = "";
@@ -24,14 +30,14 @@ if ($status_filter) {
 
 if ($date_filter === 'today') {
     $today = date('Y-m-d');
-    $query .= " AND (gr.arrival_date = ? OR gr.departure_date = ?)";
+    $query .= " AND (gr.check_in_date = ? OR gr.check_out_date = ?)";
     $params[] = $today;
     $params[] = $today;
     $types .= "ss";
 } elseif ($date_filter === 'week') {
     $start_week = date('Y-m-d', strtotime('monday this week'));
     $end_week = date('Y-m-d', strtotime('sunday this week'));
-    $query .= " AND (gr.arrival_date BETWEEN ? AND ? OR gr.departure_date BETWEEN ? AND ?)";
+    $query .= " AND (gr.check_in_date BETWEEN ? AND ? OR gr.check_out_date BETWEEN ? AND ?)";
     $params[] = $start_week;
     $params[] = $end_week;
     $params[] = $start_week;
@@ -40,7 +46,7 @@ if ($date_filter === 'today') {
 } elseif ($date_filter === 'month') {
     $start_month = date('Y-m-01');
     $end_month = date('Y-m-t');
-    $query .= " AND (gr.arrival_date BETWEEN ? AND ? OR gr.departure_date BETWEEN ? AND ?)";
+    $query .= " AND (gr.check_in_date BETWEEN ? AND ? OR gr.check_out_date BETWEEN ? AND ?)";
     $params[] = $start_month;
     $params[] = $end_month;
     $params[] = $start_month;
@@ -49,13 +55,12 @@ if ($date_filter === 'today') {
 }
 
 if ($search) {
-    $query .= " AND (gr.booking_no LIKE ? OR gr.last_name LIKE ? OR gr.first_name LIKE ? OR gr.email LIKE ?)";
+    $query .= " AND (gr.booking_no LIKE ? OR gr.guest_name LIKE ? OR gr.guest_email LIKE ?)";
     $search_term = "%$search%";
     $params[] = $search_term;
     $params[] = $search_term;
     $params[] = $search_term;
-    $params[] = $search_term;
-    $types .= "ssss";
+    $types .= "sss";
 }
 
 $query .= " ORDER BY gr.created_at DESC";
@@ -69,10 +74,10 @@ $reservations = $stmt->get_result();
 
 // Get counts for each status
 $status_counts = [
-    'pending' => $conn->query("SELECT COUNT(*) as count FROM guest_reservations WHERE status = 'pending'")->fetch_assoc()['count'],
-    'confirmed' => $conn->query("SELECT COUNT(*) as count FROM guest_reservations WHERE status = 'confirmed'")->fetch_assoc()['count'],
-    'cancelled' => $conn->query("SELECT COUNT(*) as count FROM guest_reservations WHERE status = 'cancelled'")->fetch_assoc()['count'],
-    'completed' => $conn->query("SELECT COUNT(*) as count FROM guest_reservations WHERE status = 'completed'")->fetch_assoc()['count']
+    'pending' => $conn->query("SELECT COUNT(*) as count FROM guest_room_reservations WHERE deleted=0 AND status = 'pending'")->fetch_assoc()['count'],
+    'confirmed' => $conn->query("SELECT COUNT(*) as count FROM guest_room_reservations WHERE deleted=0 AND status = 'confirmed'")->fetch_assoc()['count'],
+    'cancelled' => $conn->query("SELECT COUNT(*) as count FROM guest_room_reservations WHERE deleted=0 AND status = 'cancelled'")->fetch_assoc()['count'],
+    'completed' => $conn->query("SELECT COUNT(*) as count FROM guest_room_reservations WHERE deleted=0 AND status IN ('checked_out')")->fetch_assoc()['count']
 ];
 
 function getStatusBadgeClass($status) {
@@ -80,7 +85,7 @@ function getStatusBadgeClass($status) {
         case 'pending': return 'status-pending';
         case 'confirmed': return 'status-approved';
         case 'cancelled': return 'status-cancelled';
-        case 'completed': return 'status-completed';
+        case 'checked_out': return 'status-completed';
         default: return 'status-default';
     }
 }
@@ -521,7 +526,7 @@ tr:hover {
                     </label>
                     <label class="checkbox-label">
                         <input type="checkbox" name="status" value="completed" 
-                            <?= $status_filter === 'completed' ? 'checked' : '' ?>>
+                            <?= $status_filter_raw === 'completed' ? 'checked' : '' ?>>
                         Completed <span class="count">(<?= $status_counts['completed'] ?>)</span>
                     </label>
                     <label class="checkbox-label">
@@ -583,7 +588,7 @@ tr:hover {
             <tbody>
                 <?php while ($row = $reservations->fetch_assoc()): 
                     $other_guests = json_decode($row['other_guests'], true);
-                    $total_guests = $row['adults_count'] + $row['kids_count'];
+                    $total_guests = (int)($row['total_guests'] ?? 0);
                     if (!empty($other_guests)) {
                         foreach ($other_guests as $guest) {
                             if (!empty($guest['name'])) $total_guests++;
@@ -596,8 +601,8 @@ tr:hover {
                         <small style="color: #999;"><?= date('M d, Y', strtotime($row['created_at'])) ?></small>
                     </td>
                     <td>
-                        <div class="guest-name"><?= htmlspecialchars($row['last_name'] . ', ' . $row['first_name']) ?></div>
-                        <small style="color: #999;"><?= htmlspecialchars($row['email']) ?></small>
+                        <div class="guest-name"><?= htmlspecialchars($row['guest_name']) ?></div>
+                        <small style="color: #999;"><?= htmlspecialchars($row['guest_email']) ?></small>
                     </td>
                     <td>
                         <div class="room-info">
@@ -610,7 +615,7 @@ tr:hover {
                             <i class="bi bi-calendar"></i> <?= date('M d, Y', strtotime($row['arrival_date'])) ?>
                         </div>
                         <div class="date-info">
-                            <i class="bi bi-clock"></i> <?= date('h:i A', strtotime($row['checkin_time'])) ?>
+                            <i class="bi bi-clock"></i> <?= date('h:i A', strtotime($row['check_in_time'])) ?>
                         </div>
                     </td>
                     <td>
@@ -618,7 +623,12 @@ tr:hover {
                             <i class="bi bi-calendar"></i> <?= date('M d, Y', strtotime($row['departure_date'])) ?>
                         </div>
                         <div class="date-info">
-                            <i class="bi bi-clock"></i> <?= date('h:i A', strtotime($row['checkout_time'])) ?>
+                            <i class="bi bi-clock"></i> <?= date('h:i A', strtotime($row['check_out_time'])) ?>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="date-info">
+                            <i class="bi bi-people"></i> <?= (int)$total_guests ?>
                         </div>
                     </td>
                     <td>

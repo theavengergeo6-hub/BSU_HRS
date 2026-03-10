@@ -1,6 +1,6 @@
 <?php
-$pageTitle = 'Guest Reservation Details';
-require_once __DIR__ . '/inc/header.php';
+require_once __DIR__ . '/inc/auth.php';
+requireAdminLogin();
 
 $id = (int)($_GET['id'] ?? 0);
 if (!$id) {
@@ -12,16 +12,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     $new_status = $_POST['status'] ?? '';
     $admin_remarks = clean($_POST['admin_remarks'] ?? '');
     
-    if (in_array($new_status, ['pending', 'confirmed', 'cancelled', 'completed'])) {
+    if (in_array($new_status, ['pending', 'confirmed', 'checked_in', 'checked_out', 'cancelled', 'no_show'], true)) {
         $remark_entry = "\n--- " . date("Y-m-d H:i:s") . " (" . ucfirst($new_status) . ") ---\n" . $admin_remarks;
-        
-        // Check if admin_remarks column exists, if not add it
-        $check_column = $conn->query("SHOW COLUMNS FROM guest_reservations LIKE 'admin_remarks'");
-        if ($check_column->num_rows == 0) {
-            $conn->query("ALTER TABLE guest_reservations ADD COLUMN admin_remarks TEXT DEFAULT NULL");
-        }
-        
-        $update_stmt = $conn->prepare("UPDATE guest_reservations SET status = ?, admin_remarks = CONCAT(IFNULL(admin_remarks, ''), ?) WHERE id = ?");
+
+        $update_stmt = $conn->prepare("UPDATE guest_room_reservations SET status = ?, admin_remarks = CONCAT(IFNULL(admin_remarks, ''), ?) WHERE id = ? AND deleted = 0");
         $update_stmt->bind_param("ssi", $new_status, $remark_entry, $id);
         if ($update_stmt->execute()) {
             $_SESSION['success_message'] = "Reservation status updated successfully!";
@@ -33,11 +27,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     }
 }
 
-// Get reservation details
-$query = "SELECT gr.*, v.name as room_name, v.floor, v.capacity 
-          FROM guest_reservations gr
-          JOIN venues v ON gr.room_id = v.id
-          WHERE gr.id = ?";
+// Get reservation details (must happen before header output so we can redirect safely)
+$query = "SELECT 
+              gr.*,
+              g.room_name,
+              g.floor,
+              g.room_type,
+              g.max_guests AS capacity,
+              gr.check_in_date AS arrival_date,
+              gr.check_out_date AS departure_date,
+              gr.total_amount AS total_price
+          FROM guest_room_reservations gr
+          JOIN guest_rooms g ON gr.guest_room_id = g.id
+          WHERE gr.id = ? AND gr.deleted = 0";
 $stmt = $conn->prepare($query);
 $stmt->bind_param("i", $id);
 $stmt->execute();
@@ -54,12 +56,16 @@ $stmt->close();
 // Decode other guests
 $other_guests = json_decode($reservation['other_guests'], true);
 
+// Only include the admin header AFTER all redirects/updates/lookups (prevents headers-already-sent).
+$pageTitle = 'Guest Reservation Details';
+require_once __DIR__ . '/inc/header.php';
+
 function getStatusBadgeClass($status) {
     switch (strtolower($status)) {
         case 'pending': return 'status-pending';
         case 'confirmed': return 'status-approved';
         case 'cancelled': return 'status-cancelled';
-        case 'completed': return 'status-completed';
+        case 'checked_out': return 'status-completed';
         default: return 'status-default';
     }
 }
@@ -319,7 +325,7 @@ $total_nights = (strtotime($reservation['departure_date']) - strtotime($reservat
         <div class="d-flex justify-content-between align-items-center flex-wrap">
             <div>
                 <h2><?= htmlspecialchars($reservation['booking_no']) ?></h2>
-                <small>Reservation No: <?= htmlspecialchars($reservation['reservation_no']) ?></small>
+                <small>Reservation ID: <?= (int)$reservation['id'] ?></small>
             </div>
             <div class="text-end">
                 <span class="status-badge <?= getStatusBadgeClass($reservation['status']) ?>">
@@ -345,7 +351,7 @@ $total_nights = (strtotime($reservation['departure_date']) - strtotime($reservat
                         <div class="detail-content">
                             <div class="detail-label">Full Name</div>
                             <div class="detail-value">
-                                <?= htmlspecialchars($reservation['last_name'] . ', ' . $reservation['first_name'] . ' ' . $reservation['middle_initial']) ?>
+                                <?= htmlspecialchars($reservation['guest_name']) ?>
                             </div>
                         </div>
                     </div>
@@ -355,7 +361,19 @@ $total_nights = (strtotime($reservation['departure_date']) - strtotime($reservat
                         <div class="detail-icon"><i class="bi bi-calendar"></i></div>
                         <div class="detail-content">
                             <div class="detail-label">Date of Birth</div>
-                            <div class="detail-value"><?= date('F d, Y', strtotime($reservation['date_of_birth'])) ?></div>
+                            <div class="detail-value">
+                                <?php
+                                    $legacy = null;
+                                    $legacyRaw = $reservation['special_requests'] ?? '';
+                                    if (is_string($legacyRaw) && $legacyRaw !== '' && $legacyRaw[0] === '{') {
+                                        $tmp = json_decode($legacyRaw, true);
+                                        if (is_array($tmp)) $legacy = $tmp;
+                                    }
+                                    $dob = $reservation['guest_dob'] ?? '';
+                                    if (!$dob && $legacy && !empty($legacy['dob'])) $dob = $legacy['dob'];
+                                    echo $dob ? date('F d, Y', strtotime($dob)) : '—';
+                                ?>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -364,7 +382,13 @@ $total_nights = (strtotime($reservation['departure_date']) - strtotime($reservat
                         <div class="detail-icon"><i class="bi bi-geo-alt"></i></div>
                         <div class="detail-content">
                             <div class="detail-label">Address</div>
-                            <div class="detail-value"><?= htmlspecialchars($reservation['address']) ?></div>
+                            <div class="detail-value">
+                                <?php
+                                    $addr = $reservation['guest_address'] ?? '';
+                                    if (!$addr && $legacy && !empty($legacy['address'])) $addr = $legacy['address'];
+                                    echo htmlspecialchars($addr ?: '—');
+                                ?>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -373,7 +397,7 @@ $total_nights = (strtotime($reservation['departure_date']) - strtotime($reservat
                         <div class="detail-icon"><i class="bi bi-envelope"></i></div>
                         <div class="detail-content">
                             <div class="detail-label">Email</div>
-                            <div class="detail-value"><?= htmlspecialchars($reservation['email']) ?></div>
+                            <div class="detail-value"><?= htmlspecialchars($reservation['guest_email'] ?? '') ?></div>
                         </div>
                     </div>
                 </div>
@@ -382,7 +406,7 @@ $total_nights = (strtotime($reservation['departure_date']) - strtotime($reservat
                         <div class="detail-icon"><i class="bi bi-telephone"></i></div>
                         <div class="detail-content">
                             <div class="detail-label">Contact Number</div>
-                            <div class="detail-value"><?= htmlspecialchars($reservation['contact_number']) ?></div>
+                            <div class="detail-value"><?= htmlspecialchars($reservation['guest_contact'] ?? '') ?></div>
                         </div>
                     </div>
                 </div>
@@ -438,7 +462,7 @@ $total_nights = (strtotime($reservation['departure_date']) - strtotime($reservat
                         <div class="detail-icon"><i class="bi bi-clock"></i></div>
                         <div class="detail-content">
                             <div class="detail-label">Check-in Time</div>
-                            <div class="detail-value"><?= date('h:i A', strtotime($reservation['checkin_time'])) ?></div>
+                            <div class="detail-value"><?= date('h:i A', strtotime($reservation['check_in_time'])) ?></div>
                         </div>
                     </div>
                 </div>
@@ -456,7 +480,7 @@ $total_nights = (strtotime($reservation['departure_date']) - strtotime($reservat
                         <div class="detail-icon"><i class="bi bi-clock"></i></div>
                         <div class="detail-content">
                             <div class="detail-label">Check-out Time</div>
-                            <div class="detail-value"><?= date('h:i A', strtotime($reservation['checkout_time'])) ?></div>
+                            <div class="detail-value"><?= date('h:i A', strtotime($reservation['check_out_time'])) ?></div>
                         </div>
                     </div>
                 </div>
@@ -466,7 +490,7 @@ $total_nights = (strtotime($reservation['departure_date']) - strtotime($reservat
                         <div class="detail-content">
                             <div class="detail-label">Guests</div>
                             <div class="detail-value">
-                                <?= $reservation['adults_count'] ?> Adult(s), <?= $reservation['kids_count'] ?> Kid(s)
+                                <?= (int)$reservation['adults_count'] ?> Adult(s), <?= (int)$reservation['children_count'] ?> Kid(s)
                             </div>
                         </div>
                     </div>
@@ -502,16 +526,31 @@ $total_nights = (strtotime($reservation['departure_date']) - strtotime($reservat
                 </div>
             </div>
             
-            <?php if (!empty($reservation['remarks'])): ?>
+            <?php
+                $displayRemarks = $reservation['special_requests'] ?? '';
+                if (isset($legacy) && is_array($legacy) && isset($legacy['remarks'])) {
+                    $displayRemarks = (string)$legacy['remarks'];
+                }
+            ?>
+            <?php if (!empty($displayRemarks)): ?>
             <div class="mt-3 pt-3 border-top">
                 <div class="detail-label mb-2">Remarks / Special Arrangements</div>
-                <div class="detail-value"><?= nl2br(htmlspecialchars($reservation['remarks'])) ?></div>
+                <div class="detail-value"><?= nl2br(htmlspecialchars($displayRemarks)) ?></div>
             </div>
             <?php endif; ?>
             
             <div class="mt-3 pt-3 border-top">
                 <div class="detail-label mb-2">Registered By</div>
-                <div class="detail-value"><?= htmlspecialchars($reservation['registered_by']) ?></div>
+                <div class="detail-value">
+                    <?php
+                        $registeredBy = $reservation['terms_accepted_by'] ?? '';
+                        if (!$registeredBy && isset($legacy) && is_array($legacy) && !empty($legacy['registered_by'])) {
+                            $registeredBy = (string)$legacy['registered_by'];
+                        }
+                        if (!$registeredBy && !empty($reservation['created_by'])) $registeredBy = 'User ID #' . (int)$reservation['created_by'];
+                        echo htmlspecialchars($registeredBy ?: '—');
+                    ?>
+                </div>
             </div>
         </div>
     </div>
@@ -542,7 +581,13 @@ $total_nights = (strtotime($reservation['departure_date']) - strtotime($reservat
                 <div class="col-md-6">
                     <div class="detail-label">Digital Signature</div>
                     <div class="signature-box">
-                        <i class="bi bi-pen"></i> <?= htmlspecialchars($reservation['digital_signature']) ?>
+                        <?php if (!empty($reservation['digital_signature']) && str_starts_with($reservation['digital_signature'], 'data:image')): ?>
+                            <img src="<?= htmlspecialchars($reservation['digital_signature']) ?>" alt="Digital signature" style="max-width: 100%; height: auto; display:block;">
+                        <?php elseif (!empty($reservation['digital_signature'])): ?>
+                            <i class="bi bi-pen"></i> <?= htmlspecialchars($reservation['digital_signature']) ?>
+                        <?php else: ?>
+                            <span class="text-muted">—</span>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
@@ -562,8 +607,10 @@ $total_nights = (strtotime($reservation['departure_date']) - strtotime($reservat
                     <select class="form-select" name="status">
                         <option value="pending" <?= $reservation['status'] === 'pending' ? 'selected' : '' ?>>Pending</option>
                         <option value="confirmed" <?= $reservation['status'] === 'confirmed' ? 'selected' : '' ?>>Confirmed</option>
-                        <option value="completed" <?= $reservation['status'] === 'completed' ? 'selected' : '' ?>>Completed</option>
+                        <option value="checked_in" <?= $reservation['status'] === 'checked_in' ? 'selected' : '' ?>>Checked In</option>
+                        <option value="checked_out" <?= $reservation['status'] === 'checked_out' ? 'selected' : '' ?>>Completed (Checked Out)</option>
                         <option value="cancelled" <?= $reservation['status'] === 'cancelled' ? 'selected' : '' ?>>Cancelled</option>
+                        <option value="no_show" <?= $reservation['status'] === 'no_show' ? 'selected' : '' ?>>No Show</option>
                     </select>
                     <small class="text-muted">Current: <strong><?= ucfirst($reservation['status']) ?></strong></small>
                 </div>

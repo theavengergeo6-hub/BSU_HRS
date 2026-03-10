@@ -2066,3 +2066,108 @@ Stack trace:
 [2026-03-09 18:33:27] Success! Inserted ID: 27
 [2026-03-09 18:33:27] Inserted activity_name: Quiz Bee
 [2026-03-09 18:33:27] Inserted 1 venue(s) into reservation_venues for reservation ID 27
+[2026-03-10 03:51:31] ========== START reservation_submit.php ==========
+[2026-03-10 10:51:31] RAW POST data: Array
+(
+    [reservation_type] => function
+    [last_name] => Dela Vega
+    [first_name] => Emerish Jem
+    [middle_initial] => R
+    [email] => emsdelavega@gmail.com
+    [contact] => 09626970801
+    [office_type_id] => 1
+    [office_id] => 2
+    [event_type_id] => 1
+    [activity_name] => CAS Meeting
+    [participants] => 50
+    [banquet_style_id] => 14
+    [guest_last_name] => 
+    [guest_first_name] => 
+    [guest_middle_initial] => 
+    [guest_dob] => 
+    [guest_address] => 
+    [guest_email] => 
+    [guest_contact] => 
+    [guest_room_id] => 
+    [guest_remarks] => 
+    [arrival_date] => 
+    [checkin_time] => 
+    [checkout_time] => 
+    [departure_date] => 
+    [adults_count] => 1
+    [kids_count] => 0
+    [registered_by] => 
+    [venue_ids] => Array
+        (
+            [0] => 3
+        )
+
+    [view_board_qty] => 1
+    [additional_instruction] => 
+    [action] => submit_function
+    [event_type] => Meeting and Conference
+    [venue_id] => 3
+    [facilities_schedules] => {"venues":[{"id":"3","name":"Function Room C","floor":"Ground Floor"}],"schedules":{"3":[{"date":"2026-03-16","start":"07:00","end":"12:00"}],"4":[],"5":[]}}
+    [miscellaneous_items] => {"basic_sound_system":{"speaker":2,"mic":0},"banquet_chairs":{"quantity":50}}
+    [terms_agreed_by] => Emerish Jem R Dela Vega
+    [terms_position] => 
+    [terms_date] => March 10, 2026
+)
+
+[2026-03-10 10:51:31] SPECIFIC CHECK - activity_name: 'CAS Meeting'
+[2026-03-10 10:51:31] SPECIFIC CHECK - event_type_id: '1'
+[2026-03-10 10:51:31] Generated numbers - booking_no: FAC-20260310-977, reservation_no: RES-20260310-673
+[2026-03-10 10:51:31] BEFORE CLEAN - activity_name: 'CAS Meeting'
+[2026-03-10 10:51:31] AFTER CLEAN - activity_name: 'CAS Meeting'
+[2026-03-10 10:51:31] event_type_id: 1
+[2026-03-10 10:51:31] FINAL activity_name: 'CAS Meeting'
+[2026-03-10 10:51:31] facilities_schedules decoded: Array
+(
+    [venues] => Array
+        (
+            [0] => Array
+                (
+                    [id] => 3
+                    [name] => Function Room C
+                    [floor] => Ground Floor
+                )
+
+        )
+
+    [schedules] => Array
+        (
+            [3] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-03-16
+                            [start] => 07:00
+                            [end] => 12:00
+                        )
+
+                )
+
+            [4] => Array
+                (
+                )
+
+            [5] => Array
+                (
+                )
+
+        )
+
+)
+
+[2026-03-10 10:51:31] Times - start_datetime: 2026-03-16 07:00, end_datetime: 2026-03-16 12:00
+[2026-03-10 10:51:31] Conflict check passed for all venues
+[2026-03-10 10:51:31] SQL: INSERT INTO facility_reservations (
+        booking_no, reservation_no, last_name, first_name, middle_initial, 
+        email, contact_number, office_type_id, office_id, external_office_name, 
+        activity_name, event_type_id, venue_id, venue_setup_id, banquet_style_id,
+        start_datetime, end_datetime, participants_count, miscellaneous_items, 
+        additional_instruction
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+[2026-03-10 10:51:31] Success! Inserted ID: 28
+[2026-03-10 10:51:31] Inserted activity_name: CAS Meeting
+[2026-03-10 10:51:31] Inserted 1 venue(s) into reservation_venues for reservation ID 28

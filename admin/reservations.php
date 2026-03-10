@@ -100,33 +100,34 @@ if ($view === 'function') {
 
 // ── Guest room data ──────────────────────────────────────────────────────────
 if ($view === 'guest') {
-    $gTotal    = (int)$conn->query("SELECT COUNT(*) AS c FROM guest_reservations WHERE MONTH(check_in)=$month AND YEAR(check_in)=$year")->fetch_assoc()['c'];
-    $gConfirmed= (int)$conn->query("SELECT COUNT(*) AS c FROM guest_reservations WHERE status='confirmed' AND MONTH(check_in)=$month AND YEAR(check_in)=$year")->fetch_assoc()['c'];
-    $gPending  = (int)$conn->query("SELECT COUNT(*) AS c FROM guest_reservations WHERE status='pending' AND MONTH(check_in)=$month AND YEAR(check_in)=$year")->fetch_assoc()['c'];
-    $gCancelled= (int)$conn->query("SELECT COUNT(*) AS c FROM guest_reservations WHERE status='cancelled' AND MONTH(check_in)=$month AND YEAR(check_in)=$year")->fetch_assoc()['c'];
+    $gTotal     = (int)$conn->query("SELECT COUNT(*) AS c FROM guest_room_reservations WHERE deleted=0 AND MONTH(check_in_date)=$month AND YEAR(check_in_date)=$year")->fetch_assoc()['c'];
+    $gConfirmed = (int)$conn->query("SELECT COUNT(*) AS c FROM guest_room_reservations WHERE deleted=0 AND status='confirmed' AND MONTH(check_in_date)=$month AND YEAR(check_in_date)=$year")->fetch_assoc()['c'];
+    $gPending   = (int)$conn->query("SELECT COUNT(*) AS c FROM guest_room_reservations WHERE deleted=0 AND status='pending' AND MONTH(check_in_date)=$month AND YEAR(check_in_date)=$year")->fetch_assoc()['c'];
+    $gCancelled = (int)$conn->query("SELECT COUNT(*) AS c FROM guest_room_reservations WHERE deleted=0 AND status='cancelled' AND MONTH(check_in_date)=$month AND YEAR(check_in_date)=$year")->fetch_assoc()['c'];
 
     // Load all active guest reservations that overlap this month
     $gr_result = $conn->query("
         SELECT gr.id,
                gr.guest_name,
-               gr.email,
-               gr.contact_number,
-               gr.room_id,
-               gr.check_in   AS arrival_date,
-               gr.check_out  AS departure_date,
-               gr.num_guests,
-               gr.total_price,
+               gr.guest_email   AS email,
+               gr.guest_contact AS contact_number,
+               gr.guest_room_id AS room_id,
+               gr.check_in_date  AS arrival_date,
+               gr.check_out_date AS departure_date,
+               gr.total_guests   AS num_guests,
+               gr.total_amount   AS total_price,
                gr.special_requests,
                gr.status,
                gr.created_at,
-               v.name  AS room_name,
-               v.floor AS room_floor
-        FROM guest_reservations gr
-        JOIN venues v ON gr.room_id = v.id
-        WHERE gr.status IN ('confirmed','pending')
-          AND gr.check_in  <= '$end_date'
-          AND gr.check_out >= '$start_date'
-        ORDER BY gr.check_in ASC
+               g.room_name  AS room_name,
+               g.floor      AS room_floor
+        FROM guest_room_reservations gr
+        JOIN guest_rooms g ON gr.guest_room_id = g.id
+        WHERE gr.status IN ('confirmed','checked_in','pending')
+          AND gr.deleted = 0
+          AND gr.check_in_date  <= '$end_date'
+          AND gr.check_out_date >= '$start_date'
+        ORDER BY gr.check_in_date ASC
     ");
 
     // Build events_by_date: each date gets an array of reservations with event_type
@@ -916,7 +917,7 @@ foreach ($rows as $row):
 
                 dotsEl.innerHTML = '';
                 var evs   = dedupeForDate(guestData[date] || []);
-                var cEvs  = evs.filter(function (e) { return e.status === 'confirmed'; });
+                var cEvs  = evs.filter(function (e) { return (e.status === 'confirmed' || e.status === 'checked_in'); });
                 var pEvs  = evs.filter(function (e) { return e.status === 'pending';   });
 
                 /* badge counts */
@@ -936,7 +937,7 @@ foreach ($rows as $row):
                 shown.forEach(function (ev) {
                     var dot = document.createElement('span');
                     dot.className = 'event-dot';
-                    dot.style.background = ev.status === 'confirmed' ? '#28a745' : '#ffc107';
+                    dot.style.background = (ev.status === 'confirmed' || ev.status === 'checked_in') ? '#28a745' : '#ffc107';
                     if (ev.status === 'pending') dot.style.border = '1px solid #e0a800';
                     dot.title = (ev.guest_name || '') + ' – ' + ev.room_name;
                     dotsEl.appendChild(dot);
@@ -955,7 +956,8 @@ foreach ($rows as $row):
 
             var raw = guestData[date] || [];
             var evs = dedupeForDate(raw).filter(function (e) {
-                return (showC && e.status === 'confirmed') ||
+                var isConfirmedLike = (e.status === 'confirmed' || e.status === 'checked_in');
+                return (showC && isConfirmedLike) ||
                        (showP && e.status === 'pending');
             });
 
@@ -969,8 +971,9 @@ foreach ($rows as $row):
                 });
 
                 evs.forEach(function (ev) {
-                    var statusClass  = ev.status === 'confirmed' ? 'confirmed' : 'pending';
-                    var pillClass    = ev.status === 'confirmed' ? 'pill-approved' : 'pill-pending';
+                    var isConfirmedLike = (ev.status === 'confirmed' || ev.status === 'checked_in');
+                    var statusClass  = isConfirmedLike ? 'confirmed' : 'pending';
+                    var pillClass    = isConfirmedLike ? 'pill-approved' : 'pill-pending';
                     var typeLabel    = ev.event_type === 'checkin'  ? '<i class="bi bi-box-arrow-in-right"></i> Check-in'
                                     : ev.event_type === 'checkout' ? '<i class="bi bi-box-arrow-right"></i> Check-out'
                                     :                                '<i class="bi bi-moon-stars"></i> Staying';
