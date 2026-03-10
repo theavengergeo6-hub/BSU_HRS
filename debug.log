@@ -1969,3 +1969,100 @@ Stack trace:
 [2026-03-09 10:25:17] Success! Inserted ID: 26
 [2026-03-09 10:25:17] Inserted activity_name: Lakers Film Study
 [2026-03-09 10:25:17] Inserted 2 venue(s) into reservation_venues for reservation ID 26
+[2026-03-09 11:33:27] ========== START reservation_submit.php ==========
+[2026-03-09 18:33:27] RAW POST data: Array
+(
+    [reservation_type] => function
+    [last_name] => Azarcon
+    [first_name] => Jeremie
+    [middle_initial] => R
+    [email] => jeremieazarcon@gmail.com
+    [contact] => 09626970801
+    [office_type_id] => 1
+    [office_id] => 6
+    [event_type_id] => 5
+    [activity_name] => Quiz Bee
+    [participants] => 40
+    [banquet_style_id] => 12
+    [guest_last_name] => 
+    [guest_first_name] => 
+    [guest_middle_initial] => 
+    [guest_dob] => 
+    [guest_address] => 
+    [guest_email] => 
+    [guest_contact] => 
+    [arrival_date] => 
+    [checkin_time] => 
+    [checkout_time] => 
+    [departure_date] => 
+    [adults_count] => 1
+    [kids_count] => 0
+    [guest_room_id] => 
+    [guest_remarks] => 
+    [registered_by] => 
+    [venue_ids] => Array
+        (
+            [0] => 4
+        )
+
+    [view_board_qty] => 1
+    [additional_instruction] => Parteady ng lapis and ballpen
+    [action] => submit_function
+    [event_type] => Programs and Special Events
+    [venue_id] => 4
+    [facilities_schedules] => {"venues":[{"id":"4","name":"Function Room D","floor":"Ground Floor"}],"schedules":{"4":[{"date":"2026-03-11","start":"14:00","end":"17:00"}]}}
+    [miscellaneous_items] => {"basic_sound_system":{"speaker":2,"mic":0},"banquet_chairs":{"quantity":40},"view_board":{"requested":true},"rectangular_table":{"quantity":4}}
+    [terms_agreed_by] => Jeremie R Azarcon
+    [terms_position] => 
+    [terms_date] => March 9, 2026
+)
+
+[2026-03-09 18:33:27] SPECIFIC CHECK - activity_name: 'Quiz Bee'
+[2026-03-09 18:33:27] SPECIFIC CHECK - event_type_id: '5'
+[2026-03-09 18:33:27] Generated numbers - booking_no: FAC-20260309-186, reservation_no: RES-20260309-960
+[2026-03-09 18:33:27] BEFORE CLEAN - activity_name: 'Quiz Bee'
+[2026-03-09 18:33:27] AFTER CLEAN - activity_name: 'Quiz Bee'
+[2026-03-09 18:33:27] event_type_id: 5
+[2026-03-09 18:33:27] FINAL activity_name: 'Quiz Bee'
+[2026-03-09 18:33:27] facilities_schedules decoded: Array
+(
+    [venues] => Array
+        (
+            [0] => Array
+                (
+                    [id] => 4
+                    [name] => Function Room D
+                    [floor] => Ground Floor
+                )
+
+        )
+
+    [schedules] => Array
+        (
+            [4] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-03-11
+                            [start] => 14:00
+                            [end] => 17:00
+                        )
+
+                )
+
+        )
+
+)
+
+[2026-03-09 18:33:27] Times - start_datetime: 2026-03-11 14:00, end_datetime: 2026-03-11 17:00
+[2026-03-09 18:33:27] Conflict check passed for all venues
+[2026-03-09 18:33:27] SQL: INSERT INTO facility_reservations (
+        booking_no, reservation_no, last_name, first_name, middle_initial, 
+        email, contact_number, office_type_id, office_id, external_office_name, 
+        activity_name, event_type_id, venue_id, venue_setup_id, banquet_style_id,
+        start_datetime, end_datetime, participants_count, miscellaneous_items, 
+        additional_instruction
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+[2026-03-09 18:33:27] Success! Inserted ID: 27
+[2026-03-09 18:33:27] Inserted activity_name: Quiz Bee
+[2026-03-09 18:33:27] Inserted 1 venue(s) into reservation_venues for reservation ID 27

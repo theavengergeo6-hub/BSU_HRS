@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 03, 2026 at 09:49 AM
+-- Generation Time: Mar 10, 2026 at 01:52 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -60,7 +60,7 @@ CREATE TABLE `admin_notifications` (
   `is_read` tinyint(1) NOT NULL DEFAULT 0,
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `booking_no` varchar(255) NOT NULL,
-  `source_table` enum('reservations','room_reservation') NOT NULL
+  `source_table` enum('reservations','room_reservation','guest_room_reservations','function_room_reservations') NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -172,7 +172,7 @@ CREATE TABLE `admin_users` (
 --
 
 INSERT INTO `admin_users` (`id`, `username`, `password`, `email`, `role`, `last_login`, `created_at`) VALUES
-(7, 'admin', '$2y$10$bBebV2Cv8MqUlKXuspWljOhAwaHlggSg3EmlKBVJNbMAsQ/WhWx3G', 'admin@bsu.edu.ph', 'super_admin', '2026-03-03 13:43:47', '2026-02-25 03:44:02');
+(7, 'admin', '$2y$10$bBebV2Cv8MqUlKXuspWljOhAwaHlggSg3EmlKBVJNbMAsQ/WhWx3G', 'admin@bsu.edu.ph', 'super_admin', '2026-03-10 07:26:18', '2026-02-25 03:44:02');
 
 -- --------------------------------------------------------
 
@@ -184,22 +184,47 @@ CREATE TABLE `banquet` (
   `id` int(11) NOT NULL,
   `image` varchar(100) NOT NULL,
   `name` varchar(50) NOT NULL,
-  `description` varchar(500) NOT NULL
+  `description` varchar(500) NOT NULL,
+  `is_active` tinyint(1) DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `banquet`
 --
 
-INSERT INTO `banquet` (`id`, `image`, `name`, `description`) VALUES
-(3, 'IMG_70840.png', 'THEATER TYPE', 'In this type of setup, rows of rectangle meeting tables or banquet tables with skirting and banquet chairs are facing a stage or screen. This style is ideal for events where attendees will be sitting and watching for an extended period.'),
-(9, 'IMG_69154.png', 'BOARDROOM TYPE', 'It&#039;s referred to as the boardroom setup because it looks like all the standard boardrooms and conference rooms in corporate office spaces. If you have the space in your hotel, a boardroom setup in a smaller banquet hall is ideal as a standing de'),
-(10, 'IMG_99683.png', 'U-SHAPE TYPE', 'U-shaped floor plans layout tables and seating to form a &quot;U&quot; toward the front of the room where the speaker will lead a discussion. U-shaped floor plans are good for smaller gatherings in rectangle-shaped rooms.'),
-(11, 'IMG_90306.png', 'WEDDING STYLE', 'A banquet is a formal meal held for a large group of people. Banquets are typically held for special occasions like wedding receptions, recognition ceremonies, or large conferences. Many different banquet styles exist including buffet, reception, caf'),
-(12, 'IMG_93068.png', 'HERRING BONE TYPE', 'This style is very similar to Classroom, however with a Herringbone seating arrangement, each consecutive row of chairs and tables are angled inwards. Positives: – All of the seats are angled inward towards the podium. – All of the seats are facing f'),
-(13, 'IMG_87503.png', 'HOLLOW SQUARE TYPE', 'The hollow square layout is similar to the u-shape floor plan but simply closes off the fourth side to form a closed square or rectangle. It also has an open space in the middle of the table.'),
-(14, 'IMG_23903.png', 'CLASSROOM TYPE', 'The classroom setup is a simple and easy setup with rows of rectangular tables and chairs on either side. This setup works for a banquet event with a speaker. That said, it can also be used for a banquet that is devoted to the full course meal and socializing with the other guests.'),
-(15, 'IMG_64307.png', 'T-SHAPE TYPE', 'This type of seating is followed in conferences, where the top table is laid down and there is one spring attached with the top table.');
+INSERT INTO `banquet` (`id`, `image`, `name`, `description`, `is_active`) VALUES
+(3, 'IMG_70840.png', 'THEATER TYPE', 'In this setup, rows of rectangular meeting or banquet tables, covered with skirting and paired with banquet chairs, are arranged facing a stage or screen.\r\n\r\nThis layout suits events where guests remain seated and watch the program for a long time.\r\n', 1),
+(9, 'IMG_69154.png', 'BOARDROOM TYPE', 'It is called a boardroom setup because it resembles the typical layout used in corporate boardrooms and conference rooms.\r\n\r\nIf space allows, setting up a boardroom arrangement in a smaller banquet hall works well as a dedicated meeting area.\r\n', 1),
+(10, 'IMG_99683.png', 'U-SHAPE TYPE', 'A U-shaped floor plan arranges tables and chairs in the shape of a “U,” facing the front where the speaker leads the discussion.\r\n\r\nThis layout works best for small groups and fits well in rectangular rooms.\r\n', 1),
+(11, 'IMG_90306.png', 'WEDDING STYLE', 'A banquet is a formal dining event organized for a large number of guests.\r\n\r\nIt is usually held for special occasions such as wedding receptions, award ceremonies, or major conferences.\r\n\r\nThere are different banquet styles, including buffet, reception, and cafeteria style setups.\r\n', 1),
+(12, 'IMG_93068.png', 'HERRING BONE TYPE', 'This layout is similar to the classroom setup.\r\n\r\nIn a herringbone arrangement, each row of tables and chairs is slightly angled inward toward the front.\r\n\r\nAdvantages include better visibility of the podium since all seats are directed inward.\r\n\r\nParticipants also face forward, making it easier to focus on the speaker.\r\n', 1),
+(13, 'IMG_87503.png', 'HOLLOW SQUARE TYPE', 'The hollow square layout is similar to the u-shape floor plan but simply closes off the fourth side to form a closed square or rectangle. It also has an open space in the middle of the table.', 1),
+(14, 'IMG_23903.png', 'CLASSROOM TYPE', 'The classroom setup is a simple and easy setup with rows of rectangular tables and chairs on either side. This setup works for a banquet event with a speaker. That said, it can also be used for a banquet that is devoted to the full course meal and socializing with the other guests.', 1),
+(15, 'IMG_64307.png', 'T-SHAPE TYPE', 'This type of seating is followed in conferences, where the top table is laid down and there is one spring attached with the top table.', 1);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `booking_sequences`
+--
+
+CREATE TABLE `booking_sequences` (
+  `id` int(11) NOT NULL,
+  `type` varchar(50) NOT NULL COMMENT 'guest, function',
+  `year` int(4) NOT NULL,
+  `month` int(2) NOT NULL,
+  `last_number` int(11) NOT NULL DEFAULT 0,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `booking_sequences`
+--
+
+INSERT INTO `booking_sequences` (`id`, `type`, `year`, `month`, `last_number`, `created_at`, `updated_at`) VALUES
+(1, 'guest', 2026, 3, 0, '2026-03-06 07:17:27', '2026-03-06 07:17:27'),
+(2, 'function', 2026, 3, 0, '2026-03-06 07:17:27', '2026-03-06 07:17:27');
 
 -- --------------------------------------------------------
 
@@ -224,7 +249,7 @@ CREATE TABLE `carousel_slides` (
 --
 
 INSERT INTO `carousel_slides` (`id`, `title`, `subtitle`, `button_text`, `button_url`, `image_path`, `sort_order`, `is_active`, `created_at`) VALUES
-(1, 'Welcome to BSU Hostel', 'The perfect venue for your events. Spacious function rooms and comfortable guest rooms for meetings, celebrations, and group stays. Reserve your space today.', 'View Rooms', 'rooms.php', 'hostel/hostel2.png', 1, 1, '2026-02-19 05:14:52'),
+(1, 'Welcome to BSU Hostel', 'The perfect venue for your events. Spacious function rooms and comfortable guest rooms for meetings, celebrations, and group stays. Reserve your space today.', 'View Rooms', 'rooms_showcase.php', 'hostel/hostel2.png', 1, 1, '2026-02-19 05:14:52'),
 (2, 'Book Your Function or Guest Room', 'Check availability and reserve your stay in minutes.', 'Check Availability', 'rooms.php', 'rooms/IMG_19689.jpg', 2, 1, '2026-02-19 05:14:52'),
 (3, 'Your Comfort, Our Priority', 'Modern amenities and a welcoming environment for every guest.', 'See Amenities', 'facilities.php', 'rooms/IMG_85146.png', 3, 1, '2026-02-19 05:14:52'),
 (4, 'Stay With Us', 'Ideal for students, groups, and travelers visiting BSU.', 'Get in Touch', 'contact.php', 'hostel/hostel2.png', 4, 1, '2026-02-19 05:14:52');
@@ -401,7 +426,10 @@ INSERT INTO `facility_reservations` (`id`, `booking_no`, `reservation_no`, `last
 (21, 'FAC-20260302-760', 'RES-20260302-793', 'Graham', 'Aubery', 'D', 2, 22, '', 'CHS Buffet', 3, 1, 1, 9, '2026-03-02 07:00:00', '2026-03-02 17:00:00', 70, 'geomarc789@gmail.com', '09087547440', '{\"basic_sound_system\":{\"speaker\":2,\"mic\":2},\"round_table\":{\"quantity\":0}}', '', '', '\n--- 2026-03-02 13:39:35 (Pencil booked) ---\nPencil Booked', '2026-03-02 05:09:33', '2026-03-02 05:39:35'),
 (22, 'FAC-20260302-808', 'RES-20260302-597', 'Pantheress', 'Pink', 'E', 4, NULL, 'BFP', 'BFP Fire Prevention Month', 1, 1, 1, 3, '2026-03-02 07:00:00', '2026-03-02 17:00:00', 120, 'geomarc789@gmail.com', '09087547440', '{\"basic_sound_system\":{\"speaker\":2,\"mic\":2},\"view_board\":{\"quantity\":2},\"rectangular_table\":{\"quantity\":2}}', '', 'approved', '\n--- 2026-03-02 16:40:13 (Approved) ---\nSubmitted All the REquirements', '2026-03-02 06:19:17', '2026-03-02 08:40:13'),
 (23, 'FAC-20260302-645', 'RES-20260302-235', 'Drake', 'Drizzy', 'D', 3, 69, '', 'Kunwari Lang', 2, 1, 1, 14, '2026-03-02 21:00:00', '2026-03-02 23:00:00', 60, 'michaelblackson0975@gmail.com', '09087547440', '{\"basic_sound_system\":{\"speaker\":2,\"mic\":2},\"round_table\":{\"quantity\":16},\"banquet_chairs\":{\"quantity\":190},\"view_board\":{\"requested\":true},\"rectangular_table\":{\"quantity\":10}}', '', 'cancelled', '\n--- 2026-03-02 16:04:42 (Pencil booked) ---\nSubmitted Reservation form with Signatures\n--- 2026-03-03 08:20:19 (Cancelled) ---\nCancelled, di nakapag pasa ng forms', '2026-03-02 08:03:45', '2026-03-03 00:20:19'),
-(24, 'FAC-20260303-316', 'RES-20260303-887', 'Curry', 'Marco', 'C', 1, 2, '', 'CTE Assembly', 2, 1, 1, 9, '2026-03-05 07:00:00', '2026-03-05 12:00:00', 60, 'gomari13@gmail.com', '09087547440', '{\"basic_sound_system\":{\"speaker\":2,\"mic\":2},\"banquet_chairs\":{\"quantity\":2},\"view_board\":{\"requested\":true}}', '', 'pencil_booked', '\n--- 2026-03-03 14:23:58 (Pencil booked) ---\nSubmitted a paper signed by me', '2026-03-03 06:22:31', '2026-03-03 06:23:58');
+(24, 'FAC-20260303-316', 'RES-20260303-887', 'Curry', 'Marco', 'C', 1, 2, '', 'CTE Assembly', 2, 1, 1, 9, '2026-03-05 07:00:00', '2026-03-05 12:00:00', 60, 'gomari13@gmail.com', '09087547440', '{\"basic_sound_system\":{\"speaker\":2,\"mic\":2},\"banquet_chairs\":{\"quantity\":2},\"view_board\":{\"requested\":true}}', '', 'approved', '\n--- 2026-03-03 14:23:58 (Pencil booked) ---\nSubmitted a paper signed by me\n--- 2026-03-05 08:20:49 (Approved) ---\nSubmitted signed papers', '2026-03-03 06:22:31', '2026-03-05 00:20:49'),
+(25, 'FAC-20260305-925', 'RES-20260305-161', 'Jordan', 'Michael', 'K', 1, 5, '', 'Technoprenuership Pitch', 5, 1, 1, 3, '2026-03-06 07:00:00', '2026-03-06 17:00:00', 150, 'geomarc789@gmail.com', '09087547440', '{\"basic_sound_system\":{\"speaker\":2,\"mic\":2},\"banquet_chairs\":{\"quantity\":150},\"view_board\":{\"requested\":true},\"rectangular_table\":{\"quantity\":1}}', '', 'approved', '\n--- 2026-03-05 08:26:21 (Pencil booked) ---\nSigned by me\n--- 2026-03-05 08:30:57 (Approved) ---\nSubmitted signed paper by Sir Marvin', '2026-03-05 00:23:48', '2026-03-05 00:30:57'),
+(26, 'FAC-20260309-588', 'RES-20260309-123', 'Tesfaye', 'Abel', 'C', 4, NULL, 'Los Angeles Lakers', 'Lakers Film Study', 2, 4, 1, 14, '2026-03-11 07:00:00', '2026-03-11 13:00:00', 40, 'geomarc789@gmail.com', '09087547440', '{\"basic_sound_system\":{\"speaker\":1,\"mic\":1},\"banquet_chairs\":{\"quantity\":40},\"view_board\":{\"requested\":true},\"rectangular_table\":{\"quantity\":5}}', '', 'approved', '\n--- 2026-03-09 10:28:52 (Pencil booked) ---\nSubmitted signed by me document\n--- 2026-03-09 10:29:51 (Approved) ---\nSubmitted signed papers by Dean Marvin', '2026-03-09 02:25:17', '2026-03-09 02:29:51'),
+(27, 'FAC-20260309-186', 'RES-20260309-960', 'Azarcon', 'Jeremie', 'R', 1, 6, '', 'Quiz Bee', 5, 4, 1, 12, '2026-03-11 14:00:00', '2026-03-11 17:00:00', 40, 'jeremieazarcon@gmail.com', '09626970801', '{\"basic_sound_system\":{\"speaker\":2,\"mic\":0},\"banquet_chairs\":{\"quantity\":40},\"view_board\":{\"requested\":true},\"rectangular_table\":{\"quantity\":4}}', 'Parteady ng lapis and ballpen', 'approved', '\n--- 2026-03-09 18:34:19 (Approved) ---\nSubhmitted all the requirements', '2026-03-09 10:33:27', '2026-03-09 10:34:19');
 
 -- --------------------------------------------------------
 
@@ -441,24 +469,851 @@ CREATE TABLE `features` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `function_room_reviews`
+-- Table structure for table `function_calendar_config`
 --
 
-CREATE TABLE `function_room_reviews` (
+CREATE TABLE `function_calendar_config` (
   `id` int(11) NOT NULL,
-  `reservation_id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `rating` int(1) NOT NULL CHECK (`rating` between 1 and 5),
-  `review` text NOT NULL,
-  `created_at` datetime NOT NULL DEFAULT current_timestamp()
+  `config_key` varchar(100) NOT NULL,
+  `config_value` text DEFAULT NULL,
+  `description` varchar(255) DEFAULT NULL,
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `function_room_reviews`
+-- Dumping data for table `function_calendar_config`
 --
 
-INSERT INTO `function_room_reviews` (`id`, `reservation_id`, `user_id`, `rating`, `review`, `created_at`) VALUES
-(28, 111, 43, 5, 'Excellent service, highly recommended!', '2025-03-09 11:08:48');
+INSERT INTO `function_calendar_config` (`id`, `config_key`, `config_value`, `description`, `updated_at`) VALUES
+(1, 'min_advance_days', '1', 'Minimum days in advance for booking', '2026-03-06 07:07:06'),
+(2, 'max_advance_days', '180', 'Maximum days in advance for booking', '2026-03-06 07:07:06'),
+(3, 'min_duration_hours', '1', 'Minimum event duration in hours', '2026-03-06 07:07:06'),
+(4, 'max_duration_hours', '12', 'Maximum event duration in hours', '2026-03-06 07:07:06'),
+(5, 'operating_hours_start', '07:00:00', 'Start of operating hours', '2026-03-06 07:07:06'),
+(6, 'operating_hours_end', '23:00:00', 'End of operating hours', '2026-03-06 07:07:06'),
+(7, 'buffer_before_minutes', '30', 'Buffer time before events in minutes', '2026-03-06 07:07:06'),
+(8, 'buffer_after_minutes', '60', 'Buffer time after events in minutes', '2026-03-06 07:07:06'),
+(9, 'weekly_holidays', '[]', 'Days of week when bookings are not allowed', '2026-03-06 07:07:06'),
+(10, 'special_dates', '[]', 'Special dates with custom rules', '2026-03-06 07:07:06');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `function_rooms`
+--
+
+CREATE TABLE `function_rooms` (
+  `id` int(11) NOT NULL,
+  `room_name` varchar(100) NOT NULL,
+  `floor` varchar(20) DEFAULT NULL,
+  `capacity_min` int(11) DEFAULT 0,
+  `capacity_max` int(11) NOT NULL,
+  `rate_per_hour` decimal(10,2) DEFAULT NULL,
+  `rate_per_day` decimal(10,2) NOT NULL,
+  `has_sound_system` tinyint(1) NOT NULL DEFAULT 0,
+  `has_projector` tinyint(1) NOT NULL DEFAULT 0,
+  `has_wifi` tinyint(1) NOT NULL DEFAULT 1,
+  `description` text DEFAULT NULL,
+  `amenities` text DEFAULT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `sort_order` int(11) DEFAULT 0,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `function_rooms`
+--
+
+INSERT INTO `function_rooms` (`id`, `room_name`, `floor`, `capacity_min`, `capacity_max`, `rate_per_hour`, `rate_per_day`, `has_sound_system`, `has_projector`, `has_wifi`, `description`, `amenities`, `is_active`, `sort_order`, `created_at`, `updated_at`) VALUES
+(1, 'Function Room A', 'Ground Floor', 20, 40, 500.00, 4000.00, 1, 1, 1, 'Spacious function room perfect for meetings, seminars, and small events.', NULL, 1, 0, '2026-03-06 07:07:05', '2026-03-06 07:07:05'),
+(2, 'Function Room B', 'Ground Floor', 25, 50, 600.00, 4500.00, 1, 1, 1, 'Ideal for workshops, training sessions, and medium-sized gatherings.', NULL, 1, 0, '2026-03-06 07:07:05', '2026-03-06 07:07:05'),
+(3, 'Function Room C', 'Ground Floor', 30, 60, 700.00, 5000.00, 1, 1, 1, 'Largest function room with complete AV equipment, suitable for conferences and events.', NULL, 1, 0, '2026-03-06 07:07:05', '2026-03-06 07:07:05'),
+(4, 'Function Room D', 'Ground Floor', 15, 30, 400.00, 3000.00, 1, 0, 1, 'Intimate space for small meetings, interviews, and private discussions.', NULL, 1, 0, '2026-03-06 07:07:05', '2026-03-06 07:07:05'),
+(5, 'Function Room E', 'Ground Floor', 20, 45, 550.00, 4200.00, 1, 1, 1, 'Versatile space for training, seminars, and corporate events.', NULL, 1, 0, '2026-03-06 07:07:05', '2026-03-06 07:07:05');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `function_room_availability`
+--
+
+CREATE TABLE `function_room_availability` (
+  `id` int(11) NOT NULL,
+  `function_room_id` int(11) NOT NULL,
+  `date` date NOT NULL,
+  `time_slot` varchar(20) NOT NULL COMMENT 'e.g., 08:00-10:00',
+  `start_time` time NOT NULL,
+  `end_time` time NOT NULL,
+  `is_available` tinyint(1) NOT NULL DEFAULT 1,
+  `reservation_id` int(11) DEFAULT NULL,
+  `status` enum('available','booked','blocked','maintenance') NOT NULL DEFAULT 'available',
+  `notes` varchar(255) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `function_room_blocked_dates`
+--
+
+CREATE TABLE `function_room_blocked_dates` (
+  `id` int(11) NOT NULL,
+  `function_room_id` int(11) NOT NULL,
+  `start_date` date NOT NULL,
+  `end_date` date NOT NULL,
+  `start_time` time DEFAULT NULL,
+  `end_time` time DEFAULT NULL,
+  `reason` varchar(255) NOT NULL,
+  `is_full_day` tinyint(1) NOT NULL DEFAULT 1,
+  `created_by` int(11) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `function_room_images`
+--
+
+CREATE TABLE `function_room_images` (
+  `id` int(11) NOT NULL,
+  `function_room_id` int(11) NOT NULL,
+  `image_path` varchar(255) NOT NULL,
+  `is_primary` tinyint(1) DEFAULT 0,
+  `sort_order` int(11) DEFAULT 0,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `function_room_reservations`
+--
+
+CREATE TABLE `function_room_reservations` (
+  `id` int(11) NOT NULL,
+  `booking_no` varchar(50) NOT NULL,
+  `reservation_no` varchar(50) NOT NULL,
+  `user_id` int(11) DEFAULT NULL,
+  `last_name` varchar(100) NOT NULL,
+  `first_name` varchar(100) NOT NULL,
+  `middle_initial` varchar(10) DEFAULT NULL,
+  `email` varchar(255) NOT NULL,
+  `contact_number` varchar(50) NOT NULL,
+  `office_type_id` int(11) NOT NULL,
+  `office_id` int(11) DEFAULT NULL,
+  `external_office_name` varchar(255) DEFAULT NULL,
+  `activity_name` varchar(255) NOT NULL,
+  `event_type_id` int(11) DEFAULT NULL,
+  `participants_count` int(11) NOT NULL,
+  `banquet_style_id` int(11) DEFAULT NULL,
+  `function_room_id` int(11) NOT NULL,
+  `venue_setup_id` int(11) NOT NULL,
+  `event_date` date NOT NULL,
+  `start_time` time NOT NULL,
+  `end_time` time NOT NULL,
+  `setup_time` time DEFAULT NULL,
+  `cleanup_time` time DEFAULT NULL,
+  `total_hours` decimal(5,2) GENERATED ALWAYS AS (timestampdiff(HOUR,concat(`event_date`,' ',`start_time`),concat(`event_date`,' ',`end_time`))) STORED,
+  `rate_per_hour` decimal(10,2) NOT NULL,
+  `total_rental_cost` decimal(10,2) NOT NULL,
+  `discount_amount` decimal(10,2) DEFAULT 0.00,
+  `total_amount` decimal(10,2) NOT NULL,
+  `miscellaneous_items` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`miscellaneous_items`)),
+  `additional_instruction` text DEFAULT NULL,
+  `status` enum('pending','pencil_booked','approved','denied','cancelled','completed') NOT NULL DEFAULT 'pending',
+  `payment_status` enum('unpaid','partial','paid','refunded') NOT NULL DEFAULT 'unpaid',
+  `payment_method` varchar(50) DEFAULT NULL,
+  `payment_date` datetime DEFAULT NULL,
+  `amount_paid` decimal(10,2) DEFAULT 0.00,
+  `admin_remarks` text DEFAULT NULL,
+  `terms_accepted` tinyint(1) NOT NULL DEFAULT 0,
+  `terms_accepted_by` varchar(255) DEFAULT NULL,
+  `terms_accepted_at` datetime DEFAULT NULL,
+  `terms_position` varchar(100) DEFAULT NULL,
+  `digital_signature` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `deleted` tinyint(1) NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Triggers `function_room_reservations`
+--
+DELIMITER $$
+CREATE TRIGGER `trg_function_reservation_after_insert` AFTER INSERT ON `function_room_reservations` FOR EACH ROW BEGIN
+  INSERT INTO function_room_availability 
+    (function_room_id, date, time_slot, start_time, end_time, is_available, reservation_id, status)
+  VALUES 
+    (NEW.function_room_id, NEW.event_date, 
+     CONCAT(NEW.start_time, '-', NEW.end_time),
+     NEW.start_time, NEW.end_time, 0, NEW.id, 'booked');
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trg_function_reservation_after_update` AFTER UPDATE ON `function_room_reservations` FOR EACH ROW BEGIN
+  IF NEW.status = 'cancelled' AND OLD.status != 'cancelled' THEN
+    DELETE FROM function_room_availability 
+    WHERE reservation_id = OLD.id;
+  END IF;
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `guest_calendar_config`
+--
+
+CREATE TABLE `guest_calendar_config` (
+  `id` int(11) NOT NULL,
+  `config_key` varchar(100) NOT NULL,
+  `config_value` text DEFAULT NULL,
+  `description` varchar(255) DEFAULT NULL,
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `guest_calendar_config`
+--
+
+INSERT INTO `guest_calendar_config` (`id`, `config_key`, `config_value`, `description`, `updated_at`) VALUES
+(1, 'min_advance_days', '1', 'Minimum days in advance for booking', '2026-03-06 07:07:06'),
+(2, 'max_advance_days', '90', 'Maximum days in advance for booking', '2026-03-06 07:07:06'),
+(3, 'min_stay_nights', '1', 'Minimum number of nights for stay', '2026-03-06 07:07:06'),
+(4, 'max_stay_nights', '30', 'Maximum number of nights for stay', '2026-03-06 07:07:06'),
+(5, 'check_in_time', '14:00:00', 'Default check-in time', '2026-03-06 07:07:06'),
+(6, 'check_out_time', '12:00:00', 'Default check-out time', '2026-03-06 07:07:06'),
+(7, 'buffer_days', '0', 'Buffer days between bookings', '2026-03-06 07:07:06'),
+(8, 'weekly_holidays', '[]', 'Days of week when bookings are not allowed', '2026-03-06 07:07:06'),
+(9, 'special_dates', '[]', 'Special dates with custom rules', '2026-03-06 07:07:06');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `guest_details`
+--
+
+CREATE TABLE `guest_details` (
+  `id` int(11) NOT NULL,
+  `reservation_id` int(11) NOT NULL,
+  `full_name` varchar(255) NOT NULL,
+  `date_of_birth` date DEFAULT NULL,
+  `age` int(11) DEFAULT NULL,
+  `relationship` varchar(50) DEFAULT NULL,
+  `id_type` varchar(50) DEFAULT NULL,
+  `id_number` varchar(100) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `guest_rooms`
+--
+
+CREATE TABLE `guest_rooms` (
+  `id` int(11) NOT NULL,
+  `room_number` varchar(20) NOT NULL,
+  `room_name` varchar(100) NOT NULL,
+  `room_type` enum('standard','deluxe','family','dormitory') NOT NULL DEFAULT 'standard',
+  `capacity_adults` int(11) NOT NULL DEFAULT 2,
+  `capacity_children` int(11) NOT NULL DEFAULT 0,
+  `max_guests` int(11) NOT NULL DEFAULT 2,
+  `bed_configuration` varchar(100) DEFAULT NULL,
+  `floor` varchar(20) DEFAULT NULL,
+  `price_per_night` decimal(10,2) NOT NULL,
+  `extra_bed_available` tinyint(1) NOT NULL DEFAULT 0,
+  `extra_bed_price` decimal(10,2) DEFAULT 500.00,
+  `description` text DEFAULT NULL,
+  `amenities` text DEFAULT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `sort_order` int(11) DEFAULT 0,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `guest_rooms`
+--
+
+INSERT INTO `guest_rooms` (`id`, `room_number`, `room_name`, `room_type`, `capacity_adults`, `capacity_children`, `max_guests`, `bed_configuration`, `floor`, `price_per_night`, `extra_bed_available`, `extra_bed_price`, `description`, `amenities`, `is_active`, `sort_order`, `created_at`, `updated_at`) VALUES
+(1, '101', 'Guest Room 1', 'standard', 2, 1, 4, '1 Queen Bed', '2nd Floor', 2500.00, 1, 500.00, 'Comfortable guest room with queen bed and city view.', NULL, 1, 0, '2026-03-06 07:07:05', '2026-03-06 07:07:05'),
+(2, '102', 'Guest Room 2', 'standard', 2, 1, 5, '2 Twin Beds', '2nd Floor', 2500.00, 1, 500.00, 'Guest room with two twin beds, perfect for friends or colleagues.', NULL, 1, 0, '2026-03-06 07:07:05', '2026-03-06 07:07:05'),
+(3, '103', 'Guest Room 3', 'family', 3, 2, 5, '1 Queen + 1 Single', '2nd Floor', 3000.00, 1, 500.00, 'Spacious family room with queen bed and single bed.', NULL, 1, 0, '2026-03-06 07:07:05', '2026-03-06 07:07:05'),
+(4, '104', 'Guest Room 4', 'deluxe', 2, 2, 8, '1 King Bed + Sofa Bed', '2nd Floor', 3500.00, 1, 500.00, 'Deluxe room with king bed and sofa bed, suitable for small families.', NULL, 1, 0, '2026-03-06 07:07:05', '2026-03-06 07:07:05'),
+(5, 'D001', 'Dormitory', 'dormitory', 20, 4, 24, 'Bunk Beds (12 beds)', 'Ground Floor', 8000.00, 0, 0.00, 'Spacious dormitory with 12 bunk beds, accommodating up to 24 guests. Ideal for student delegations, sports teams, and group accommodations.', NULL, 1, 0, '2026-03-06 07:07:05', '2026-03-06 07:07:05');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `guest_room_availability`
+--
+
+CREATE TABLE `guest_room_availability` (
+  `id` int(11) NOT NULL,
+  `guest_room_id` int(11) NOT NULL,
+  `date` date NOT NULL,
+  `is_available` tinyint(1) NOT NULL DEFAULT 1,
+  `available_quantity` int(11) NOT NULL DEFAULT 1,
+  `booked_quantity` int(11) NOT NULL DEFAULT 0,
+  `blocked_quantity` int(11) NOT NULL DEFAULT 0,
+  `notes` varchar(255) DEFAULT NULL,
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `guest_room_availability`
+--
+
+INSERT INTO `guest_room_availability` (`id`, `guest_room_id`, `date`, `is_available`, `available_quantity`, `booked_quantity`, `blocked_quantity`, `notes`, `updated_at`) VALUES
+(1, 1, '2026-03-06', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(2, 2, '2026-03-06', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(3, 4, '2026-03-06', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(4, 3, '2026-03-06', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(5, 5, '2026-03-06', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(6, 1, '2026-03-07', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(7, 2, '2026-03-07', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(8, 4, '2026-03-07', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(9, 3, '2026-03-07', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(10, 5, '2026-03-07', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(11, 1, '2026-03-08', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(12, 2, '2026-03-08', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(13, 4, '2026-03-08', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(14, 3, '2026-03-08', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(15, 5, '2026-03-08', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(16, 1, '2026-03-09', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(17, 2, '2026-03-09', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(18, 4, '2026-03-09', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(19, 3, '2026-03-09', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(20, 5, '2026-03-09', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(21, 1, '2026-03-10', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(22, 2, '2026-03-10', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(23, 4, '2026-03-10', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(24, 3, '2026-03-10', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(25, 5, '2026-03-10', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(26, 1, '2026-03-11', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(27, 2, '2026-03-11', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(28, 4, '2026-03-11', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(29, 3, '2026-03-11', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(30, 5, '2026-03-11', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(31, 1, '2026-03-12', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(32, 2, '2026-03-12', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(33, 4, '2026-03-12', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(34, 3, '2026-03-12', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(35, 5, '2026-03-12', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(36, 1, '2026-03-13', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(37, 2, '2026-03-13', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(38, 4, '2026-03-13', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(39, 3, '2026-03-13', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(40, 5, '2026-03-13', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(41, 1, '2026-03-14', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(42, 2, '2026-03-14', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(43, 4, '2026-03-14', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(44, 3, '2026-03-14', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(45, 5, '2026-03-14', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(46, 1, '2026-03-15', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(47, 2, '2026-03-15', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(48, 4, '2026-03-15', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(49, 3, '2026-03-15', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(50, 5, '2026-03-15', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(51, 1, '2026-03-16', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(52, 2, '2026-03-16', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(53, 4, '2026-03-16', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(54, 3, '2026-03-16', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(55, 5, '2026-03-16', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(56, 1, '2026-03-17', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(57, 2, '2026-03-17', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(58, 4, '2026-03-17', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(59, 3, '2026-03-17', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(60, 5, '2026-03-17', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(61, 1, '2026-03-18', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(62, 2, '2026-03-18', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(63, 4, '2026-03-18', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(64, 3, '2026-03-18', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(65, 5, '2026-03-18', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(66, 1, '2026-03-19', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(67, 2, '2026-03-19', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(68, 4, '2026-03-19', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(69, 3, '2026-03-19', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(70, 5, '2026-03-19', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(71, 1, '2026-03-20', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(72, 2, '2026-03-20', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(73, 4, '2026-03-20', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(74, 3, '2026-03-20', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(75, 5, '2026-03-20', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(76, 1, '2026-03-21', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(77, 2, '2026-03-21', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(78, 4, '2026-03-21', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(79, 3, '2026-03-21', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(80, 5, '2026-03-21', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(81, 1, '2026-03-22', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(82, 2, '2026-03-22', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(83, 4, '2026-03-22', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(84, 3, '2026-03-22', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(85, 5, '2026-03-22', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(86, 1, '2026-03-23', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(87, 2, '2026-03-23', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(88, 4, '2026-03-23', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(89, 3, '2026-03-23', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(90, 5, '2026-03-23', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(91, 1, '2026-03-24', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(92, 2, '2026-03-24', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(93, 4, '2026-03-24', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(94, 3, '2026-03-24', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(95, 5, '2026-03-24', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(96, 1, '2026-03-25', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(97, 2, '2026-03-25', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(98, 4, '2026-03-25', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(99, 3, '2026-03-25', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(100, 5, '2026-03-25', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(101, 1, '2026-03-26', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(102, 2, '2026-03-26', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(103, 4, '2026-03-26', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(104, 3, '2026-03-26', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(105, 5, '2026-03-26', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(106, 1, '2026-03-27', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(107, 2, '2026-03-27', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(108, 4, '2026-03-27', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(109, 3, '2026-03-27', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(110, 5, '2026-03-27', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(111, 1, '2026-03-28', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(112, 2, '2026-03-28', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(113, 4, '2026-03-28', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(114, 3, '2026-03-28', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(115, 5, '2026-03-28', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(116, 1, '2026-03-29', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(117, 2, '2026-03-29', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(118, 4, '2026-03-29', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(119, 3, '2026-03-29', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(120, 5, '2026-03-29', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(121, 1, '2026-03-30', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(122, 2, '2026-03-30', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(123, 4, '2026-03-30', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(124, 3, '2026-03-30', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(125, 5, '2026-03-30', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(126, 1, '2026-03-31', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(127, 2, '2026-03-31', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(128, 4, '2026-03-31', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(129, 3, '2026-03-31', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(130, 5, '2026-03-31', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(131, 1, '2026-04-01', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(132, 2, '2026-04-01', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(133, 4, '2026-04-01', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(134, 3, '2026-04-01', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(135, 5, '2026-04-01', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(136, 1, '2026-04-02', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(137, 2, '2026-04-02', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(138, 4, '2026-04-02', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(139, 3, '2026-04-02', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(140, 5, '2026-04-02', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(141, 1, '2026-04-03', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(142, 2, '2026-04-03', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(143, 4, '2026-04-03', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(144, 3, '2026-04-03', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(145, 5, '2026-04-03', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(146, 1, '2026-04-04', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(147, 2, '2026-04-04', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(148, 4, '2026-04-04', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(149, 3, '2026-04-04', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(150, 5, '2026-04-04', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(151, 1, '2026-04-05', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(152, 2, '2026-04-05', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(153, 4, '2026-04-05', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(154, 3, '2026-04-05', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(155, 5, '2026-04-05', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(156, 1, '2026-04-06', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(157, 2, '2026-04-06', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(158, 4, '2026-04-06', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(159, 3, '2026-04-06', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(160, 5, '2026-04-06', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(161, 1, '2026-04-07', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(162, 2, '2026-04-07', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(163, 4, '2026-04-07', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(164, 3, '2026-04-07', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(165, 5, '2026-04-07', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(166, 1, '2026-04-08', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(167, 2, '2026-04-08', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(168, 4, '2026-04-08', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(169, 3, '2026-04-08', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(170, 5, '2026-04-08', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(171, 1, '2026-04-09', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(172, 2, '2026-04-09', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(173, 4, '2026-04-09', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(174, 3, '2026-04-09', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(175, 5, '2026-04-09', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(176, 1, '2026-04-10', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(177, 2, '2026-04-10', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(178, 4, '2026-04-10', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(179, 3, '2026-04-10', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(180, 5, '2026-04-10', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(181, 1, '2026-04-11', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(182, 2, '2026-04-11', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(183, 4, '2026-04-11', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(184, 3, '2026-04-11', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(185, 5, '2026-04-11', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(186, 1, '2026-04-12', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(187, 2, '2026-04-12', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(188, 4, '2026-04-12', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(189, 3, '2026-04-12', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(190, 5, '2026-04-12', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(191, 1, '2026-04-13', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(192, 2, '2026-04-13', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(193, 4, '2026-04-13', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(194, 3, '2026-04-13', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(195, 5, '2026-04-13', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(196, 1, '2026-04-14', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(197, 2, '2026-04-14', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(198, 4, '2026-04-14', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(199, 3, '2026-04-14', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(200, 5, '2026-04-14', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(201, 1, '2026-04-15', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(202, 2, '2026-04-15', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(203, 4, '2026-04-15', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(204, 3, '2026-04-15', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(205, 5, '2026-04-15', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(206, 1, '2026-04-16', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(207, 2, '2026-04-16', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(208, 4, '2026-04-16', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(209, 3, '2026-04-16', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(210, 5, '2026-04-16', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(211, 1, '2026-04-17', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(212, 2, '2026-04-17', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(213, 4, '2026-04-17', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(214, 3, '2026-04-17', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(215, 5, '2026-04-17', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(216, 1, '2026-04-18', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(217, 2, '2026-04-18', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(218, 4, '2026-04-18', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(219, 3, '2026-04-18', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(220, 5, '2026-04-18', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(221, 1, '2026-04-19', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(222, 2, '2026-04-19', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(223, 4, '2026-04-19', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(224, 3, '2026-04-19', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(225, 5, '2026-04-19', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(226, 1, '2026-04-20', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(227, 2, '2026-04-20', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(228, 4, '2026-04-20', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(229, 3, '2026-04-20', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(230, 5, '2026-04-20', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(231, 1, '2026-04-21', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(232, 2, '2026-04-21', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(233, 4, '2026-04-21', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(234, 3, '2026-04-21', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(235, 5, '2026-04-21', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(236, 1, '2026-04-22', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(237, 2, '2026-04-22', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(238, 4, '2026-04-22', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(239, 3, '2026-04-22', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(240, 5, '2026-04-22', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(241, 1, '2026-04-23', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(242, 2, '2026-04-23', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(243, 4, '2026-04-23', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(244, 3, '2026-04-23', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(245, 5, '2026-04-23', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(246, 1, '2026-04-24', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(247, 2, '2026-04-24', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(248, 4, '2026-04-24', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(249, 3, '2026-04-24', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(250, 5, '2026-04-24', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(251, 1, '2026-04-25', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(252, 2, '2026-04-25', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(253, 4, '2026-04-25', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(254, 3, '2026-04-25', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(255, 5, '2026-04-25', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(256, 1, '2026-04-26', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(257, 2, '2026-04-26', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(258, 4, '2026-04-26', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(259, 3, '2026-04-26', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(260, 5, '2026-04-26', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(261, 1, '2026-04-27', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(262, 2, '2026-04-27', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(263, 4, '2026-04-27', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(264, 3, '2026-04-27', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(265, 5, '2026-04-27', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(266, 1, '2026-04-28', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(267, 2, '2026-04-28', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(268, 4, '2026-04-28', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(269, 3, '2026-04-28', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(270, 5, '2026-04-28', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(271, 1, '2026-04-29', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(272, 2, '2026-04-29', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(273, 4, '2026-04-29', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(274, 3, '2026-04-29', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(275, 5, '2026-04-29', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(276, 1, '2026-04-30', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(277, 2, '2026-04-30', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(278, 4, '2026-04-30', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(279, 3, '2026-04-30', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(280, 5, '2026-04-30', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(281, 1, '2026-05-01', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(282, 2, '2026-05-01', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(283, 4, '2026-05-01', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(284, 3, '2026-05-01', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(285, 5, '2026-05-01', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(286, 1, '2026-05-02', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(287, 2, '2026-05-02', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(288, 4, '2026-05-02', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(289, 3, '2026-05-02', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(290, 5, '2026-05-02', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(291, 1, '2026-05-03', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(292, 2, '2026-05-03', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(293, 4, '2026-05-03', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(294, 3, '2026-05-03', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(295, 5, '2026-05-03', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(296, 1, '2026-05-04', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(297, 2, '2026-05-04', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(298, 4, '2026-05-04', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(299, 3, '2026-05-04', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(300, 5, '2026-05-04', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(301, 1, '2026-05-05', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(302, 2, '2026-05-05', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(303, 4, '2026-05-05', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(304, 3, '2026-05-05', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(305, 5, '2026-05-05', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(306, 1, '2026-05-06', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(307, 2, '2026-05-06', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(308, 4, '2026-05-06', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(309, 3, '2026-05-06', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(310, 5, '2026-05-06', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(311, 1, '2026-05-07', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(312, 2, '2026-05-07', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(313, 4, '2026-05-07', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(314, 3, '2026-05-07', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(315, 5, '2026-05-07', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(316, 1, '2026-05-08', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(317, 2, '2026-05-08', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(318, 4, '2026-05-08', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(319, 3, '2026-05-08', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(320, 5, '2026-05-08', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(321, 1, '2026-05-09', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(322, 2, '2026-05-09', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(323, 4, '2026-05-09', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(324, 3, '2026-05-09', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(325, 5, '2026-05-09', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(326, 1, '2026-05-10', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(327, 2, '2026-05-10', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(328, 4, '2026-05-10', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(329, 3, '2026-05-10', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(330, 5, '2026-05-10', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(331, 1, '2026-05-11', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(332, 2, '2026-05-11', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(333, 4, '2026-05-11', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(334, 3, '2026-05-11', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(335, 5, '2026-05-11', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(336, 1, '2026-05-12', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(337, 2, '2026-05-12', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(338, 4, '2026-05-12', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(339, 3, '2026-05-12', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(340, 5, '2026-05-12', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(341, 1, '2026-05-13', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(342, 2, '2026-05-13', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(343, 4, '2026-05-13', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(344, 3, '2026-05-13', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(345, 5, '2026-05-13', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(346, 1, '2026-05-14', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(347, 2, '2026-05-14', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(348, 4, '2026-05-14', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(349, 3, '2026-05-14', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(350, 5, '2026-05-14', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(351, 1, '2026-05-15', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(352, 2, '2026-05-15', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(353, 4, '2026-05-15', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(354, 3, '2026-05-15', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(355, 5, '2026-05-15', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(356, 1, '2026-05-16', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(357, 2, '2026-05-16', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(358, 4, '2026-05-16', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(359, 3, '2026-05-16', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(360, 5, '2026-05-16', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(361, 1, '2026-05-17', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(362, 2, '2026-05-17', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(363, 4, '2026-05-17', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(364, 3, '2026-05-17', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(365, 5, '2026-05-17', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(366, 1, '2026-05-18', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(367, 2, '2026-05-18', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(368, 4, '2026-05-18', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(369, 3, '2026-05-18', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(370, 5, '2026-05-18', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(371, 1, '2026-05-19', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(372, 2, '2026-05-19', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(373, 4, '2026-05-19', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(374, 3, '2026-05-19', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(375, 5, '2026-05-19', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(376, 1, '2026-05-20', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(377, 2, '2026-05-20', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(378, 4, '2026-05-20', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(379, 3, '2026-05-20', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(380, 5, '2026-05-20', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(381, 1, '2026-05-21', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(382, 2, '2026-05-21', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(383, 4, '2026-05-21', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(384, 3, '2026-05-21', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(385, 5, '2026-05-21', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(386, 1, '2026-05-22', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(387, 2, '2026-05-22', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(388, 4, '2026-05-22', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(389, 3, '2026-05-22', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(390, 5, '2026-05-22', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(391, 1, '2026-05-23', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(392, 2, '2026-05-23', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(393, 4, '2026-05-23', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(394, 3, '2026-05-23', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(395, 5, '2026-05-23', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(396, 1, '2026-05-24', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(397, 2, '2026-05-24', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(398, 4, '2026-05-24', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(399, 3, '2026-05-24', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(400, 5, '2026-05-24', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(401, 1, '2026-05-25', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(402, 2, '2026-05-25', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(403, 4, '2026-05-25', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(404, 3, '2026-05-25', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(405, 5, '2026-05-25', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(406, 1, '2026-05-26', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(407, 2, '2026-05-26', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(408, 4, '2026-05-26', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(409, 3, '2026-05-26', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(410, 5, '2026-05-26', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(411, 1, '2026-05-27', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(412, 2, '2026-05-27', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(413, 4, '2026-05-27', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(414, 3, '2026-05-27', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(415, 5, '2026-05-27', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(416, 1, '2026-05-28', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(417, 2, '2026-05-28', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(418, 4, '2026-05-28', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(419, 3, '2026-05-28', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(420, 5, '2026-05-28', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(421, 1, '2026-05-29', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(422, 2, '2026-05-29', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(423, 4, '2026-05-29', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(424, 3, '2026-05-29', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(425, 5, '2026-05-29', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(426, 1, '2026-05-30', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(427, 2, '2026-05-30', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(428, 4, '2026-05-30', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(429, 3, '2026-05-30', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(430, 5, '2026-05-30', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(431, 1, '2026-05-31', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(432, 2, '2026-05-31', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(433, 4, '2026-05-31', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(434, 3, '2026-05-31', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(435, 5, '2026-05-31', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(436, 1, '2026-06-01', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(437, 2, '2026-06-01', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(438, 4, '2026-06-01', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(439, 3, '2026-06-01', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(440, 5, '2026-06-01', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(441, 1, '2026-06-02', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(442, 2, '2026-06-02', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(443, 4, '2026-06-02', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(444, 3, '2026-06-02', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(445, 5, '2026-06-02', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(446, 1, '2026-06-03', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(447, 2, '2026-06-03', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(448, 4, '2026-06-03', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(449, 3, '2026-06-03', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(450, 5, '2026-06-03', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `guest_room_images`
+--
+
+CREATE TABLE `guest_room_images` (
+  `id` int(11) NOT NULL,
+  `guest_room_id` int(11) NOT NULL,
+  `image_path` varchar(255) NOT NULL,
+  `is_primary` tinyint(1) DEFAULT 0,
+  `sort_order` int(11) DEFAULT 0,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `guest_room_reservations`
+--
+
+CREATE TABLE `guest_room_reservations` (
+  `id` int(11) NOT NULL,
+  `booking_no` varchar(50) NOT NULL,
+  `user_id` int(11) DEFAULT NULL,
+  `guest_name` varchar(255) NOT NULL,
+  `guest_email` varchar(255) NOT NULL,
+  `guest_contact` varchar(50) NOT NULL,
+  `guest_address` text DEFAULT NULL,
+  `guest_dob` date DEFAULT NULL,
+  `guest_id_type` varchar(50) DEFAULT NULL,
+  `guest_id_number` varchar(100) DEFAULT NULL,
+  `purpose_of_stay` varchar(255) DEFAULT NULL,
+  `check_in_date` date NOT NULL,
+  `check_out_date` date NOT NULL,
+  `check_in_time` time NOT NULL,
+  `check_out_time` time NOT NULL,
+  `number_of_nights` int(11) GENERATED ALWAYS AS (to_days(`check_out_date`) - to_days(`check_in_date`)) STORED,
+  `adults_count` int(11) NOT NULL DEFAULT 1,
+  `children_count` int(11) NOT NULL DEFAULT 0,
+  `total_guests` int(11) NOT NULL,
+  `guest_room_id` int(11) NOT NULL,
+  `extra_bed_requested` tinyint(1) NOT NULL DEFAULT 0,
+  `extra_beds_count` int(11) NOT NULL DEFAULT 0,
+  `room_price_per_night` decimal(10,2) NOT NULL,
+  `extra_bed_price_per_night` decimal(10,2) DEFAULT 0.00,
+  `subtotal` decimal(10,2) NOT NULL,
+  `discount_amount` decimal(10,2) DEFAULT 0.00,
+  `total_amount` decimal(10,2) NOT NULL,
+  `other_guests` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`other_guests`)),
+  `status` enum('pending','confirmed','checked_in','checked_out','cancelled','no_show') NOT NULL DEFAULT 'pending',
+  `payment_status` enum('unpaid','partial','paid','refunded') NOT NULL DEFAULT 'unpaid',
+  `payment_method` varchar(50) DEFAULT NULL,
+  `payment_date` datetime DEFAULT NULL,
+  `amount_paid` decimal(10,2) DEFAULT 0.00,
+  `special_requests` text DEFAULT NULL,
+  `admin_remarks` text DEFAULT NULL,
+  `terms_accepted` tinyint(1) NOT NULL DEFAULT 0,
+  `terms_accepted_by` varchar(255) DEFAULT NULL,
+  `terms_accepted_at` datetime DEFAULT NULL,
+  `digital_signature` text DEFAULT NULL,
+  `data_privacy_consent` tinyint(1) NOT NULL DEFAULT 0,
+  `created_by` int(11) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `deleted` tinyint(1) NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Triggers `guest_room_reservations`
+--
+DELIMITER $$
+CREATE TRIGGER `trg_guest_reservation_after_insert` AFTER INSERT ON `guest_room_reservations` FOR EACH ROW BEGIN
+  DECLARE curr_date DATE;
+  SET curr_date = NEW.check_in_date;
+  
+  WHILE curr_date < NEW.check_out_date DO
+    UPDATE guest_room_availability 
+    SET booked_quantity = booked_quantity + 1,
+        is_available = CASE 
+          WHEN (available_quantity - (booked_quantity + 1)) > 0 THEN 1 
+          ELSE 0 
+        END
+    WHERE guest_room_id = NEW.guest_room_id 
+      AND date = curr_date;
+    
+    SET curr_date = DATE_ADD(curr_date, INTERVAL 1 DAY);
+  END WHILE;
+END
+$$
+DELIMITER ;
 
 -- --------------------------------------------------------
 
@@ -477,42 +1332,6 @@ CREATE TABLE `hidden_users` (
 INSERT INTO `hidden_users` (`user_id`) VALUES
 (25),
 (29);
-
--- --------------------------------------------------------
-
---
--- Table structure for table `hostel`
---
-
-CREATE TABLE `hostel` (
-  `sr_no` int(11) NOT NULL,
-  `image` varchar(150) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `hostel`
---
-
-INSERT INTO `hostel` (`sr_no`, `image`) VALUES
-(6, 'IMG_36905.png'),
-(7, 'IMG_88715.png'),
-(11, 'IMG_89818.jpg');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `liabilities`
---
-
-CREATE TABLE `liabilities` (
-  `id` int(11) NOT NULL,
-  `reservation_no` varchar(255) NOT NULL,
-  `name` varchar(255) NOT NULL,
-  `amount` decimal(10,2) NOT NULL,
-  `notes` text DEFAULT NULL,
-  `date_created` timestamp NOT NULL DEFAULT current_timestamp(),
-  `user_id` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -877,72 +1696,6 @@ INSERT INTO `request` (`id`, `name`) VALUES
 -- --------------------------------------------------------
 
 --
--- Table structure for table `reservations`
---
-
-CREATE TABLE `reservations` (
-  `id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `function_no` varchar(4) NOT NULL,
-  `date` date NOT NULL,
-  `full_name` varchar(255) NOT NULL,
-  `department` varchar(255) NOT NULL,
-  `purpose` text NOT NULL,
-  `room_type` varchar(255) NOT NULL,
-  `event_name` varchar(255) NOT NULL,
-  `doe` date NOT NULL,
-  `toe` time NOT NULL,
-  `end_of_event` time NOT NULL,
-  `nop` int(11) NOT NULL,
-  `vsetup` text NOT NULL,
-  `email` varchar(255) NOT NULL,
-  `contact` varchar(20) NOT NULL,
-  `remarks` text DEFAULT NULL,
-  `miscellaneous` text DEFAULT NULL,
-  `banquet_type` varchar(255) NOT NULL,
-  `booking_no` varchar(255) NOT NULL,
-  `status` enum('Pending','Approved','Denied','Canceled') NOT NULL DEFAULT 'Pending',
-  `payment_status` varchar(10) NOT NULL DEFAULT 'UNPAID',
-  `attachment` varchar(255) DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT current_timestamp(),
-  `updated_at` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `deleted` tinyint(1) NOT NULL DEFAULT 0
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `reservations`
---
-
-INSERT INTO `reservations` (`id`, `user_id`, `function_no`, `date`, `full_name`, `department`, `purpose`, `room_type`, `event_name`, `doe`, `toe`, `end_of_event`, `nop`, `vsetup`, `email`, `contact`, `remarks`, `miscellaneous`, `banquet_type`, `booking_no`, `status`, `payment_status`, `attachment`, `created_at`, `updated_at`, `deleted`) VALUES
-(100, 34, '0005', '2025-02-24', 'Roica Ellao', 'Cvf', ' D f', 'ROOM D', ' Gg ', '2025-03-19', '01:39:00', '16:39:00', 60, 'Hrn', 'mariaroicalouisse.ellao@g.batstate-u.edu.ph', '09940677596', '', '', 'THEATER TYPE', 'EV RES-20250224-0005', 'Approved', 'PAID', 'IMG_2153.png', '2025-02-25 08:14:43', '2025-02-27 07:39:22', 0),
-(101, 34, '0006', '2025-02-24', 'Roica Ellao', 'Hebe', ' Dhr', 'ROOM C', ' Frb', '2031-02-24', '17:40:00', '10:44:00', 30, 'Bdbd', 'mariaroicalouisse.ellao@g.batstate-u.edu.ph', '09940677596', '', '', 'HERRING BONE TYPE', 'EV RES-20250224-0006', 'Denied', 'PAID', 'IMG_2231.jpeg', '2025-02-25 08:14:43', '2025-02-27 05:20:45', 0),
-(102, 34, '0007', '2025-02-24', 'Roica Ellao', 'Jsns', ' Jnxm', 'ROOM C', 'Jzizn', '2025-03-19', '18:16:00', '06:17:00', 30, 'Sijx', 'mariaroicalouisse.ellao@g.batstate-u.edu.ph', '09940677596', '', '', 'CLASSROOM TYPE', 'EV RES-20250224-0007', 'Denied', 'PAID', 'IMG_2221.jpeg', '2025-02-25 08:14:43', '2025-02-27 05:20:47', 0),
-(103, 34, '0008', '2025-02-24', 'Roica Ellao', 'Dci', 'Anx', 'ROOM B', ' Jxk', '2025-03-10', '18:17:00', '18:23:00', 50, 'Isns', 'mariaroicalouisse.ellao@g.batstate-u.edu.ph', '09940677596', '', '', 'HERRING BONE TYPE', 'EV RES-20250224-0008', 'Canceled', 'UNPAID', 'IMG_2492.png', '2025-02-25 08:14:43', '2025-03-04 03:38:12', 0),
-(104, 34, '0009', '2025-02-24', 'Roica Ellao', 'Ksnd', 'Nenjd', 'ROOM A', 'Nejnd', '2025-03-10', '07:59:00', '19:32:00', 60, 'Iwhidj', 'mariaroicalouisse.ellao@g.batstate-u.edu.ph', '09940677596', '', '', 'U-SHAPE TYPE', 'EV RES-20250224-0009', 'Pending', 'UNPAID', 'IMG_2492.png', '2025-02-25 08:14:43', '2025-02-27 05:17:49', 0),
-(105, 29, '0010', '2025-02-25', 'Emmanuel Laparan', 'CICS', 'Anything', 'ROOM C', 'Career-Day', '2025-02-28', '08:01:00', '11:09:00', 30, 'Theater', 'erllaparan06@gmail.com', '9087547679', '', 'Rectangular Table, Basic Sound System, Mono Block Chair, Projector Screen', 'T-SHAPE TYPE', 'EV RES-20250225-0010', 'Denied', 'UNPAID', NULL, '2025-02-25 08:14:43', '2025-03-09 10:22:23', 1),
-(106, 29, '0010', '2025-02-25', 'Emmanuel Laparan', 'CICS', 'Anything', 'ROOM C', 'Career-Day', '2025-02-28', '08:01:00', '11:09:00', 30, 'Theater', 'erllaparan06@gmail.com', '9087547679', '', 'Rectangular Table, Basic Sound System, Mono Block Chair, Projector Screen', 'T-SHAPE TYPE', 'EV RES-20250225-0010', 'Pending', 'UNPAID', NULL, '2025-02-25 08:14:43', '2025-02-25 08:14:43', 0),
-(107, 29, '0011', '2025-02-25', 'Emmanuel Laparan', 'CICS', 'wer', 'ROOM E', 'sdf', '2025-03-03', '09:12:00', '14:13:00', 50, 'Theater', 'erllaparan06@gmail.com', '9087547679', '', 'Rectangular Table', 'BOARDROOM TYPE', 'EV RES-20250225-0011', 'Pending', 'UNPAID', NULL, '2025-02-25 08:14:43', '2025-02-25 08:14:43', 0),
-(108, 30, '0012', '2025-02-27', 'Francis Dave Laparan', 'fff', 'ffff', 'ROOM E, ROOM D', 'fff', '2025-03-01', '06:21:00', '07:22:00', 110, 'ggg', 'erllaparan07@gmail.com', '09129098657', 'ggg', 'Rectangular Table, Basic Sound System', 'THEATER TYPE', 'EV RES-20250227-0012', 'Canceled', 'PAID', 'Reg.JPG', '2025-02-27 03:50:03', '2025-02-27 09:32:45', 1),
-(109, 34, '0013', '2025-02-27', 'Roica Ellao', 'MAIN', 'NIAM', 'ROOM B, ROOM A', 'QWERTT', '2025-02-25', '12:50:00', '20:50:00', 110, 'Bahzns', 'mariaroicalouisse.ellao@g.batstate-u.edu.ph', '09940677596', '', 'Rectangular Table, Round Table, Basic Sound System, Mono Block Chair, Projector Screen', 'HERRING BONE TYPE', 'EV RES-20250227-0013', 'Approved', 'PAID', 'IMG_2314.jpeg', '2025-02-27 03:51:24', '2025-02-27 05:28:49', 0),
-(110, 43, '0014', '2025-02-27', 'Aaron', 'Majka', ' Sksl', 'ROOM C, ROOM B', 'Makks', '2025-03-11', '13:08:00', '20:08:00', 80, 'Msks', 'roicanix@gmail.com', '09940677514', '', 'Basic Sound System, Projector Screen', 'T-SHAPE TYPE', 'EV RES-20250227-0014', 'Approved', 'UNPAID', NULL, '2025-02-27 05:08:52', '2025-02-27 05:12:18', 0),
-(111, 43, '0015', '2025-02-27', 'Aaron', 'CICS', 'KANSK', 'ROOM C, ROOM B, ROOM A', 'JAISIS', '2025-03-02', '07:00:00', '12:00:00', 140, 'Makanns', 'roicanix@gmail.com', '09940677514', '', 'Basic Sound System, Mono Block Chair, Projector Screen', 'THEATER TYPE', 'EV RES-20250227-0015', 'Approved', 'UNPAID', NULL, '2025-02-27 05:29:14', '2025-02-27 05:31:52', 0),
-(112, 44, '0016', '2025-02-27', 'Jack Ender', 'Jeros2Pharmacy', 'Birthday Celebration', 'ROOM C, ROOM B, ROOM A', 'Jeros Birthday', '2025-03-14', '09:01:00', '13:01:00', 140, 'T-Shape', 'izarjamesf28@gmail.com', '09919463805', '', 'Rectangular Table, Basic Sound System, Mono Block Chair, Projector Screen', 'T-SHAPE TYPE', 'EV RES-20250227-0016', 'Approved', 'PAID', 'rimuru.jpg', '2025-02-27 05:36:06', '2025-02-27 06:32:39', 0),
-(114, 44, '0018', '2025-02-27', 'Jack Ender', 'kahit ano', 'asdf', 'ROOM E, ROOM C, ROOM B', 'KAHIT ANO', '2025-03-18', '08:25:00', '16:25:00', 130, 'Classroom', 'izarjamesf28@gmail.com', '09919463805', '', 'Mono Block Chair', 'CLASSROOM TYPE', 'EV RES-20250227-0018', 'Canceled', 'UNPAID', NULL, '2025-02-27 06:26:40', '2025-02-27 06:34:48', 0),
-(115, 30, '0019', '2025-02-27', 'Francis Dave Laparan', 'dd', 'dd', 'ROOM D', 'ddd', '2025-03-08', '09:12:00', '06:15:00', 60, 'dddd', 'erllaparan07@gmail.com', '09129098657', 'dddd', 'Rectangular Table, Basic Sound System', 'THEATER TYPE', 'EV RES-20250227-0019', 'Canceled', 'UNPAID', NULL, '2025-02-27 08:08:57', '2025-03-20 03:51:03', 1),
-(116, 44, '0020', '2025-03-03', 'Jack Ender', 'Dot Company ', 'Celebration ', 'ROOM D, ROOM C', 'Celebration ', '2025-03-02', '08:00:00', '12:00:00', 90, 'Anything ', 'izarjamesf28@gmail.com', '09919463805', '', 'Rectangular Table, Mono Block Chair, Projector Screen', 'U-SHAPE TYPE', 'EV RES-20250303-0020', 'Approved', 'PAID', 'IMG20250103100307.jpg', '2025-03-03 06:58:33', '2025-03-03 07:38:07', 1),
-(117, 30, '0021', '2025-03-03', 'Francis Dave Laparan', 'None', 'None', 'ROOM E', 'Christmas party ', '2025-03-05', '15:00:00', '16:00:00', 50, 'None', 'erllaparan07@gmail.com', '09129098657', 'None', 'Rectangular Table, Basic Sound System', 'THEATER TYPE', 'EV RES-20250303-0021', 'Canceled', 'UNPAID', NULL, '2025-03-03 07:00:42', '2025-03-04 04:16:05', 1),
-(118, 44, '0022', '2025-03-03', 'Jack Ender', 'gggdg', 'hshsh', 'ROOM C', 'shh', '2025-03-05', '16:19:00', '17:20:00', 30, 'hshshs', 'izarjamesf28@gmail.com', '09919463805', 'shshh', 'Rectangular Table, Basic Sound System', 'BOARDROOM TYPE', 'EV RES-20250303-0022', 'Pending', 'UNPAID', NULL, '2025-03-03 07:19:45', '2025-03-03 07:19:45', 0),
-(119, 30, '0023', '2025-03-04', 'Francis Dave Laparan', 'ABSOLUTE', 'None', 'ROOM D', 'Christmas party ', '2025-03-06', '01:00:00', '05:00:00', 60, 'None', 'erllaparan07@gmail.com', '09129098657', 'None', 'Rectangular Table, Basic Sound System', 'WEDDING STYLE', 'EV RES-20250304-0023', 'Canceled', 'UNPAID', NULL, '2025-03-04 03:34:07', '2025-03-14 08:19:15', 1),
-(120, 29, '0024', '2025-03-09', 'Emmanuel Laparan', 'Jeros Company', 'wedding', 'ROOM E', 'asd wedding', '2025-03-10', '10:00:00', '18:30:00', 50, 'WEDDING', 'erllaparan06@gmail.com', '9087547679', '', 'Rectangular Table, Round Table, Basic Sound System, Mono Block Chair, Projector Screen', 'WEDDING STYLE', 'EV RES-20250309-0024', 'Pending', 'UNPAID', NULL, '2025-03-09 11:58:21', '2025-03-09 11:58:21', 0),
-(121, 30, '0024', '2025-03-09', 'Francis Dave Laparan', 'None', 'None', 'ROOM E', 'Christmas party ', '2025-03-12', '22:58:00', '12:58:00', 50, 'None', 'erllaparan07@gmail.com', '09129098657', 'None', 'Rectangular Table, Basic Sound System', 'THEATER TYPE', 'EV RES-20250309-0024', 'Canceled', 'UNPAID', NULL, '2025-03-09 11:58:48', '2025-03-20 03:50:53', 1),
-(122, 30, '0025', '2025-03-14', 'Francis Dave Laparan', 'none', 'none', 'ROOM E', 'hahaha', '2025-03-15', '18:11:00', '18:13:00', 50, 'ssss', 'erllaparan07@gmail.com', '09129098657', 'ssss', 'Rectangular Table, Basic Sound System', 'BOARDROOM TYPE', 'EV RES-20250314-0025', 'Canceled', 'UNPAID', NULL, '2025-03-14 08:12:06', '2025-03-20 03:50:35', 1),
-(123, 43, '0026', '2025-03-15', 'Aaron', 'CICS', 'MEETING', 'ROOM C', 'CICS Yearly Meeting', '2025-03-15', '17:00:00', '19:00:00', 30, 'classroom type', 'roicanix@gmail.com', '09940677514', '', 'Rectangular Table, Round Table, Basic Sound System, Mono Block Chair, Projector Screen', 'CLASSROOM TYPE', 'EV RES-20250315-0026', 'Pending', 'UNPAID', NULL, '2025-03-15 08:01:43', '2025-03-15 08:01:43', 0),
-(124, 29, '0027', '2025-03-15', 'Emmanuel Laparan', 'CTE', 'CTE Meeting', 'ROOM D', 'CTE Yearly Meeting', '2025-03-30', '08:00:00', '10:00:00', 60, 'classroom type', 'erllaparan06@gmail.com', '9087547679', '', 'Rectangular Table, Round Table, Basic Sound System, Mono Block Chair, Projector Screen', 'CLASSROOM TYPE', 'EV RES-20250315-0027', 'Pending', 'UNPAID', NULL, '2025-03-15 08:10:45', '2025-03-15 08:10:45', 0),
-(125, 44, '0028', '2025-03-16', 'Jack Ender', 'BFP Nasugbu', ' Anniversary Celebration', 'ROOM E, ROOM C', 'BFP Nasugbu Aniversary', '2025-03-31', '08:00:00', '22:00:00', 80, 'specific', 'izarjamesf28@gmail.com', '09919463805', '', 'Rectangular Table, Round Table, Basic Sound System, Mono Block Chair, Projector Screen', 'HOLLOW SQUARE TYPE', 'EV RES-20250316-0028', 'Approved', 'PAID', 'Screenshot_16-3-2025_163443_bsuarasofhostel.tech.jpeg', '2025-03-16 08:34:20', '2025-03-16 08:37:22', 0);
-
--- --------------------------------------------------------
-
---
 -- Table structure for table `reservation_venues`
 --
 
@@ -978,238 +1731,13 @@ INSERT INTO `reservation_venues` (`id`, `reservation_id`, `venue_id`, `start_dat
 (19, 23, 1, '2026-03-02 21:00:00', '2026-03-02 23:00:00', '2026-03-02 08:03:45'),
 (20, 24, 1, '2026-03-05 07:00:00', '2026-03-05 12:00:00', '2026-03-03 06:22:31'),
 (21, 24, 2, '2026-03-05 12:00:00', '2026-03-05 16:00:00', '2026-03-03 06:22:31'),
-(22, 24, 3, '2026-03-05 16:00:00', '2026-03-05 18:00:00', '2026-03-03 06:22:31');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `rooms`
---
-
-CREATE TABLE `rooms` (
-  `id` int(11) NOT NULL,
-  `name` varchar(150) NOT NULL,
-  `area` int(11) NOT NULL,
-  `price` int(11) NOT NULL,
-  `quantity` int(11) NOT NULL,
-  `description` varchar(750) NOT NULL,
-  `status` tinyint(4) NOT NULL DEFAULT 1,
-  `removed` int(11) NOT NULL DEFAULT 0,
-  `type_id` int(11) NOT NULL,
-  `seats_capacity` int(11) DEFAULT NULL COMMENT 'Max seats (function rooms)',
-  `tables_count` int(11) DEFAULT NULL COMMENT 'Number of tables (function rooms)',
-  `details_extra` text DEFAULT NULL COMMENT 'Additional details',
-  `adult_capacity` int(11) DEFAULT 0,
-  `children_capacity` int(11) DEFAULT 0
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `rooms`
---
-
-INSERT INTO `rooms` (`id`, `name`, `area`, `price`, `quantity`, `description`, `status`, `removed`, `type_id`, `seats_capacity`, `tables_count`, `details_extra`, `adult_capacity`, `children_capacity`) VALUES
-(29, 'DORMITORY', 114, 8000, 12, 'This room is designed to accommodate larger groups, making it an ideal choice for student delegations, sports teams, event participants, or any gathering that requires ample space and comfort. It offers a welcoming and functional environment, ensuring that all guests can relax and enjoy their stay, whether they are here for a team-building event, a competition, or a group excursion. With its spacious layout and thoughtful amenities, this room guarantees a memorable and hassle-free experience for everyone', 1, 0, 14, NULL, NULL, NULL, 0, 0),
-(37, 'Function Room A', 50, 1500, 0, 'Spacious function room for meetings and events.', 0, 0, 15, NULL, NULL, NULL, 30, 0),
-(38, 'Function Room B', 60, 1800, 0, 'Ideal for seminars and workshops.', 0, 0, 15, NULL, NULL, NULL, 40, 0),
-(39, 'Function Room C', 70, 2000, 0, 'Largest function room with AV equipment.', 0, 0, 15, NULL, NULL, NULL, 50, 0),
-(40, 'Function Room D', 40, 1200, 0, 'Small function room for intimate events.', 0, 0, 15, NULL, NULL, NULL, 20, 0),
-(41, 'Function Room E', 55, 1600, 0, 'Versatile space for training and events.', 0, 0, 15, NULL, NULL, NULL, 35, 0),
-(42, 'Guest Room 1', 25, 800, 0, 'Comfortable guest room with queen bed.', 0, 0, 14, NULL, NULL, NULL, 2, 1),
-(43, 'Guest Room 2', 28, 850, 0, 'Guest room with city view.', 0, 0, 14, NULL, NULL, NULL, 2, 1),
-(44, 'Guest Room 3', 30, 900, 0, 'Spacious guest room for small families.', 0, 0, 14, NULL, NULL, NULL, 3, 1),
-(45, 'Guest Room 4', 22, 750, 0, 'Cozy room for couples or solo travelers.', 0, 0, 14, NULL, NULL, NULL, 2, 0);
-
--- --------------------------------------------------------
-
---
--- Table structure for table `room_facilities`
---
-
-CREATE TABLE `room_facilities` (
-  `sr_no` int(11) NOT NULL,
-  `room_id` int(11) NOT NULL,
-  `facilities_id` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `room_facilities`
---
-
-INSERT INTO `room_facilities` (`sr_no`, `room_id`, `facilities_id`) VALUES
-(332, 29, 13);
-
--- --------------------------------------------------------
-
---
--- Table structure for table `room_guests`
---
-
-CREATE TABLE `room_guests` (
-  `id` int(11) NOT NULL,
-  `reservation_id` int(11) NOT NULL,
-  `guest_name` varchar(255) NOT NULL,
-  `dob` date NOT NULL,
-  `age` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `room_guests`
---
-
-INSERT INTO `room_guests` (`id`, `reservation_id`, `guest_name`, `dob`, `age`) VALUES
-(187, 161, 'Sc', '1985-06-24', 39),
-(188, 161, 'Cd', '2008-09-24', 16),
-(189, 161, 'Cd', '2007-02-24', 18),
-(190, 161, 'Cws', '2009-06-24', 15),
-(191, 161, 'Cfd', '1987-09-24', 37),
-(192, 162, '', '0000-00-00', 0),
-(199, 165, 'Jsn', '1963-03-24', 61),
-(200, 166, '1', '1988-01-01', 37),
-(201, 166, '2', '1975-08-02', 49),
-(202, 166, '3', '1979-10-03', 45),
-(203, 166, '4', '1974-10-04', 50),
-(204, 166, '5', '1987-11-05', 37),
-(218, 171, '', '0000-00-00', 0),
-(219, 172, 'Zc ', '2004-09-27', 20),
-(220, 172, 'Rsxc', '2025-02-27', 0),
-(221, 172, 'Accd', '1990-12-27', 34),
-(222, 172, 'Ax d', '2004-07-27', 20),
-(223, 172, 'Axxs', '1999-05-27', 25),
-(224, 173, 'Kaisj', '1994-11-27', 30),
-(225, 173, 'Xdjsj', '1997-07-27', 27),
-(226, 173, 'Sjanz', '1985-07-27', 39),
-(227, 173, ' Skkxj', '1997-09-27', 27),
-(228, 173, 'Shwla', '1992-11-27', 32),
-(229, 174, 'Miggy ', '2000-01-01', 25),
-(230, 174, 'Marione', '2001-02-02', 24),
-(231, 174, 'Jiciele', '2002-03-03', 22),
-(232, 174, 'Marian', '2005-04-04', 19),
-(233, 174, 'Marry', '2006-05-05', 18),
-(234, 175, '', '0000-00-00', 0),
-(235, 176, '', '0000-00-00', 0),
-(236, 177, 'Def', '1980-03-03', 45),
-(237, 177, 'Lef', '1962-03-03', 63),
-(238, 178, 'xsdvbv', '2022-12-22', 2),
-(239, 179, 'def', '2024-04-09', 0),
-(240, 179, 'wse', '2023-02-02', 2),
-(241, 179, 'we', '2019-06-11', 5),
-(242, 179, 'wer', '2019-07-24', 5),
-(243, 179, '12we', '2009-07-09', 15),
-(244, 180, 'df', '1997-03-06', 28),
-(245, 181, 'dddd', '2021-06-08', 3),
-(246, 182, 'roica', '2000-08-12', 24),
-(247, 182, 'kinsay', '2020-07-14', 4),
-(248, 183, 'aaron', '1999-02-20', 26),
-(249, 183, 'kinsay', '2020-07-14', 4),
-(250, 184, 'chloe', '2011-06-02', 13),
-(251, 184, 'thirdy', '2010-04-10', 14),
-(252, 184, 'oden', '2016-01-27', 9),
-(253, 184, 'casius', '2005-02-20', 20);
-
--- --------------------------------------------------------
-
---
--- Table structure for table `room_images`
---
-
-CREATE TABLE `room_images` (
-  `id` int(11) NOT NULL,
-  `room_id` int(11) NOT NULL,
-  `image_path` varchar(255) NOT NULL,
-  `is_primary` tinyint(1) DEFAULT 0
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `room_images`
---
-
-INSERT INTO `room_images` (`id`, `room_id`, `image_path`, `is_primary`) VALUES
-(1, 37, 'rooms/IMG_19689.jpg', 1),
-(2, 38, 'rooms/IMG_19689.jpg', 1),
-(3, 39, 'rooms/IMG_19689.jpg', 1),
-(4, 40, 'rooms/IMG_19689.jpg', 1),
-(5, 41, 'rooms/IMG_19689.jpg', 1),
-(8, 42, 'rooms/IMG_85146.png', 1),
-(9, 43, 'rooms/IMG_85146.png', 1),
-(10, 44, 'rooms/IMG_85146.png', 1),
-(11, 45, 'rooms/IMG_85146.png', 1);
-
--- --------------------------------------------------------
-
---
--- Table structure for table `room_reservation`
---
-
-CREATE TABLE `room_reservation` (
-  `id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `booking_no` varchar(20) NOT NULL,
-  `principal_guest_name` varchar(255) NOT NULL,
-  `dob` date NOT NULL,
-  `email` varchar(255) NOT NULL,
-  `address` varchar(255) NOT NULL,
-  `contact` varchar(20) NOT NULL,
-  `arrival_date` date NOT NULL,
-  `departure_date` date NOT NULL,
-  `checkin_time` time NOT NULL,
-  `checkout_time` time NOT NULL,
-  `room_type` varchar(255) DEFAULT NULL,
-  `remarks` text DEFAULT NULL,
-  `signature` varchar(255) DEFAULT NULL,
-  `status` enum('Pending','Approved','Denied','Canceled') NOT NULL DEFAULT 'Pending',
-  `payment_status` varchar(10) NOT NULL DEFAULT 'UNPAID',
-  `attachment` varchar(255) DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT current_timestamp(),
-  `updated_at` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `deleted` tinyint(1) NOT NULL DEFAULT 0
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `room_reservation`
---
-
-INSERT INTO `room_reservation` (`id`, `user_id`, `booking_no`, `principal_guest_name`, `dob`, `email`, `address`, `contact`, `arrival_date`, `departure_date`, `checkin_time`, `checkout_time`, `room_type`, `remarks`, `signature`, `status`, `payment_status`, `attachment`, `created_at`, `updated_at`, `deleted`) VALUES
-(161, 34, 'GM RES-20250224-161', 'Roica Ellao', '2000-08-12', 'mariaroicalouisse.ellao@g.batstate-u.edu.ph', 'Gimalas', '09940677596', '2025-02-25', '2025-02-27', '14:00:00', '12:00:00', 'ROOM 304', '', 'https://bsuarasofhostel.site/images/signature/1740382871_signature.png', 'Approved', 'PAID', NULL, '2025-02-25 08:14:43', '2025-02-27 07:39:59', 0),
-(162, 34, 'GM RES-20250224-162', 'Roica Ellao', '2000-08-12', 'mariaroicalouisse.ellao@g.batstate-u.edu.ph', 'Gimalas', '09940677596', '2025-02-25', '2025-02-28', '14:00:00', '12:00:00', 'DORMITORY', '', 'https://bsuarasofhostel.site/images/signature/1740383447_IMG_2390.jpeg', 'Approved', 'PAID', 'IMG_2295.png', '2025-02-25 08:14:43', '2025-02-27 05:21:36', 0),
-(165, 34, 'GM RES-20250224-165', 'Roica Ellao', '2000-08-12', 'mariaroicalouisse.ellao@g.batstate-u.edu.ph', 'Gimalas', '09940677596', '2025-02-28', '2025-03-01', '14:00:00', '12:00:00', 'ROOM 305', '', 'https://bsuarasofhostel.site/images/signature/1740389490_signature.png', 'Approved', 'PAID', 'IMG_2331.jpeg', '2025-02-25 08:14:43', '2025-02-27 09:31:31', 0),
-(166, 34, 'GM RES-20250224-166', 'Roica Ellao', '2000-08-12', 'mariaroicalouisse.ellao@g.batstate-u.edu.ph', 'Gimalas', '09940677596', '2025-02-24', '2025-02-25', '14:00:00', '12:00:00', 'ROOM 305', '', 'https://bsuarasofhostel.site/images/signature/1740389572_signature.png', 'Pending', 'PAID', 'agile.png', '2025-02-25 08:14:43', '2025-02-27 09:10:13', 0),
-(171, 30, 'GM RES-20250227-171', 'Francis Dave Laparan', '1999-01-25', 'erllaparan07@gmail.com', 'BALANOY', '09129098657', '2025-03-07', '2025-03-08', '14:00:00', '12:00:00', 'ROOM 305', 'dddd', 'https://bsuarasofhostel.tech/images/signature/1740628558_signature.png', 'Approved', 'PAID', 'gclass.JPG', '2025-02-27 03:55:58', '2025-02-27 05:21:31', 0),
-(172, 34, 'GM RES-20250227-172', 'Roica Ellao', '2000-08-12', 'mariaroicalouisse.ellao@g.batstate-u.edu.ph', 'Gimalas', '09940677596', '2025-03-02', '2025-03-03', '14:00:00', '12:00:00', 'ROOM 303', '', 'https://bsuarasofhostel.tech/images/signature/1740630135_IMG_2314.jpeg', 'Pending', 'UNPAID', 'IMG_2492.png', '2025-02-27 04:22:15', '2025-02-27 04:23:10', 0),
-(173, 43, 'GM RES-20250227-173', 'Aaron', '1999-02-20', 'roicanix@gmail.com', 'Gimalas', '09940677514', '2025-03-13', '2025-03-16', '14:00:00', '12:00:00', 'ROOM 305', '', 'https://bsuarasofhostel.tech/images/signature/1740633008_IMG_2496.png', 'Pending', 'UNPAID', NULL, '2025-02-27 05:10:08', '2025-02-27 05:10:08', 0),
-(174, 44, 'GM RES-20250227-174', 'Jack Ender', '2001-01-28', 'izarjamesf28@gmail.com', 'Lumbangan, Nasugbu, Batangas', '09919463805', '2025-03-09', '2025-03-10', '14:00:00', '12:00:00', 'ROOM 305', '', 'https://bsuarasofhostel.tech/images/signature/1740634329_signature.png', 'Canceled', 'UNPAID', 'rimuru1.jpg', '2025-02-27 05:32:09', '2025-03-16 10:06:38', 1),
-(175, 44, 'GM RES-20250227-175', 'Jack Ender', '2001-01-28', 'izarjamesf28@gmail.com', 'Lumbangan, Nasugbu, Batangas', '09919463805', '2025-03-13', '2025-03-14', '14:00:00', '12:00:00', 'ROOM 304', '', 'https://bsuarasofhostel.tech/images/signature/1740634379_signature.png', 'Pending', 'UNPAID', 'index.jpg', '2025-02-27 05:32:59', '2025-02-27 05:37:37', 0),
-(176, 30, 'GM RES-20250227-176', 'Francis Dave Laparan', '1999-01-25', 'erllaparan07@gmail.com', 'BALANOY', '09129098657', '2025-03-01', '2025-03-07', '14:00:00', '12:00:00', 'DORMITORY', 'ddddd', 'https://bsuarasofhostel.tech/images/signature/1740643776_signature.png', 'Approved', 'UNPAID', NULL, '2025-02-27 08:09:36', '2025-02-27 09:23:44', 0),
-(177, 44, 'GM RES-20250303-177', 'Jack Ender', '2001-01-28', 'izarjamesf28@gmail.com', 'Lumbangan, Nasugbu, Batangas', '09919463805', '2025-03-19', '2025-03-20', '14:00:00', '12:00:00', 'ROOM 304', '', 'https://bsuarasofhostel.tech/images/signature/1740984866_signature.png', 'Pending', 'UNPAID', NULL, '2025-03-03 06:54:26', '2025-03-03 06:54:26', 0),
-(178, 29, 'GM RES-20250309-178', 'Emmanuel Laparan', '2000-07-06', 'erllaparan06@gmail.com', 'BALANOY', '9087547679', '2025-03-11', '2025-03-13', '14:00:00', '12:00:00', 'DORMITORY', '', 'https://bsuarasofhostel.tech/images/signature/1741515179_signature.png', 'Approved', 'UNPAID', NULL, '2025-03-09 10:12:59', '2025-03-09 10:21:55', 0),
-(179, 29, 'GM RES-20250309-179', 'Emmanuel Laparan', '2000-07-06', 'erllaparan06@gmail.com', 'BALANOY', '9087547679', '2025-03-17', '2025-03-18', '14:00:00', '12:00:00', 'ROOM 304', '', 'https://bsuarasofhostel.tech/images/signature/1741515580_signature.png', 'Approved', 'UNPAID', NULL, '2025-03-09 10:19:40', '2025-03-09 10:22:02', 0),
-(180, 29, 'GM RES-20250309-180', 'Emmanuel Laparan', '2000-07-06', 'erllaparan06@gmail.com', 'BALANOY', '9087547679', '2025-03-16', '2025-03-18', '14:00:00', '12:00:00', 'DORMITORY', '', 'https://bsuarasofhostel.tech/images/signature/1741522811_signature.png', 'Pending', 'UNPAID', NULL, '2025-03-09 12:20:11', '2025-03-09 12:20:11', 0),
-(181, 30, 'GM RES-20250314-181', 'Francis Dave Laparan', '1999-01-25', 'erllaparan07@gmail.com', 'BALANOY', '09129098657', '2025-03-20', '2025-03-21', '14:00:00', '12:00:00', 'ROOM 305', 'ddd', 'https://bsuarasofhostel.tech/images/signature/1741940031_signature.png', 'Canceled', 'UNPAID', NULL, '2025-03-14 08:13:51', '2025-03-14 08:15:31', 0),
-(182, 43, 'GM RES-20250315-182', 'Aaron', '1999-02-20', 'roicanix@gmail.com', 'Gimalas', '09940677514', '2025-03-18', '2025-03-19', '14:00:00', '12:00:00', 'ROOM 305', '', 'https://bsuarasofhostel.tech/images/signature/1742025809_signature.png', 'Pending', 'UNPAID', NULL, '2025-03-15 08:03:29', '2025-03-15 08:03:29', 0),
-(183, 34, 'GM RES-20250315-183', 'Roica Ellao', '2000-08-12', 'mariaroicalouisse.ellao@g.batstate-u.edu.ph', 'Gimalas', '09940677596', '2025-03-19', '2025-03-20', '14:00:00', '12:00:00', 'ROOM 301', '', 'https://bsuarasofhostel.tech/images/signature/1742025916_signature.png', 'Pending', 'UNPAID', NULL, '2025-03-15 08:05:16', '2025-03-15 08:05:16', 0),
-(184, 34, 'GM RES-20250315-184', 'Roica Ellao', '2000-08-12', 'mariaroicalouisse.ellao@g.batstate-u.edu.ph', 'Gimalas', '09940677596', '2025-03-21', '2025-03-23', '14:00:00', '12:00:00', 'ROOM 304', '', 'https://bsuarasofhostel.tech/images/signature/1742026099_signature.png', 'Pending', 'UNPAID', NULL, '2025-03-15 08:08:19', '2025-03-15 08:08:19', 0);
-
--- --------------------------------------------------------
-
---
--- Table structure for table `room_reviews`
---
-
-CREATE TABLE `room_reviews` (
-  `id` int(11) NOT NULL,
-  `reservation_id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `rating` int(1) NOT NULL CHECK (`rating` between 1 and 5),
-  `review` text NOT NULL,
-  `created_at` datetime NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `room_reviews`
---
-
-INSERT INTO `room_reviews` (`id`, `reservation_id`, `user_id`, `rating`, `review`, `created_at`) VALUES
-(65, 161, 34, 5, 'nice accommodation! highly recommended.', '2025-03-09 11:04:57'),
-(66, 165, 34, 5, 'Smooth booking process, very convenient.', '2025-03-09 11:09:42');
+(22, 24, 3, '2026-03-05 16:00:00', '2026-03-05 18:00:00', '2026-03-03 06:22:31'),
+(23, 25, 1, '2026-03-06 07:00:00', '2026-03-06 17:00:00', '2026-03-05 00:23:48'),
+(24, 25, 2, '2026-03-06 07:00:00', '2026-03-06 17:00:00', '2026-03-05 00:23:48'),
+(25, 25, 3, '2026-03-06 07:00:00', '2026-03-06 17:00:00', '2026-03-05 00:23:48'),
+(26, 26, 4, '2026-03-11 07:00:00', '2026-03-11 13:00:00', '2026-03-09 02:25:17'),
+(27, 26, 5, '2026-03-11 07:00:00', '2026-03-11 13:00:00', '2026-03-09 02:25:17'),
+(28, 27, 4, '2026-03-11 14:00:00', '2026-03-11 17:00:00', '2026-03-09 10:33:27');
 
 -- --------------------------------------------------------
 
@@ -1276,7 +1804,8 @@ INSERT INTO `terms_and_conditions` (`id`, `customer_type`, `title`, `content`, `
 (1, 'college', 'CABEIHM Memo No. 3 Series of 2025 - Guidelines for Utilizing the Hostel Function Rooms', 'We would like to remind all colleges of the following rules and regulations in order to assure the proper use and maintenance of the ARASOF-Nasugbu Hostel function rooms:\r\n\r\n1. Reservation Process: The function rooms are available on a first-come, first-served basis, with priority given to events approved by the Office of the Chancellor.\r\n\r\n2. Reservation Form: To ensure appropriate service, all necessary information must be filled out on the hostel reservation form.\r\n\r\n3. Use of Equipment and Supplies: Any requests for tablecloths, napkins, dining utensils, or laboratory tools and equipment must be submitted using a requisition form and coordinated with the Hostel Laboratory Assistant.\r\n\r\n4. Decorations: Event decorations are allowed, but tapes, adhesives, nails, and screws are strictly prohibited to prevent damage. Balloons are not allowed.\r\n\r\n5. Water Dispensers: The organizer is responsible for providing drinking water during the event.\r\n\r\n6. Audio-Visual Equipment: Coordination with ICT or the Audio Room (PFM) is necessary for the use of a view board, projector, microphone, or sound system.\r\n\r\n7. Event Setup and Clean-Up: Facilitators are responsible for setting up chairs and tables prior to the event and cleaning up the function room afterward.\r\n\r\n8. Environmental Sustainability Guidelines:\r\n   • No Disposable Water Bottles – Bring personal tumblers and use refill stations.\r\n   • Buffet-Style Food Only – To minimize waste, only buffet-style meals are allowed.\r\n   • No Single-Use Plastics – Items like disposable food wrappers, containers, cups, and straws are strictly prohibited.\r\n   • CLAYGO Policy – All event participants must clean as they go.\r\n   • No Tarpaulins – The use of tarpaulins in university events is prohibited.\r\n   • Proper Waste Segregation – Waste must be sorted into designated bins.\r\n   • No Laminated Paper Products – Food containers, paper cups, and plates made from laminated paper are discouraged. Bringing personal food containers and tumblers is required for take-out meals.\r\n\r\n9. Post-Event Cleanliness: The function room must be returned to its original, clean, and damage-free condition following its use.\r\n\r\nAll colleges must ensure strict compliance to these guidelines. Failure to comply with these regulations could affect future reservations. For concerns, please reach out to the Hostel Management Office.\r\n\r\nThank you for your cooperation.', 'CABEIHM_Memo_No.3.s.2025.pdf', '2025', 1, '2026-03-02 02:49:23', '2026-03-02 03:20:28'),
 (2, 'student_org', 'CABEIHM Memo No. 3 Series of 2025 - Guidelines for Utilizing the Hostel Function Rooms', 'We would like to remind all colleges of the following rules and regulations in order to assure the proper use and maintenance of the ARASOF-Nasugbu Hostel function rooms:\r\n\r\n1. Reservation Process: The function rooms are available on a first-come, first-served basis, with priority given to events approved by the Office of the Chancellor.\r\n\r\n2. Reservation Form: To ensure appropriate service, all necessary information must be filled out on the hostel reservation form.\r\n\r\n3. Use of Equipment and Supplies: Any requests for tablecloths, napkins, dining utensils, or laboratory tools and equipment must be submitted using a requisition form and coordinated with the Hostel Laboratory Assistant.\r\n\r\n4. Decorations: Event decorations are allowed, but tapes, adhesives, nails, and screws are strictly prohibited to prevent damage. Balloons are not allowed.\r\n\r\n5. Water Dispensers: The organizer is responsible for providing drinking water during the event.\r\n\r\n6. Audio-Visual Equipment: Coordination with ICT or the Audio Room (PFM) is necessary for the use of a view board, projector, microphone, or sound system.\r\n\r\n7. Event Setup and Clean-Up: Facilitators are responsible for setting up chairs and tables prior to the event and cleaning up the function room afterward.\r\n\r\n8. Environmental Sustainability Guidelines:\r\n   • No Disposable Water Bottles – Bring personal tumblers and use refill stations.\r\n   • Buffet-Style Food Only – To minimize waste, only buffet-style meals are allowed.\r\n   • No Single-Use Plastics – Items like disposable food wrappers, containers, cups, and straws are strictly prohibited.\r\n   • CLAYGO Policy – All event participants must clean as they go.\r\n   • No Tarpaulins – The use of tarpaulins in university events is prohibited.\r\n   • Proper Waste Segregation – Waste must be sorted into designated bins.\r\n   • No Laminated Paper Products – Food containers, paper cups, and plates made from laminated paper are discouraged. Bringing personal food containers and tumblers is required for take-out meals.\r\n\r\n9. Post-Event Cleanliness: The function room must be returned to its original, clean, and damage-free condition following its use.\r\n\r\nAll colleges must ensure strict compliance to these guidelines. Failure to comply with these regulations could affect future reservations. For concerns, please reach out to the Hostel Management Office.\r\n\r\nThank you for your cooperation.', 'CABEIHM_Memo_No.3.s.2025.pdf', '2025', 1, '2026-03-02 02:49:23', '2026-03-02 03:20:28'),
 (3, 'external', 'HOSTEL FUNCTION ROOM AND EVENTS RULES AND GUIDELINES', '1. The function room reservation in the hostel operates on a first-come, first-served basis. We prioritize events with approved letters signed by the Office of the Chancellor.\r\n\r\n2. Make sure to fill out all the necessary information in the hostel reservation form so that we can better assist you with your events.\r\n\r\n3. If the event requires tablecloths, napkins, or even kitchen utensils and other laboratory tools and equipment, the facilitators must fill out the requisition form and coordinate with the Hostel Laboratory Assistant.\r\n\r\n4. Decorations and props are allowed to fit the theme of the event however, the use of tapes and all kinds of adhesives and nails/screws on the wall are not allowed to avoid chipping of paint and or leaving adhesive marks. The use of balloons as décor is not allowed.\r\n\r\n5. If water dispensers are needed for the said event, the person in charge is responsible for providing a gallon of water for the event.\r\n\r\n6. If the event requires the following: View board, Projector, Microphone, or basic sound system, the person in charge is responsible for coordinating with ICT or the Audio Room (PFM) to request the said items and assistance in setting up the equipment.\r\n\r\n7. If students or colleagues are the facilitators of the event, they will be responsible to set up the chairs and tables before the events and clean the function rooms after use.\r\n\r\n8. Environmental Sustainability Guidelines:\r\n   • No Disposable Water Bottles – The use of disposable water bottles is strictly prohibited. All members are encouraged to bring their own tumblers or use the water refill stations available across the campus.\r\n   • Buffet-Style Food Only – To reduce food waste, only buffet-style meals will be allowed during university events. Please take only what you can finish.\r\n   • No Single-Use Plastics or Disposables – The use of single-use plastics, including food wrappers, containers, balloons, paper and plastic cups, straws, plastic stirrers, and similar items, is strictly prohibited.\r\n   • Practice CLAYGO (Clean As You Go) – All event participants must practice the CLAYGO policy to maintain cleanliness and reduce the volume of waste.\r\n   • Prohibition on Tarpaulins – The use of tarpaulins is prohibited in all university activities and events.\r\n   • Proper Waste Segregation – All waste must be properly segregated according to the designated bins for biodegradable, recyclable, and non-recyclable materials.\r\n\r\n9. The use of laminated paper products such as food containers, paper cups, and paper plates is strictly discouraged. \"Bring your food container\" policy shall be implemented for \"take out\" food and bringing of personal sustainable tumbler/mug for water refilling is highly encouraged.\r\n\r\n10. The organizer must ensure that the function room is clean and damage-free after the activity.', 'function_rooms_HOUSE_RULES_2026.pdf', '2026', 1, '2026-03-02 02:49:23', '2026-03-02 03:50:37'),
-(4, 'office', 'HOSTEL FUNCTION ROOM AND EVENTS RULES AND GUIDELINES', '1. The function room reservation in the hostel operates on a first-come, first-served basis. We prioritize events with approved letters signed by the Office of the Chancellor.\r\n\r\n2. Make sure to fill out all the necessary information in the hostel reservation form so that we can better assist you with your events.\r\n\r\n3. If the event requires tablecloths, napkins, or even kitchen utensils and other laboratory tools and equipment, the facilitators must fill out the requisition form and coordinate with the Hostel Laboratory Assistant.\r\n\r\n4. Decorations and props are allowed to fit the theme of the event however, the use of tapes and all kinds of adhesives and nails/screws on the wall are not allowed to avoid chipping of paint and or leaving adhesive marks. The use of balloons as décor is not allowed.\r\n\r\n5. If water dispensers are needed for the said event, the person in charge is responsible for providing a gallon of water for the event.\r\n\r\n6. If the event requires the following: View board, Projector, Microphone, or basic sound system, the person in charge is responsible for coordinating with ICT or the Audio Room (PFM) to request the said items and assistance in setting up the equipment.\r\n\r\n7. If students or colleagues are the facilitators of the event, they will be responsible to set up the chairs and tables before the events and clean the function rooms after use.\r\n\r\n8. Environmental Sustainability Guidelines:\r\n   • No Disposable Water Bottles – The use of disposable water bottles is strictly prohibited. All members are encouraged to bring their own tumblers or use the water refill stations available across the campus.\r\n   • Buffet-Style Food Only – To reduce food waste, only buffet-style meals will be allowed during university events. Please take only what you can finish.\r\n   • No Single-Use Plastics or Disposables – The use of single-use plastics, including food wrappers, containers, balloons, paper and plastic cups, straws, plastic stirrers, and similar items, is strictly prohibited.\r\n   • Practice CLAYGO (Clean As You Go) – All event participants must practice the CLAYGO policy to maintain cleanliness and reduce the volume of waste.\r\n   • Prohibition on Tarpaulins – The use of tarpaulins is prohibited in all university activities and events.\r\n   • Proper Waste Segregation – All waste must be properly segregated according to the designated bins for biodegradable, recyclable, and non-recyclable materials.\r\n\r\n9. The use of laminated paper products such as food containers, paper cups, and paper plates is strictly discouraged. \"Bring your food container\" policy shall be implemented for \"take out\" food and bringing of personal sustainable tumbler/mug for water refilling is highly encouraged.\r\n\r\n10. The organizer must ensure that the function room is clean and damage-free after the activity.', 'function_rooms_HOUSE_RULES_2026.pdf', '2026', 1, '2026-03-02 02:49:23', '2026-03-02 03:50:37');
+(4, 'office', 'HOSTEL FUNCTION ROOM AND EVENTS RULES AND GUIDELINES', '1. The function room reservation in the hostel operates on a first-come, first-served basis. We prioritize events with approved letters signed by the Office of the Chancellor.\r\n\r\n2. Make sure to fill out all the necessary information in the hostel reservation form so that we can better assist you with your events.\r\n\r\n3. If the event requires tablecloths, napkins, or even kitchen utensils and other laboratory tools and equipment, the facilitators must fill out the requisition form and coordinate with the Hostel Laboratory Assistant.\r\n\r\n4. Decorations and props are allowed to fit the theme of the event however, the use of tapes and all kinds of adhesives and nails/screws on the wall are not allowed to avoid chipping of paint and or leaving adhesive marks. The use of balloons as décor is not allowed.\r\n\r\n5. If water dispensers are needed for the said event, the person in charge is responsible for providing a gallon of water for the event.\r\n\r\n6. If the event requires the following: View board, Projector, Microphone, or basic sound system, the person in charge is responsible for coordinating with ICT or the Audio Room (PFM) to request the said items and assistance in setting up the equipment.\r\n\r\n7. If students or colleagues are the facilitators of the event, they will be responsible to set up the chairs and tables before the events and clean the function rooms after use.\r\n\r\n8. Environmental Sustainability Guidelines:\r\n   • No Disposable Water Bottles – The use of disposable water bottles is strictly prohibited. All members are encouraged to bring their own tumblers or use the water refill stations available across the campus.\r\n   • Buffet-Style Food Only – To reduce food waste, only buffet-style meals will be allowed during university events. Please take only what you can finish.\r\n   • No Single-Use Plastics or Disposables – The use of single-use plastics, including food wrappers, containers, balloons, paper and plastic cups, straws, plastic stirrers, and similar items, is strictly prohibited.\r\n   • Practice CLAYGO (Clean As You Go) – All event participants must practice the CLAYGO policy to maintain cleanliness and reduce the volume of waste.\r\n   • Prohibition on Tarpaulins – The use of tarpaulins is prohibited in all university activities and events.\r\n   • Proper Waste Segregation – All waste must be properly segregated according to the designated bins for biodegradable, recyclable, and non-recyclable materials.\r\n\r\n9. The use of laminated paper products such as food containers, paper cups, and paper plates is strictly discouraged. \"Bring your food container\" policy shall be implemented for \"take out\" food and bringing of personal sustainable tumbler/mug for water refilling is highly encouraged.\r\n\r\n10. The organizer must ensure that the function room is clean and damage-free after the activity.', 'function_rooms_HOUSE_RULES_2026.pdf', '2026', 1, '2026-03-02 02:49:23', '2026-03-02 03:50:37'),
+(5, 'guest', 'HOSTEL ROOM GUIDELINES AND PROHIBITED ACTS', '# HOSTEL ROOM GUIDELINES\r\n\r\n1. BatStateU_Hostel is a non-smoking area.  \r\n2. Standard Check-in time at 2:00 pm and 12:00 noon check out time.  \r\n3. The hostel is located at BatStateU_ARASOF - Nasugbu Campus. Maintaining good relationships with faculty and students must be observed. Be generally mindful by their presence as they move around the building.  \r\n4. Toned-down sounds between 7 AM until 6 PM are observed in consideration for the faculty and students during class hours.  \r\n5. No Curfew administered for all the guests, however perceive not to disturb others upon returning to the Hostel late at night.  \r\n6. Hostel Laundry Service for Php 100.00 per kilogram, inclusive of powder detergent w/ color protection and fabric softener. Housekeeping to assist with laundry provided with laundry bag.  \r\n7. Trash Bins are placed around the Hostel. Proper throwing of trash helps us maintain the cleanliness of the facilities for the guests as well as for the faculty and students.  \r\n8. Turning off the lights and air-conditioning as well as the faucet before leaving the Hostel room will help us conserve energy and water.  \r\n9. BatStateU_Hostel is not liable for any lost or damage of guest’s personal belongings.  \r\n10. Room Keys can be deposited at the reception. Any lost key will be charged accordingly.  \r\n11. Incidental charges will apply for any loss or damages at the Hostel property during the guest’s stay. Settlement must be done before check-out/departure and must be settled through cash.  \r\n12. The management reserves the right to refuse entry/stay to individuals violating Hotel policies and guidelines.  \r\n13. Hostel Housekeeping staff is authorized to enter your room with or without guests inside for a housekeeping operation.  \r\n\r\n---\r\n\r\n# PROHIBITED ACTS\r\n\r\n- Uncooked foods and cooking inside the Hostel room of prohibited.  \r\n- Deadly weapons and illegal drugs are STRICTLY PROHIBITED inside the hostel.  \r\n- Drinking inside the Hostel room is not allowed. Hostel Bar on the ground floor can be used for any alcoholic beverage consumption.  \r\n- Pets are not allowed inside the property.  \r\n- Only registered guests are allowed to stay in the Hostel room.  \r\n\r\nFor further clarification and queries please feel free to contact us at 09287842104 or email us at **hostel.nasugbu@g.batstate-u.edu.ph**.  \r\n\r\nThank you. We look forward in welcoming your group here at the Hostel!', 'hostel_room_guidelines_2026.pdf', '2026', 1, '2026-03-06 08:25:48', '2026-03-06 08:25:48');
 
 -- --------------------------------------------------------
 
@@ -1293,27 +1822,6 @@ CREATE TABLE `testimonials` (
   `is_approved` tinyint(1) DEFAULT 1,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `types_room`
---
-
-CREATE TABLE `types_room` (
-  `id` int(11) NOT NULL,
-  `image` varchar(100) NOT NULL,
-  `name` varchar(50) NOT NULL,
-  `description` varchar(750) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `types_room`
---
-
-INSERT INTO `types_room` (`id`, `image`, `name`, `description`) VALUES
-(14, '', 'Guest Room', 'A welcoming space for guests attending events, seminars, or meetings. Private and comfortable rooms to unwind and recharge during your stay.'),
-(15, 'IMG_32980.jpg', 'Function Room', 'Whether it\'s a corporate meeting or a celebration, our function room fits the occasion. Modern space with AV equipment and flexible seating to match your needs.');
 
 -- --------------------------------------------------------
 
@@ -1407,23 +1915,82 @@ CREATE TABLE `venues` (
   `description` text DEFAULT NULL,
   `is_active` tinyint(1) DEFAULT 1,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `color` varchar(20) DEFAULT NULL
+  `color` varchar(20) DEFAULT NULL,
+  `is_available` tinyint(1) NOT NULL DEFAULT 1 COMMENT '1 = bookable, 0 = hidden from showcase + reservation form',
+  `price` decimal(10,2) DEFAULT NULL COMMENT 'Nightly rate for guest rooms / room hire fee for function rooms',
+  `extra_bed_available` tinyint(1) NOT NULL DEFAULT 0 COMMENT '1 = extra beds can be requested for this guest room',
+  `extra_bed_price` decimal(10,2) DEFAULT 500.00 COMMENT 'Price per extra bed per night',
+  `half_day_rate` decimal(10,2) NOT NULL DEFAULT 2000.00,
+  `whole_day_rate` decimal(10,2) NOT NULL DEFAULT 3000.00,
+  `extension_rate` decimal(10,2) NOT NULL DEFAULT 400.00,
+  `sound_system_fee` decimal(10,2) NOT NULL DEFAULT 1500.00
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `venues`
 --
 
-INSERT INTO `venues` (`id`, `name`, `capacity`, `floor`, `description`, `is_active`, `created_at`, `color`) VALUES
-(1, 'Function Room A', 40, 'Ground Floor', 'Spacious function room for meetings and events.', 1, '2026-02-25 06:38:50', NULL),
-(2, 'Function Room B', 40, 'Ground Floor', 'Ideal for seminars and workshops.', 1, '2026-02-25 06:38:50', NULL),
-(3, 'Function Room C', 40, 'Ground Floor', 'Largest function room with AV equipment.', 1, '2026-02-25 06:38:50', NULL),
-(4, 'Function Room D', 40, 'Ground Floor', 'Small function room for intimate events.', 1, '2026-02-25 06:38:50', NULL),
-(5, 'Function Room E', 40, 'Ground Floor', 'Versatile space for training and events.', 1, '2026-02-25 06:38:50', NULL),
-(6, 'Guest Room 1', 2, '2nd Floor', 'Comfortable guest room with queen bed.', 1, '2026-02-25 06:38:50', NULL),
-(7, 'Guest Room 2', 2, '2nd Floor', 'Guest room with city view.', 1, '2026-02-25 06:38:50', NULL),
-(8, 'Guest Room 3', 3, '2nd Floor', 'Spacious guest room for small families.', 1, '2026-02-25 06:38:50', NULL),
-(9, 'Guest Room 4', 2, '2nd Floor', 'Cozy room for couples or solo travelers.', 1, '2026-02-25 06:38:50', NULL);
+INSERT INTO `venues` (`id`, `name`, `capacity`, `floor`, `description`, `is_active`, `created_at`, `color`, `is_available`, `price`, `extra_bed_available`, `extra_bed_price`, `half_day_rate`, `whole_day_rate`, `extension_rate`, `sound_system_fee`) VALUES
+(1, 'Function Room A', 40, 'Ground Floor', 'Spacious function room for meetings and events.', 1, '2026-02-25 06:38:50', NULL, 1, 5000.00, 0, 500.00, 2000.00, 3000.00, 400.00, 1500.00),
+(2, 'Function Room B', 40, 'Ground Floor', 'Ideal for seminars and workshops.', 1, '2026-02-25 06:38:50', NULL, 1, 5000.00, 0, 500.00, 2000.00, 3000.00, 400.00, 1500.00),
+(3, 'Function Room C', 40, 'Ground Floor', 'Largest function room with AV equipment.', 1, '2026-02-25 06:38:50', NULL, 1, 5000.00, 0, 500.00, 2000.00, 3000.00, 400.00, 1500.00),
+(4, 'Function Room D', 40, 'Ground Floor', 'Small function room for intimate events.', 1, '2026-02-25 06:38:50', NULL, 1, 5000.00, 0, 500.00, 2000.00, 3000.00, 400.00, 1500.00),
+(5, 'Function Room E', 40, 'Ground Floor', 'Versatile space for training and events.', 1, '2026-02-25 06:38:50', NULL, 1, 5000.00, 0, 500.00, 2000.00, 3000.00, 400.00, 1500.00),
+(6, 'Guest Room 1', 4, '2nd Floor', 'Comfortable guest room with queen bed.', 1, '2026-02-25 06:38:50', NULL, 1, 5000.00, 1, 500.00, 2000.00, 3000.00, 400.00, 1500.00),
+(7, 'Guest Room 2', 5, '2nd Floor', 'Guest room with city view.', 1, '2026-02-25 06:38:50', NULL, 1, 2500.00, 1, 500.00, 2000.00, 3000.00, 400.00, 1500.00),
+(8, 'Guest Room 3', 5, '2nd Floor', 'Spacious guest room for small families.', 1, '2026-02-25 06:38:50', NULL, 1, 2500.00, 1, 500.00, 2000.00, 3000.00, 400.00, 1500.00),
+(9, 'Guest Room 4', 8, '2nd Floor', 'Cozy room for couples or solo travelers.', 1, '2026-02-25 06:38:50', NULL, 1, 2500.00, 1, 500.00, 2000.00, 3000.00, 400.00, 1500.00),
+(10, 'Dormitory', 24, 'Ground Floor', 'Spacious dormitory accommodating up to 24 guests. Ideal for student delegations, sports teams, and group accommodations.', 1, '2026-03-06 06:08:38', NULL, 1, 8000.00, 0, 0.00, 2000.00, 3000.00, 400.00, 1500.00);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `venue_images`
+--
+
+CREATE TABLE `venue_images` (
+  `id` int(11) NOT NULL,
+  `venue_id` int(11) NOT NULL,
+  `image_path` varchar(255) NOT NULL,
+  `is_primary` tinyint(1) DEFAULT 0,
+  `sort_order` int(11) DEFAULT 0,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `venue_images`
+--
+
+INSERT INTO `venue_images` (`id`, `venue_id`, `image_path`, `is_primary`, `sort_order`, `created_at`) VALUES
+(1, 1, 'venue_1_1772592772_929.jpg', 1, 0, '2026-03-04 02:52:52'),
+(2, 2, 'venue_2_1772594103_908.jpg', 1, 0, '2026-03-04 03:15:03'),
+(3, 3, 'venue_3_1772594181_395.jpg', 1, 0, '2026-03-04 03:16:21'),
+(4, 4, 'venue_4_1772594260_120.jpg', 1, 0, '2026-03-04 03:17:40'),
+(5, 5, 'venue_5_1772594431_691.jpg', 1, 0, '2026-03-04 03:20:31'),
+(8, 6, 'venue_6_1772674450_956.jpeg', 0, 1, '2026-03-05 01:34:10'),
+(9, 6, 'venue_6_1772674479_395.jpeg', 0, 2, '2026-03-05 01:34:39'),
+(10, 6, 'venue_6_1772674494_112.jpeg', 0, 3, '2026-03-05 01:34:54'),
+(11, 6, 'venue_6_1772674500_333.jpeg', 0, 4, '2026-03-05 01:35:00'),
+(12, 6, 'venue_6_1772675147_326.jpeg', 1, 0, '2026-03-05 01:45:47'),
+(13, 7, 'venue_7_1772677019_647.jpeg', 1, 0, '2026-03-05 02:16:59'),
+(14, 7, 'venue_7_1772677081_785.jpeg', 0, 1, '2026-03-05 02:18:01'),
+(15, 7, 'venue_7_1772679446_714.jpeg', 0, 2, '2026-03-05 02:57:26'),
+(16, 7, 'venue_7_1772679470_610.jpeg', 0, 3, '2026-03-05 02:57:50'),
+(17, 7, 'venue_7_1772679595_466.jpeg', 0, 4, '2026-03-05 02:59:55'),
+(18, 8, 'venue_8_1773015233_943.jpeg', 0, 0, '2026-03-09 00:13:53'),
+(19, 8, 'venue_8_1773015256_866.jpeg', 1, 1, '2026-03-09 00:14:16'),
+(20, 8, 'venue_8_1773015271_401.jpeg', 0, 2, '2026-03-09 00:14:31'),
+(21, 8, 'venue_8_1773015297_241.jpeg', 0, 3, '2026-03-09 00:14:57'),
+(22, 8, 'venue_8_1773015312_134.jpeg', 0, 4, '2026-03-09 00:15:12'),
+(28, 9, 'venue_9_1773016823_929.jpeg', 0, 0, '2026-03-09 00:40:23'),
+(30, 9, 'venue_9_1773016847_399.jpeg', 0, 2, '2026-03-09 00:40:47'),
+(31, 9, 'venue_9_1773016858_538.jpeg', 0, 3, '2026-03-09 00:40:58'),
+(32, 9, 'venue_9_1773016870_493.jpeg', 0, 4, '2026-03-09 00:41:10'),
+(33, 10, 'venue_10_1773016997_270.png', 0, 0, '2026-03-09 00:43:17'),
+(34, 10, 'venue_10_1773017027_362.png', 1, 1, '2026-03-09 00:43:47'),
+(35, 10, 'venue_10_1773018827_346.jpeg', 0, 2, '2026-03-09 01:13:47'),
+(36, 10, 'venue_10_1773018845_646.jpeg', 0, 3, '2026-03-09 01:14:05'),
+(37, 9, 'venue_9_1773052503_576.jpg', 1, 4, '2026-03-09 10:35:03');
 
 -- --------------------------------------------------------
 
@@ -1485,6 +2052,13 @@ ALTER TABLE `banquet`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `booking_sequences`
+--
+ALTER TABLE `booking_sequences`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `type_year_month` (`type`,`year`,`month`);
+
+--
 -- Indexes for table `carousel_slides`
 --
 ALTER TABLE `carousel_slides`
@@ -1543,30 +2117,127 @@ ALTER TABLE `features`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `function_room_reviews`
+-- Indexes for table `function_calendar_config`
 --
-ALTER TABLE `function_room_reviews`
+ALTER TABLE `function_calendar_config`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `reservation_id` (`reservation_id`),
-  ADD KEY `user_id` (`user_id`);
+  ADD UNIQUE KEY `config_key` (`config_key`);
+
+--
+-- Indexes for table `function_rooms`
+--
+ALTER TABLE `function_rooms`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `room_name` (`room_name`),
+  ADD KEY `idx_is_active` (`is_active`);
+
+--
+-- Indexes for table `function_room_availability`
+--
+ALTER TABLE `function_room_availability`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `room_date_time` (`function_room_id`,`date`,`start_time`,`end_time`),
+  ADD KEY `idx_date` (`date`),
+  ADD KEY `idx_status` (`status`),
+  ADD KEY `idx_reservation` (`reservation_id`);
+
+--
+-- Indexes for table `function_room_blocked_dates`
+--
+ALTER TABLE `function_room_blocked_dates`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `function_room_id` (`function_room_id`),
+  ADD KEY `idx_dates` (`start_date`,`end_date`);
+
+--
+-- Indexes for table `function_room_images`
+--
+ALTER TABLE `function_room_images`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `function_room_id` (`function_room_id`),
+  ADD KEY `is_primary` (`is_primary`);
+
+--
+-- Indexes for table `function_room_reservations`
+--
+ALTER TABLE `function_room_reservations`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `booking_no` (`booking_no`),
+  ADD UNIQUE KEY `reservation_no` (`reservation_no`),
+  ADD KEY `idx_user_id` (`user_id`),
+  ADD KEY `idx_function_room_id` (`function_room_id`),
+  ADD KEY `idx_event_type` (`event_type_id`),
+  ADD KEY `idx_status` (`status`),
+  ADD KEY `idx_event_date` (`event_date`),
+  ADD KEY `idx_payment_status` (`payment_status`),
+  ADD KEY `idx_created_at` (`created_at`),
+  ADD KEY `function_room_reservations_ibfk_3` (`banquet_style_id`),
+  ADD KEY `function_room_reservations_ibfk_4` (`office_type_id`),
+  ADD KEY `function_room_reservations_ibfk_5` (`office_id`),
+  ADD KEY `function_room_reservations_ibfk_6` (`venue_setup_id`),
+  ADD KEY `idx_function_reservation_dates` (`event_date`,`start_time`,`end_time`,`status`),
+  ADD KEY `idx_function_reservation_user` (`user_id`,`created_at`);
+
+--
+-- Indexes for table `guest_calendar_config`
+--
+ALTER TABLE `guest_calendar_config`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `config_key` (`config_key`);
+
+--
+-- Indexes for table `guest_details`
+--
+ALTER TABLE `guest_details`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `reservation_id` (`reservation_id`);
+
+--
+-- Indexes for table `guest_rooms`
+--
+ALTER TABLE `guest_rooms`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `room_number` (`room_number`),
+  ADD KEY `idx_room_type` (`room_type`),
+  ADD KEY `idx_is_active` (`is_active`);
+
+--
+-- Indexes for table `guest_room_availability`
+--
+ALTER TABLE `guest_room_availability`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `room_date` (`guest_room_id`,`date`),
+  ADD KEY `idx_date` (`date`),
+  ADD KEY `idx_availability` (`is_available`);
+
+--
+-- Indexes for table `guest_room_images`
+--
+ALTER TABLE `guest_room_images`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `guest_room_id` (`guest_room_id`),
+  ADD KEY `is_primary` (`is_primary`);
+
+--
+-- Indexes for table `guest_room_reservations`
+--
+ALTER TABLE `guest_room_reservations`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `booking_no` (`booking_no`),
+  ADD KEY `idx_user_id` (`user_id`),
+  ADD KEY `idx_guest_room_id` (`guest_room_id`),
+  ADD KEY `idx_status` (`status`),
+  ADD KEY `idx_payment_status` (`payment_status`),
+  ADD KEY `idx_dates` (`check_in_date`,`check_out_date`),
+  ADD KEY `idx_created_at` (`created_at`),
+  ADD KEY `idx_guest_reservation_dates` (`check_in_date`,`check_out_date`,`status`),
+  ADD KEY `idx_guest_reservation_user` (`user_id`,`created_at`);
 
 --
 -- Indexes for table `hidden_users`
 --
 ALTER TABLE `hidden_users`
   ADD PRIMARY KEY (`user_id`);
-
---
--- Indexes for table `hostel`
---
-ALTER TABLE `hostel`
-  ADD PRIMARY KEY (`sr_no`);
-
---
--- Indexes for table `liabilities`
---
-ALTER TABLE `liabilities`
-  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `messages`
@@ -1610,62 +2281,12 @@ ALTER TABLE `request`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `reservations`
---
-ALTER TABLE `reservations`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `idx_doe_toe` (`doe`,`toe`);
-
---
 -- Indexes for table `reservation_venues`
 --
 ALTER TABLE `reservation_venues`
   ADD PRIMARY KEY (`id`),
   ADD KEY `idx_reservation` (`reservation_id`),
   ADD KEY `idx_venue` (`venue_id`);
-
---
--- Indexes for table `rooms`
---
-ALTER TABLE `rooms`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `fk_type_id` (`type_id`);
-
---
--- Indexes for table `room_facilities`
---
-ALTER TABLE `room_facilities`
-  ADD PRIMARY KEY (`sr_no`),
-  ADD KEY `facilities id` (`facilities_id`),
-  ADD KEY `room id` (`room_id`);
-
---
--- Indexes for table `room_guests`
---
-ALTER TABLE `room_guests`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `reservation_id` (`reservation_id`);
-
---
--- Indexes for table `room_images`
---
-ALTER TABLE `room_images`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `room_id` (`room_id`);
-
---
--- Indexes for table `room_reservation`
---
-ALTER TABLE `room_reservation`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `room_reviews`
---
-ALTER TABLE `room_reviews`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `reservation_id` (`reservation_id`),
-  ADD KEY `user_id` (`user_id`);
 
 --
 -- Indexes for table `settings`
@@ -1693,12 +2314,6 @@ ALTER TABLE `testimonials`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `types_room`
---
-ALTER TABLE `types_room`
-  ADD PRIMARY KEY (`id`);
-
---
 -- Indexes for table `user_message`
 --
 ALTER TABLE `user_message`
@@ -1715,7 +2330,16 @@ ALTER TABLE `user_reg`
 --
 ALTER TABLE `venues`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `name` (`name`);
+  ADD UNIQUE KEY `name` (`name`),
+  ADD KEY `idx_venues_name` (`name`);
+
+--
+-- Indexes for table `venue_images`
+--
+ALTER TABLE `venue_images`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `venue_id` (`venue_id`),
+  ADD KEY `is_primary` (`is_primary`);
 
 --
 -- Indexes for table `venue_setups`
@@ -1753,6 +2377,12 @@ ALTER TABLE `banquet`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
+-- AUTO_INCREMENT for table `booking_sequences`
+--
+ALTER TABLE `booking_sequences`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
 -- AUTO_INCREMENT for table `carousel_slides`
 --
 ALTER TABLE `carousel_slides`
@@ -1786,7 +2416,7 @@ ALTER TABLE `facilities`
 -- AUTO_INCREMENT for table `facility_reservations`
 --
 ALTER TABLE `facility_reservations`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- AUTO_INCREMENT for table `faq`
@@ -1801,22 +2431,76 @@ ALTER TABLE `features`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
--- AUTO_INCREMENT for table `function_room_reviews`
+-- AUTO_INCREMENT for table `function_calendar_config`
 --
-ALTER TABLE `function_room_reviews`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+ALTER TABLE `function_calendar_config`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
--- AUTO_INCREMENT for table `hostel`
+-- AUTO_INCREMENT for table `function_rooms`
 --
-ALTER TABLE `hostel`
-  MODIFY `sr_no` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+ALTER TABLE `function_rooms`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
--- AUTO_INCREMENT for table `liabilities`
+-- AUTO_INCREMENT for table `function_room_availability`
 --
-ALTER TABLE `liabilities`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=45;
+ALTER TABLE `function_room_availability`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `function_room_blocked_dates`
+--
+ALTER TABLE `function_room_blocked_dates`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `function_room_images`
+--
+ALTER TABLE `function_room_images`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `function_room_reservations`
+--
+ALTER TABLE `function_room_reservations`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `guest_calendar_config`
+--
+ALTER TABLE `guest_calendar_config`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+
+--
+-- AUTO_INCREMENT for table `guest_details`
+--
+ALTER TABLE `guest_details`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `guest_rooms`
+--
+ALTER TABLE `guest_rooms`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+
+--
+-- AUTO_INCREMENT for table `guest_room_availability`
+--
+ALTER TABLE `guest_room_availability`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=768;
+
+--
+-- AUTO_INCREMENT for table `guest_room_images`
+--
+ALTER TABLE `guest_room_images`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `guest_room_reservations`
+--
+ALTER TABLE `guest_room_reservations`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `messages`
@@ -1855,52 +2539,10 @@ ALTER TABLE `request`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
--- AUTO_INCREMENT for table `reservations`
---
-ALTER TABLE `reservations`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=126;
-
---
 -- AUTO_INCREMENT for table `reservation_venues`
 --
 ALTER TABLE `reservation_venues`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
-
---
--- AUTO_INCREMENT for table `rooms`
---
-ALTER TABLE `rooms`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=46;
-
---
--- AUTO_INCREMENT for table `room_facilities`
---
-ALTER TABLE `room_facilities`
-  MODIFY `sr_no` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=339;
-
---
--- AUTO_INCREMENT for table `room_guests`
---
-ALTER TABLE `room_guests`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=254;
-
---
--- AUTO_INCREMENT for table `room_images`
---
-ALTER TABLE `room_images`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
-
---
--- AUTO_INCREMENT for table `room_reservation`
---
-ALTER TABLE `room_reservation`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=185;
-
---
--- AUTO_INCREMENT for table `room_reviews`
---
-ALTER TABLE `room_reviews`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=67;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
 
 --
 -- AUTO_INCREMENT for table `settings`
@@ -1918,19 +2560,13 @@ ALTER TABLE `team_details`
 -- AUTO_INCREMENT for table `terms_and_conditions`
 --
 ALTER TABLE `terms_and_conditions`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `testimonials`
 --
 ALTER TABLE `testimonials`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `types_room`
---
-ALTER TABLE `types_room`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- AUTO_INCREMENT for table `user_message`
@@ -1948,7 +2584,13 @@ ALTER TABLE `user_reg`
 -- AUTO_INCREMENT for table `venues`
 --
 ALTER TABLE `venues`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+
+--
+-- AUTO_INCREMENT for table `venue_images`
+--
+ALTER TABLE `venue_images`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
 
 --
 -- AUTO_INCREMENT for table `venue_setups`
@@ -1989,11 +2631,60 @@ ALTER TABLE `facility_reservations`
   ADD CONSTRAINT `fk_venue_setup` FOREIGN KEY (`venue_setup_id`) REFERENCES `venue_setups` (`id`) ON UPDATE CASCADE;
 
 --
--- Constraints for table `function_room_reviews`
+-- Constraints for table `function_room_availability`
 --
-ALTER TABLE `function_room_reviews`
-  ADD CONSTRAINT `function_room_reviews_ibfk_1` FOREIGN KEY (`reservation_id`) REFERENCES `reservations` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `function_room_reviews_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `user_reg` (`id`) ON DELETE CASCADE;
+ALTER TABLE `function_room_availability`
+  ADD CONSTRAINT `function_room_availability_ibfk_1` FOREIGN KEY (`function_room_id`) REFERENCES `function_rooms` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `function_room_availability_ibfk_2` FOREIGN KEY (`reservation_id`) REFERENCES `function_room_reservations` (`id`) ON DELETE SET NULL;
+
+--
+-- Constraints for table `function_room_blocked_dates`
+--
+ALTER TABLE `function_room_blocked_dates`
+  ADD CONSTRAINT `function_room_blocked_dates_ibfk_1` FOREIGN KEY (`function_room_id`) REFERENCES `function_rooms` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `function_room_images`
+--
+ALTER TABLE `function_room_images`
+  ADD CONSTRAINT `function_room_images_ibfk_1` FOREIGN KEY (`function_room_id`) REFERENCES `function_rooms` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `function_room_reservations`
+--
+ALTER TABLE `function_room_reservations`
+  ADD CONSTRAINT `function_room_reservations_ibfk_1` FOREIGN KEY (`function_room_id`) REFERENCES `function_rooms` (`id`),
+  ADD CONSTRAINT `function_room_reservations_ibfk_2` FOREIGN KEY (`event_type_id`) REFERENCES `event_types` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `function_room_reservations_ibfk_3` FOREIGN KEY (`banquet_style_id`) REFERENCES `banquet` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `function_room_reservations_ibfk_4` FOREIGN KEY (`office_type_id`) REFERENCES `office_types` (`id`),
+  ADD CONSTRAINT `function_room_reservations_ibfk_5` FOREIGN KEY (`office_id`) REFERENCES `offices` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `function_room_reservations_ibfk_6` FOREIGN KEY (`venue_setup_id`) REFERENCES `venue_setups` (`id`),
+  ADD CONSTRAINT `function_room_reservations_ibfk_7` FOREIGN KEY (`user_id`) REFERENCES `user_reg` (`id`) ON DELETE SET NULL;
+
+--
+-- Constraints for table `guest_details`
+--
+ALTER TABLE `guest_details`
+  ADD CONSTRAINT `guest_details_ibfk_1` FOREIGN KEY (`reservation_id`) REFERENCES `guest_room_reservations` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `guest_room_availability`
+--
+ALTER TABLE `guest_room_availability`
+  ADD CONSTRAINT `guest_room_availability_ibfk_1` FOREIGN KEY (`guest_room_id`) REFERENCES `guest_rooms` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `guest_room_images`
+--
+ALTER TABLE `guest_room_images`
+  ADD CONSTRAINT `guest_room_images_ibfk_1` FOREIGN KEY (`guest_room_id`) REFERENCES `guest_rooms` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `guest_room_reservations`
+--
+ALTER TABLE `guest_room_reservations`
+  ADD CONSTRAINT `guest_room_reservations_ibfk_1` FOREIGN KEY (`guest_room_id`) REFERENCES `guest_rooms` (`id`),
+  ADD CONSTRAINT `guest_room_reservations_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `user_reg` (`id`) ON DELETE SET NULL;
 
 --
 -- Constraints for table `notifications`
@@ -2015,36 +2706,10 @@ ALTER TABLE `reservation_venues`
   ADD CONSTRAINT `reservation_venues_ibfk_2` FOREIGN KEY (`venue_id`) REFERENCES `venues` (`id`) ON DELETE CASCADE;
 
 --
--- Constraints for table `rooms`
+-- Constraints for table `venue_images`
 --
-ALTER TABLE `rooms`
-  ADD CONSTRAINT `fk_type_id` FOREIGN KEY (`type_id`) REFERENCES `types_room` (`id`);
-
---
--- Constraints for table `room_facilities`
---
-ALTER TABLE `room_facilities`
-  ADD CONSTRAINT `facilities id` FOREIGN KEY (`facilities_id`) REFERENCES `facilities` (`id`) ON UPDATE NO ACTION,
-  ADD CONSTRAINT `room id` FOREIGN KEY (`room_id`) REFERENCES `rooms` (`id`) ON UPDATE NO ACTION;
-
---
--- Constraints for table `room_guests`
---
-ALTER TABLE `room_guests`
-  ADD CONSTRAINT `room_guests_ibfk_1` FOREIGN KEY (`reservation_id`) REFERENCES `room_reservation` (`id`) ON DELETE CASCADE;
-
---
--- Constraints for table `room_images`
---
-ALTER TABLE `room_images`
-  ADD CONSTRAINT `room_images_ibfk_1` FOREIGN KEY (`room_id`) REFERENCES `rooms` (`id`) ON DELETE CASCADE;
-
---
--- Constraints for table `room_reviews`
---
-ALTER TABLE `room_reviews`
-  ADD CONSTRAINT `room_reviews_ibfk_1` FOREIGN KEY (`reservation_id`) REFERENCES `room_reservation` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `room_reviews_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `user_reg` (`id`) ON DELETE CASCADE;
+ALTER TABLE `venue_images`
+  ADD CONSTRAINT `venue_images_ibfk_1` FOREIGN KEY (`venue_id`) REFERENCES `venues` (`id`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

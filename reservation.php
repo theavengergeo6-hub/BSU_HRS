@@ -56,13 +56,17 @@ if ($func_q && $func_q->num_rows > 0) {
 
 // ── Guest / accommodation rooms: from venues table (NOT Function) ────────────
 $guest_q = $conn->query("
-    SELECT id, name, floor, capacity, description, price,
-           extra_bed_available, extra_bed_price
-    FROM   venues
-    WHERE  is_active = 1
-    AND    COALESCE(is_available, 1) = 1
-    AND    name NOT LIKE '%Function%'
-    ORDER  BY name
+    SELECT id,
+           room_name       AS name,
+           floor,
+           max_guests      AS capacity,
+           description,
+           price_per_night AS price,
+           extra_bed_available,
+           extra_bed_price
+    FROM   guest_rooms
+    WHERE  COALESCE(is_active, 1) = 1
+    ORDER  BY room_name
 ");
 if ($guest_q && $guest_q->num_rows > 0) {
     while ($row = $guest_q->fetch_assoc()) {
@@ -83,11 +87,11 @@ if (empty($function_venues)) {
 
 if (empty($guest_venues)) {
     $guest_venues = [
-        ['id'=>6, 'name'=>'Guest Room 1','floor'=>'2nd Floor','capacity'=>2,'description'=>'Comfortable guest room with queen bed.','price'=>5000,'extra_bed_available'=>1,'extra_bed_price'=>500],
-        ['id'=>7, 'name'=>'Guest Room 2','floor'=>'2nd Floor','capacity'=>2,'description'=>'Guest room with city view.','price'=>2500,'extra_bed_available'=>1,'extra_bed_price'=>500],
-        ['id'=>8, 'name'=>'Guest Room 3','floor'=>'2nd Floor','capacity'=>3,'description'=>'Spacious guest room for small families.','price'=>2500,'extra_bed_available'=>1,'extra_bed_price'=>500],
-        ['id'=>9, 'name'=>'Guest Room 4','floor'=>'2nd Floor','capacity'=>2,'description'=>'Cozy room for couples or solo travelers.','price'=>2500,'extra_bed_available'=>1,'extra_bed_price'=>500],
-        ['id'=>10,'name'=>'Dormitory',   'floor'=>'Ground Floor','capacity'=>24,'description'=>'Spacious dormitory with 12 bunk beds.','price'=>8000,'extra_bed_available'=>0,'extra_bed_price'=>0],
+        ['id'=>1,'name'=>'Guest Room 1','floor'=>'2nd Floor','capacity'=>4,'description'=>'Comfortable guest room with queen bed.','price'=>2500,'extra_bed_available'=>1,'extra_bed_price'=>500],
+        ['id'=>2,'name'=>'Guest Room 2','floor'=>'2nd Floor','capacity'=>5,'description'=>'Guest room with city view.','price'=>2500,'extra_bed_available'=>1,'extra_bed_price'=>500],
+        ['id'=>3,'name'=>'Guest Room 3','floor'=>'2nd Floor','capacity'=>5,'description'=>'Spacious guest room for small families.','price'=>3000,'extra_bed_available'=>1,'extra_bed_price'=>500],
+        ['id'=>4,'name'=>'Guest Room 4','floor'=>'2nd Floor','capacity'=>8,'description'=>'Cozy room for couples or solo travelers.','price'=>3500,'extra_bed_available'=>1,'extra_bed_price'=>500],
+        ['id'=>5,'name'=>'Dormitory',   'floor'=>'Ground Floor','capacity'=>24,'description'=>'Spacious dormitory with 12 bunk beds.','price'=>8000,'extra_bed_available'=>0,'extra_bed_price'=>0],
     ];
 }
 
@@ -979,7 +983,8 @@ if ($selected_customer_type) {
                         <div class="col-md-2"><div class="form-group"><label>M.I.</label><input type="text" class="form-control" name="middle_initial" id="middle_initial" maxlength="2"></div></div>
                     </div>
                     <div class="row">
-                        <div class="col-md-6"><div class="form-group"><label>Email *</label><input type="email" class="form-control" name="email" id="email" required></div></div>
+                        <div class="col-md-6"><div class="form-group"><label>Email *</label><input type="email" class="form-control" name="email" id="email" required>
+                    </div></div>
                         <div class="col-md-6"><div class="form-group"><label>Contact Number *</label><input type="tel" class="form-control" name="contact" id="contact" maxlength="11" pattern="[0-9]{11}" required></div></div>
                     </div>
                     <hr>
@@ -1088,6 +1093,33 @@ if ($selected_customer_type) {
                                 </div>
                             </div>
                         </div>
+
+                             <!-- Room Selection -->
+                        <div class="guest-form-section">
+                            <h4><i class="bi bi-door-open"></i> Room Selection</h4>
+                            
+                            <div class="room-selector">
+                                <div class="form-group">
+                                    <label>Room *</label>
+                                    <select class="form-select" name="guest_room_id" id="guest_room_id" required onchange="updateRoomCapacity(this)">
+                                        <option value="">Select Room</option>
+                                        <?php foreach ($guest_venues as $room): ?>
+                                        <option value="<?= $room['id'] ?>" data-capacity="<?= $room['capacity'] ?>" data-name="<?= htmlspecialchars($room['name']) ?>">
+                                            <?= htmlspecialchars($room['name']) ?> (Max <?= $room['capacity'] ?> guests)
+                                        </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-3">
+                                <div class="form-group">
+                                    <label>Remarks / Special Arrangements</label>
+                                    <textarea class="form-control" name="guest_remarks" id="guest_remarks" rows="3" placeholder="Any special requests or arrangements...(Extra Beds, etc.)"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
                         
                         <!-- Other Guest Names - Dynamic Cards -->
                         <div class="guest-form-section">
@@ -1172,32 +1204,7 @@ if ($selected_customer_type) {
                                 </div>
                             </div>
                         </div>
-                        
-                        <!-- Room Selection -->
-                        <div class="guest-form-section">
-                            <h4><i class="bi bi-door-open"></i> Room Selection</h4>
-                            
-                            <div class="room-selector">
-                                <div class="form-group">
-                                    <label>Room *</label>
-                                    <select class="form-select" name="guest_room_id" id="guest_room_id" required onchange="updateRoomCapacity(this)">
-                                        <option value="">Select Room</option>
-                                        <?php foreach ($guest_venues as $room): ?>
-                                        <option value="<?= $room['id'] ?>" data-capacity="<?= $room['capacity'] ?>" data-name="<?= htmlspecialchars($room['name']) ?>">
-                                            <?= htmlspecialchars($room['name']) ?> (Max <?= $room['capacity'] ?> guests)
-                                        </option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                </div>
-                            </div>
-                            
-                            <div class="mt-3">
-                                <div class="form-group">
-                                    <label>Remarks / Special Arrangements</label>
-                                    <textarea class="form-control" name="guest_remarks" id="guest_remarks" rows="3" placeholder="Any special requests or arrangements...(Extra Beds, etc.)"></textarea>
-                                </div>
-                            </div>
-                        </div>
+
                         
                         <!-- Registered By -->
                         <div class="guest-form-section">
@@ -2133,14 +2140,30 @@ function saveGuestAndGo(n) {
 }
 
 function validateGuestForm() {
-    // Basic validation
-    var required = ['guest_last_name', 'guest_first_name', 'guest_dob', 'guest_address', 'guest_email', 'guest_contact', 'arrival_date', 'departure_date', 'checkin_time', 'checkout_time', 'adults_count', 'guest_room_id', 'registered_by'];
-    
-    for (var i = 0; i < required.length; i++) {
-        var el = document.getElementById(required[i]);
-        if (!el || !el.value.trim()) {
-            showModalAlert('⚠️', 'Required Field', 'Please fill in all required fields.');
-            el?.focus();
+    var requiredFields = [
+        { id: 'guest_last_name',  label: 'Last Name' },
+        { id: 'guest_first_name', label: 'First Name' },
+        { id: 'guest_dob',        label: 'Date of Birth' },
+        { id: 'guest_address',    label: 'Address' },
+        { id: 'guest_email',      label: 'Email Address' },
+        { id: 'guest_contact',    label: 'Contact Number' },
+        { id: 'arrival_date',     label: 'Arrival Date' },
+        { id: 'checkin_time',     label: 'Check-in Time' },
+        { id: 'departure_date',   label: 'Departure Date' },
+        { id: 'checkout_time',    label: 'Check-out Time' },
+        { id: 'adults_count',     label: 'Number of Adults' },
+        { id: 'guest_room_id',    label: 'Room Selection' },
+        { id: 'registered_by',    label: 'Name of Person Registering' }
+    ];
+
+    for (var i = 0; i < requiredFields.length; i++) {
+        var field = requiredFields[i];
+        var el = document.getElementById(field.id);
+        var val = el ? el.value.trim() : '';
+        console.log('Checking field:', field.id, '| value:', JSON.stringify(val), '| el found:', !!el);
+        if (!el || !val) {
+            showModalAlert('⚠️', 'Required Field', '"' + field.label + '" is required. Please fill it in before continuing.');
+            if (el) el.focus();
             return false;
         }
     }
@@ -2148,6 +2171,15 @@ function validateGuestForm() {
     // Check consent
     if (!document.getElementById('guestConsent').checked) {
         showModalAlert('📋', 'Consent Required', 'Please agree to the data privacy policy.');
+        return false;
+    }
+    
+    // Email validation - MUST be gmail.com
+    var email = document.getElementById('guest_email').value.trim();
+    var emailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+    if (!emailRegex.test(email)) {
+        showModalAlert('📧', 'Invalid Email', 'Please use a valid Gmail address (@gmail.com).');
+        document.getElementById('guest_email').focus();
         return false;
     }
     
@@ -2644,18 +2676,7 @@ function setupGuestTermsScrollListener() {
                 termsAgree.style.cursor = 'pointer';
             }
             
-            // Auto-fill with guest name
-            if (fullNameInput && fullNameInput.value === '') {
-                var firstName = document.getElementById('guest_first_name')?.value || '';
-                var lastName = document.getElementById('guest_last_name')?.value || '';
-                var middleInitial = document.getElementById('guest_middle_initial')?.value || '';
-                
-                var fullName = firstName + ' ' + (middleInitial ? middleInitial + ' ' : '') + lastName;
-                fullNameInput.value = fullName.trim();
-                
-                fullNameInput.style.background = '#fff3e0';
-                fullNameInput.style.borderColor = '#b71c1c';
-            }
+            // termsFullName auto-fill removed (not used for guests)
         }
     }
     
@@ -2897,22 +2918,31 @@ function validateStep(n) {
     }
     
     if (n === 1) {
-        var ot = document.getElementById('officeType').value;
-        var opt = document.getElementById('officeType').options[document.getElementById('officeType').selectedIndex];
-        var isExt = opt && opt.getAttribute('data-name') === 'External';
-        
-        if (isExt) { 
-            if (!document.getElementById('officeExternal').value.trim()) { 
-                showModalAlert('⚠️', 'Missing Information', 'Please enter your office or organization name.'); 
-                return false; 
-            }
-        } else { 
-            if (!document.getElementById('officeSelect').value) { 
-                showModalAlert('⚠️', 'Missing Information', 'Please select your office.');
-                return false; 
-            }
+    var ot = document.getElementById('officeType').value;
+    var opt = document.getElementById('officeType').options[document.getElementById('officeType').selectedIndex];
+    var isExt = opt && opt.getAttribute('data-name') === 'External';
+    
+    if (isExt) { 
+        if (!document.getElementById('officeExternal').value.trim()) { 
+            showModalAlert('⚠️', 'Missing Information', 'Please enter your office or organization name.'); 
+            return false; 
+        }
+    } else { 
+        if (!document.getElementById('officeSelect').value) { 
+            showModalAlert('⚠️', 'Missing Information', 'Please select your office.');
+            return false; 
         }
     }
+    
+    // ADD THIS EMAIL VALIDATION FOR FUNCTION ROOMS
+    var email = document.getElementById('email').value.trim();
+    var emailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+    if (!emailRegex.test(email)) {
+        showModalAlert('📧', 'Invalid Email', 'Please use a valid Gmail address (@gmail.com).');
+        document.getElementById('email').focus();
+        return false;
+    }
+}
     
     if (n === 2) {
         console.log('Validating step 2 - venues');
@@ -3526,6 +3556,28 @@ function closeTimeModal() {
     timeModalContext = null;
 }
 
+// Auto-capitalize middle initial
+function autoCapitalizeMiddleInitial() {
+    var miInput = document.getElementById('middle_initial');
+    if (miInput) {
+        miInput.addEventListener('input', function() {
+            this.value = this.value.toUpperCase().replace(/[^A-Z]/g, '').substring(0, 1);
+        });
+    }
+    
+    var guestMiInput = document.getElementById('guest_middle_initial');
+    if (guestMiInput) {
+        guestMiInput.addEventListener('input', function() {
+            this.value = this.value.toUpperCase().replace(/[^A-Z]/g, '').substring(0, 1);
+        });
+    }
+}
+
+// Call it in DOMContentLoaded
+document.addEventListener('DOMContentLoaded', function() {
+    autoCapitalizeMiddleInitial();
+});
+
 function showModalAlert(icon, title, message) {
     document.getElementById('systemAlertIcon').textContent = icon;
     document.getElementById('systemAlertTitle').textContent = title;
@@ -3857,15 +3909,6 @@ function buildGuestSummary() {
     html += '<h6 class="text-danger mt-3 mb-2">Registration Details</h6>';
     html += '<div class="summary-item"><strong>Registered By:</strong> ' + (document.getElementById('registered_by')?.value || '') + '</div>';
     html += '<div class="summary-item"><strong>Date Registered:</strong> ' + (document.getElementById('guest_form_date')?.value || '') + '</div>';
-    
-    // Terms
-    var termsName = document.getElementById('termsFullName')?.value || '';
-    if (termsName) {
-        html += '<h6 class="text-danger mt-3 mb-2">Terms Acknowledgment</h6>';
-        html += '<div class="summary-item"><strong>Agreed by:</strong> ' + termsName + '</div>';
-        html += '<div class="summary-item"><strong>Position:</strong> ' + (document.getElementById('termsPosition')?.value || '') + '</div>';
-        html += '<div class="summary-item"><strong>Date:</strong> ' + (document.getElementById('termsDate')?.value || '') + '</div>';
-    }
     
     document.getElementById('summaryBox').innerHTML = html;
 }
