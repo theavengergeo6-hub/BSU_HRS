@@ -11,13 +11,54 @@ if (!$id) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     $new_status = $_POST['status'] ?? '';
     $admin_remarks = clean($_POST['admin_remarks'] ?? '');
-    
-    if (in_array($new_status, ['pending', 'confirmed', 'checked_in', 'checked_out', 'cancelled', 'no_show'], true)) {
-        $remark_entry = "\n--- " . date("Y-m-d H:i:s") . " (" . ucfirst($new_status) . ") ---\n" . $admin_remarks;
+
+    $valid_statuses = ['pending', 'pencil_booked', 'confirmed', 'checked_in', 'checked_out', 'cancelled', 'no_show'];
+    if (in_array($new_status, $valid_statuses, true)) {
+        $remark_entry = "\n--- " . date("Y-m-d H:i:s") . " (" . ucfirst(str_replace('_', ' ', $new_status)) . ") ---\n" . $admin_remarks;
+
+        // Fetch current record before update (for availability logic)
+        $curr = $conn->query("SELECT guest_room_id, check_in_date, check_out_date, status FROM guest_room_reservations WHERE id = $id AND deleted = 0")->fetch_assoc();
+        $old_status = $curr['status'] ?? '';
+        $room_id = (int)($curr['guest_room_id'] ?? 0);
+        $check_in = $curr['check_in_date'] ?? '';
+        $check_out = $curr['check_out_date'] ?? '';
 
         $update_stmt = $conn->prepare("UPDATE guest_room_reservations SET status = ?, admin_remarks = CONCAT(IFNULL(admin_remarks, ''), ?) WHERE id = ? AND deleted = 0");
         $update_stmt->bind_param("ssi", $new_status, $remark_entry, $id);
         if ($update_stmt->execute()) {
+            // Verify the DB actually stored the requested status.
+            // MySQL can silently coerce invalid ENUM values to '' and still report success.
+            $chk_row = $conn->query("SELECT status FROM guest_room_reservations WHERE id = $id AND deleted = 0")->fetch_assoc();
+            $stored_status = $chk_row['status'] ?? '';
+            if ($stored_status !== $new_status) {
+                $_SESSION['error_message'] =
+                    "Status update did not persist (stored as '" . ($stored_status === '' ? '(blank)' : $stored_status) . "'). " .
+                    "Please run the guest reservation status migration so the database accepts '" . $new_status . "'.";
+                redirect("guest_reservation_details.php?id=$id");
+                exit;
+            }
+
+            // Update guest_room_availability: only approved/checked_in block the room
+            $blocks = ['confirmed', 'checked_in'];
+            $unblocks = ['checked_out', 'cancelled'];
+            if ($room_id && $check_in && $check_out) {
+                if (in_array($new_status, $blocks, true) && !in_array($old_status, $blocks, true)) {
+                    // Block room for each night (check_in up to day before check_out)
+                    $d = $check_in;
+                    while (strtotime($d) < strtotime($check_out)) {
+                        $conn->query("INSERT INTO guest_room_availability (guest_room_id, date, available_quantity, booked_quantity, blocked_quantity, is_available)
+                            VALUES ($room_id, '$d', 1, 1, 0, 0)
+                            ON DUPLICATE KEY UPDATE booked_quantity = booked_quantity + 1,
+                                is_available = CASE WHEN available_quantity > booked_quantity + 1 THEN 1 ELSE 0 END");
+                        $d = date('Y-m-d', strtotime($d . ' +1 day'));
+                    }
+                } elseif (in_array($new_status, $unblocks, true) && in_array($old_status, $blocks, true)) {
+                    // Unblock room
+                    $conn->query("UPDATE guest_room_availability SET booked_quantity = GREATEST(0, booked_quantity - 1),
+                        is_available = CASE WHEN available_quantity > GREATEST(0, booked_quantity - 1) THEN 1 ELSE 0 END
+                        WHERE guest_room_id = $room_id AND date >= '$check_in' AND date < '$check_out'");
+                }
+            }
             $_SESSION['success_message'] = "Reservation status updated successfully!";
         } else {
             $_SESSION['error_message'] = "Error updating status: " . $conn->error;
@@ -38,7 +79,7 @@ $query = "SELECT
               gr.check_out_date AS departure_date,
               gr.total_amount AS total_price
           FROM guest_room_reservations gr
-          JOIN guest_rooms g ON gr.guest_room_id = g.id
+          LEFT JOIN guest_rooms g ON gr.guest_room_id = g.id
           WHERE gr.id = ? AND gr.deleted = 0";
 $stmt = $conn->prepare($query);
 $stmt->bind_param("i", $id);
@@ -53,6 +94,9 @@ if ($result->num_rows === 0) {
 $reservation = $result->fetch_assoc();
 $stmt->close();
 
+// Normalize blank/invalid status so UI never shows empty badge.
+$status_norm = ($reservation['status'] === '' || $reservation['status'] === null) ? 'pending' : $reservation['status'];
+
 // Decode other guests
 $other_guests = json_decode($reservation['other_guests'], true);
 
@@ -63,7 +107,9 @@ require_once __DIR__ . '/inc/header.php';
 function getStatusBadgeClass($status) {
     switch (strtolower($status)) {
         case 'pending': return 'status-pending';
+        case 'pencil_booked': return 'status-pencil';
         case 'confirmed': return 'status-approved';
+        case 'checked_in': return 'status-checked-in';
         case 'cancelled': return 'status-cancelled';
         case 'checked_out': return 'status-completed';
         default: return 'status-default';
@@ -142,7 +188,9 @@ $total_nights = (strtotime($reservation['departure_date']) - strtotime($reservat
 }
 
 .status-pending { background: #fff3cd; color: #856404; }
+.status-pencil { background: #e2d5f1; color: #5e3c8b; }
 .status-approved { background: #d4edda; color: #155724; }
+.status-checked-in { background: #cce5ff; color: #004085; }
 .status-cancelled { background: #f8d7da; color: #721c24; }
 .status-completed { background: #cce5ff; color: #004085; }
 
@@ -328,8 +376,8 @@ $total_nights = (strtotime($reservation['departure_date']) - strtotime($reservat
                 <small>Reservation ID: <?= (int)$reservation['id'] ?></small>
             </div>
             <div class="text-end">
-                <span class="status-badge <?= getStatusBadgeClass($reservation['status']) ?>">
-                    <?= htmlspecialchars(strtoupper($reservation['status'])) ?>
+                <span class="status-badge <?= getStatusBadgeClass($status_norm) ?>">
+                    <?= htmlspecialchars(strtoupper($status_norm)) ?>
                 </span>
                 <div class="mt-1">
                     <small>Booked: <?= date("M d, Y", strtotime($reservation['created_at'])) ?></small>
@@ -604,15 +652,16 @@ $total_nights = (strtotime($reservation['departure_date']) - strtotime($reservat
                 <input type="hidden" name="action" value="update_status">
                 <div class="form-group">
                     <label><i class="bi bi-tag me-1"></i> Update Status</label>
-                    <select class="form-select" name="status">
-                        <option value="pending" <?= $reservation['status'] === 'pending' ? 'selected' : '' ?>>Pending</option>
-                        <option value="confirmed" <?= $reservation['status'] === 'confirmed' ? 'selected' : '' ?>>Confirmed</option>
-                        <option value="checked_in" <?= $reservation['status'] === 'checked_in' ? 'selected' : '' ?>>Checked In</option>
-                        <option value="checked_out" <?= $reservation['status'] === 'checked_out' ? 'selected' : '' ?>>Completed (Checked Out)</option>
-                        <option value="cancelled" <?= $reservation['status'] === 'cancelled' ? 'selected' : '' ?>>Cancelled</option>
-                        <option value="no_show" <?= $reservation['status'] === 'no_show' ? 'selected' : '' ?>>No Show</option>
+                    <select class="form-select status-select" name="status" id="guest-status-select">
+                        <option value="pending" <?= $status_norm === 'pending' ? 'selected' : '' ?>>1. Pending</option>
+                        <option value="pencil_booked" <?= $status_norm === 'pencil_booked' ? 'selected' : '' ?>>2. Pencil Booked</option>
+                        <option value="confirmed" <?= $status_norm === 'confirmed' ? 'selected' : '' ?>>3. Approved</option>
+                        <option value="checked_in" <?= $status_norm === 'checked_in' ? 'selected' : '' ?>>4. Checked In</option>
+                        <option value="checked_out" <?= $status_norm === 'checked_out' ? 'selected' : '' ?>>5. Completed (Checked Out)</option>
+                        <option value="cancelled" <?= $status_norm === 'cancelled' ? 'selected' : '' ?>>Cancelled</option>
+                        <option value="no_show" <?= $status_norm === 'no_show' ? 'selected' : '' ?>>No Show</option>
                     </select>
-                    <small class="text-muted">Current: <strong><?= ucfirst($reservation['status']) ?></strong></small>
+                    <small class="text-muted">Current: <strong><?= htmlspecialchars(ucfirst(str_replace('_',' ',$status_norm))) ?></strong></small>
                 </div>
                 <div class="form-group">
                     <label><i class="bi bi-chat me-1"></i> Admin Remarks</label>
@@ -645,6 +694,28 @@ $total_nights = (strtotime($reservation['departure_date']) - strtotime($reservat
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.querySelector('form');
+    const statusSelect = document.getElementById('guest-status-select');
+
+    function applyGuestStatusColor(select) {
+        const val = select.value;
+        let bg = '#ffffff';
+        let color = '#212529';
+        if (val === 'pending')             { bg = '#fff3cd'; color = '#856404'; }
+        else if (val === 'pencil_booked')  { bg = '#e2d5f1'; color = '#5e3c8b'; }
+        else if (val === 'confirmed')      { bg = '#d4edda'; color = '#155724'; }
+        else if (val === 'checked_in')     { bg = '#cce5ff'; color = '#004085'; }
+        else if (val === 'checked_out')    { bg = '#e2e3ff'; color = '#004085'; }
+        else if (val === 'cancelled')      { bg = '#f8d7da'; color = '#721c24'; }
+        else if (val === 'no_show')        { bg = '#e9ecef'; color = '#495057'; }
+        select.style.backgroundColor = bg;
+        select.style.color = color;
+    }
+
+    if (statusSelect) {
+        applyGuestStatusColor(statusSelect);
+        statusSelect.addEventListener('change', function() { applyGuestStatusColor(this); });
+    }
+
     if (form) {
         form.addEventListener('submit', function(e) {
             const status = document.querySelector('select[name="status"]').value;

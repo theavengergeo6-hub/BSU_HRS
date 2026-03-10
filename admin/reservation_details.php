@@ -955,7 +955,7 @@ body {
 
                         <div class="form-field">
                             <label class="fl-label"><i class="bi bi-tag me-1"></i> Update Status</label>
-                            <select class="fl-select" id="status" name="status">
+                            <select class="fl-select status-select" id="status" name="status">
                                 <option value="pending"       <?= $reservation['status'] === 'pending'       ? 'selected' : '' ?>>Pending</option>
                                 <option value="pencil_booked" <?= $reservation['status'] === 'pencil_booked' ? 'selected' : '' ?>>Pencil Booked</option>
                                 <option value="approved"      <?= $reservation['status'] === 'approved'      ? 'selected' : '' ?>>Approved</option>
@@ -1027,10 +1027,28 @@ body {
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('statusUpdateForm');
+    const statusSelect = document.getElementById('status');
+
+    function applyStatusColor(select) {
+        const val = select.value;
+        let bg = '#ffffff';
+        let color = '#111827';
+        if (val === 'pending')        { bg = '#fff3cd'; color = '#92600a'; }
+        else if (val === 'pencil_booked') { bg = '#ede9fe'; color = '#5b21b6'; }
+        else if (val === 'approved')  { bg = '#dcfce7'; color = '#166534'; }
+        else if (val === 'cancelled') { bg = '#fee2e2'; color = '#991b1b'; }
+        select.style.backgroundColor = bg;
+        select.style.color = color;
+    }
+
+    if (statusSelect) {
+        applyStatusColor(statusSelect);
+        statusSelect.addEventListener('change', function() { applyStatusColor(this); });
+    }
+
     if (!form) return;
     
     form.addEventListener('submit', function(e) {
-        const statusSelect = document.getElementById('status');
         const remarksText  = document.getElementById('admin_remarks');
         const currentStatus = '<?= $reservation['status'] ?>';
 

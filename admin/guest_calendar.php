@@ -31,7 +31,15 @@ $pending_month = $conn->query("
     SELECT COUNT(*) as c 
     FROM guest_room_reservations
     WHERE deleted = 0
-      AND status='pending' 
+      AND (status='pending' OR status='' OR status IS NULL)
+      AND MONTH(check_in_date)=$month AND YEAR(check_in_date)=$year
+")->fetch_assoc()['c'];
+
+$pencil_month = $conn->query("
+    SELECT COUNT(*) as c 
+    FROM guest_room_reservations
+    WHERE deleted = 0
+      AND status='pencil_booked' 
       AND MONTH(check_in_date)=$month AND YEAR(check_in_date)=$year
 ")->fetch_assoc()['c'];
 
@@ -59,7 +67,7 @@ $guest_reservations = $conn->query("
     WHERE gr.deleted = 0
       AND (MONTH(gr.check_in_date) = $month OR MONTH(gr.check_out_date) = $month)
       AND (YEAR(gr.check_in_date) = $year OR YEAR(gr.check_out_date) = $year)
-    AND gr.status IN ('confirmed', 'checked_in', 'pending')
+    AND gr.status IN ('confirmed', 'checked_in', 'pending', 'pencil_booked', '')
     ORDER BY gr.check_in_date ASC
 ");
 
@@ -116,6 +124,10 @@ $guest_events_json = json_encode($events_by_date);
         <i class="bi bi-check-circle stat-icon"></i>
     </div>
     <div class="stat-card">
+        <div class="stat-info"><div class="stat-title">Pencil Booked</div><div class="stat-number"><?= $pencil_month ?></div></div>
+        <i class="bi bi-pencil-square stat-icon" style="color:#6f42c1;"></i>
+    </div>
+    <div class="stat-card">
         <div class="stat-info"><div class="stat-title">Pending</div><div class="stat-number"><?= $pending_month ?></div></div>
         <i class="bi bi-hourglass-split stat-icon"></i>
     </div>
@@ -149,6 +161,11 @@ $guest_events_json = json_encode($events_by_date);
             <span class="filter-dot" style="background: #ffc107;"></span>
             <span class="filter-text">Pending</span>
         </label>
+        <label class="filter-checkbox-wrap">
+            <input type="checkbox" id="filterGuestPencil" checked onchange="renderGuestCalendar()">
+            <span class="filter-dot" style="background: #5e3c8b;"></span>
+            <span class="filter-text">Pencil Booked</span>
+        </label>
     </div>
 
     <!-- Weekday Headers -->
@@ -172,6 +189,7 @@ $guest_events_json = json_encode($events_by_date);
             echo '<span class="event-badges">';
             echo '<span class="event-count-badge confirmed-badge" id="gb-' . $date . '"></span>';
             echo '<span class="event-count-badge guest-pending-badge" id="gpb-' . $date . '"></span>';
+            echo '<span class="event-count-badge guest-pencil-badge" id="gpcb-' . $date . '"></span>';
             echo '</span>';
             echo '</div>';
             echo '<div class="event-indicator" id="guest-dots-' . $date . '"></div>';
@@ -202,6 +220,13 @@ var guestEventsData = <?= $guest_events_json ?>;
 function renderGuestCalendar() {
     var showConfirmed = document.getElementById('filterConfirmed').checked;
     var showPending = document.getElementById('filterGuestPending').checked;
+    var showPencil = document.getElementById('filterGuestPencil').checked;
+
+    function normStatus(s) {
+        if (s === null || s === undefined) return 'pending';
+        s = String(s);
+        return s === '' ? 'pending' : s;
+    }
     
     var allDates = Object.keys(guestEventsData);
     
@@ -209,13 +234,15 @@ function renderGuestCalendar() {
         var dotsEl = document.getElementById('guest-dots-' + date);
         var confirmedBadge = document.getElementById('gb-' + date);
         var pendingBadge = document.getElementById('gpb-' + date);
+        var pencilBadge = document.getElementById('gpcb-' + date);
         
         if (!dotsEl) return;
         
         dotsEl.innerHTML = '';
         var events = guestEventsData[date] || [];
-        var confirmedCount = events.filter(e => e.status === 'confirmed').length;
-        var pendingCount = events.filter(e => e.status === 'pending').length;
+        var confirmedCount = events.filter(e => (normStatus(e.status) === 'confirmed' || normStatus(e.status) === 'checked_in')).length;
+        var pendingCount = events.filter(e => normStatus(e.status) === 'pending').length;
+        var pencilCount = events.filter(e => normStatus(e.status) === 'pencil_booked').length;
         
         // Confirmed badge + dots
         if (showConfirmed && confirmedCount > 0) {
@@ -246,12 +273,35 @@ function renderGuestCalendar() {
         } else {
             pendingBadge.style.display = 'none';
         }
+
+        // Pencil booked badge + dots
+        if (showPencil && pencilCount > 0) {
+            pencilBadge.textContent = pencilCount + ' pencil';
+            pencilBadge.style.display = 'inline-block';
+            var pencilEvents = events.filter(e => normStatus(e.status) === 'pencil_booked');
+            for (var k = 0; k < Math.min(pencilEvents.length, 5); k++) {
+                var dot3 = document.createElement('span');
+                dot3.className = 'event-dot';
+                dot3.style.background = '#5e3c8b';
+                dot3.title = (pencilEvents[k] || {}).guest_name || '';
+                dotsEl.appendChild(dot3);
+            }
+        } else {
+            pencilBadge.style.display = 'none';
+        }
     });
 }
 
 function showGuestEvents(date) {
     var showConfirmed = document.getElementById('filterConfirmed').checked;
     var showPending = document.getElementById('filterGuestPending').checked;
+    var showPencil = document.getElementById('filterGuestPencil').checked;
+
+    function normStatus(s) {
+        if (s === null || s === undefined) return 'pending';
+        s = String(s);
+        return s === '' ? 'pending' : s;
+    }
     
     var options = { month:'long', day:'numeric', year:'numeric' };
     document.getElementById('guestSelectedDate').textContent =
@@ -259,8 +309,9 @@ function showGuestEvents(date) {
     
     var events = guestEventsData[date] || [];
     var filteredEvents = events.filter(e => 
-        (showConfirmed && e.status === 'confirmed') || 
-        (showPending && e.status === 'pending')
+        (showConfirmed && (normStatus(e.status) === 'confirmed' || normStatus(e.status) === 'checked_in')) || 
+        (showPending && normStatus(e.status) === 'pending') ||
+        (showPencil && normStatus(e.status) === 'pencil_booked')
     );
     
     if (filteredEvents.length === 0) {
@@ -274,8 +325,9 @@ function showGuestEvents(date) {
     filteredEvents.sort((a, b) => a.arrival_date.localeCompare(b.arrival_date));
     
     filteredEvents.forEach(function(event) {
-        var statusClass = event.status === 'confirmed' ? 'approved' : 'pending';
-        var pillClass = event.status === 'confirmed' ? 'pill-approved' : 'pill-pending';
+        var st = normStatus(event.status);
+        var statusClass = (st === 'confirmed' || st === 'checked_in') ? 'approved' : (st === 'pencil_booked' ? 'pencil' : 'pending');
+        var pillClass = (st === 'confirmed' || st === 'checked_in') ? 'pill-approved' : (st === 'pencil_booked' ? 'pill-pencil' : 'pill-pending');
         var eventTypeText = event.event_type === 'arrival' ? '🟢 Arrival' : 
                            (event.event_type === 'departure' ? '🔴 Departure' : '🟡 Stay');
         
@@ -283,7 +335,7 @@ function showGuestEvents(date) {
             <div class="event-card ${statusClass}">
                 <div class="event-header">
                     <span class="event-title">${escapeHtml(event.guest_name)}</span>
-                    <span class="event-status-pill ${pillClass}">${event.status.toUpperCase()}</span>
+                    <span class="event-status-pill ${pillClass}">${st.toUpperCase()}</span>
                 </div>
                 <div class="event-time">
                     <i class="bi bi-info-circle"></i> ${eventTypeText}
@@ -342,6 +394,12 @@ document.getElementById('guestDateModal').addEventListener('click', function(e) 
 .event-count-badge.guest-pending-badge {
     background: #fff3cd;
     color: #856404;
+    display: none;
+}
+
+.event-count-badge.guest-pencil-badge {
+    background: #e2d5f1;
+    color: #5e3c8b;
     display: none;
 }
 </style>

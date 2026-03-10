@@ -101,9 +101,11 @@ if ($view === 'function') {
 // ── Guest room data ──────────────────────────────────────────────────────────
 if ($view === 'guest') {
     $gTotal     = (int)$conn->query("SELECT COUNT(*) AS c FROM guest_room_reservations WHERE deleted=0 AND MONTH(check_in_date)=$month AND YEAR(check_in_date)=$year")->fetch_assoc()['c'];
-    $gConfirmed = (int)$conn->query("SELECT COUNT(*) AS c FROM guest_room_reservations WHERE deleted=0 AND status='confirmed' AND MONTH(check_in_date)=$month AND YEAR(check_in_date)=$year")->fetch_assoc()['c'];
-    $gPending   = (int)$conn->query("SELECT COUNT(*) AS c FROM guest_room_reservations WHERE deleted=0 AND status='pending' AND MONTH(check_in_date)=$month AND YEAR(check_in_date)=$year")->fetch_assoc()['c'];
-    $gCancelled = (int)$conn->query("SELECT COUNT(*) AS c FROM guest_room_reservations WHERE deleted=0 AND status='cancelled' AND MONTH(check_in_date)=$month AND YEAR(check_in_date)=$year")->fetch_assoc()['c'];
+    $gConfirmed = (int)$conn->query("SELECT COUNT(*) AS c FROM guest_room_reservations WHERE deleted=0 AND status='confirmed'     AND MONTH(check_in_date)=$month AND YEAR(check_in_date)=$year")->fetch_assoc()['c'];
+    $gPencil    = (int)$conn->query("SELECT COUNT(*) AS c FROM guest_room_reservations WHERE deleted=0 AND status='pencil_booked' AND MONTH(check_in_date)=$month AND YEAR(check_in_date)=$year")->fetch_assoc()['c'];
+    // Treat invalid/blank enum values as pending so reservations never "disappear"
+    $gPending   = (int)$conn->query("SELECT COUNT(*) AS c FROM guest_room_reservations WHERE deleted=0 AND (status='pending' OR status='' OR status IS NULL) AND MONTH(check_in_date)=$month AND YEAR(check_in_date)=$year")->fetch_assoc()['c'];
+    $gCancelled = (int)$conn->query("SELECT COUNT(*) AS c FROM guest_room_reservations WHERE deleted=0 AND status='cancelled'     AND MONTH(check_in_date)=$month AND YEAR(check_in_date)=$year")->fetch_assoc()['c'];
 
     // Load all active guest reservations that overlap this month
     $gr_result = $conn->query("
@@ -122,36 +124,24 @@ if ($view === 'guest') {
                g.room_name  AS room_name,
                g.floor      AS room_floor
         FROM guest_room_reservations gr
-        JOIN guest_rooms g ON gr.guest_room_id = g.id
-        WHERE gr.status IN ('confirmed','checked_in','pending')
+        LEFT JOIN guest_rooms g ON gr.guest_room_id = g.id
+        WHERE gr.status IN ('confirmed','checked_in','pending','pencil_booked')
           AND gr.deleted = 0
           AND gr.check_in_date  <= '$end_date'
           AND gr.check_out_date >= '$start_date'
         ORDER BY gr.check_in_date ASC
     ");
 
-    // Build events_by_date: each date gets an array of reservations with event_type
-    $guest_by_date = [];
+    // Build events_by_date: each reservation appears ONLY on its check-in date as a dot.
+    // The JS renders a horizontal stay-bar from check_in_date → check_out_date.
+    // This avoids the same reservation showing dots on every day of the stay.
+    $guest_by_date   = [];  // keyed by check-in date — for dot/badge rendering
+    $guest_stays_raw = [];  // flat array of all reservations — for stay-bar rendering
     while ($row = $gr_result->fetch_assoc()) {
         $arr = $row['arrival_date'];
-        $dep = $row['departure_date'];
-
-        // Arrival day
+        // Each reservation placed once, on its arrival date only
         $guest_by_date[$arr][] = array_merge($row, ['event_type' => 'checkin']);
-
-        // In-between days
-        $cur = strtotime($arr . ' +1 day');
-        $depTs = strtotime($dep);
-        while ($cur < $depTs) {
-            $mid = date('Y-m-d', $cur);
-            $guest_by_date[$mid][] = array_merge($row, ['event_type' => 'stay']);
-            $cur = strtotime('+1 day', $cur);
-        }
-
-        // Departure day (only add if different from arrival)
-        if ($dep !== $arr) {
-            $guest_by_date[$dep][] = array_merge($row, ['event_type' => 'checkout']);
-        }
+        $guest_stays_raw[]     = $row;
     }
 }
 
@@ -782,8 +772,12 @@ foreach ($rows as $row):
             <i class="bi bi-door-open stat-icon"></i>
         </div>
         <div class="stat-card">
-            <div class="stat-info"><div class="stat-title">Confirmed</div><div class="stat-number"><?= $gConfirmed ?></div></div>
-            <i class="bi bi-check-circle stat-icon"></i>
+            <div class="stat-info"><div class="stat-title">Approved</div><div class="stat-number"><?= $gConfirmed ?></div></div>
+            <i class="bi bi-check-circle stat-icon" style="color:#28a745;"></i>
+        </div>
+        <div class="stat-card" style="border-left-color:#6f42c1;">
+            <div class="stat-info"><div class="stat-title">Pencil Booked</div><div class="stat-number"><?= $gPencil ?></div></div>
+            <i class="bi bi-pencil-square stat-icon" style="color:#6f42c1;"></i>
         </div>
         <div class="stat-card" style="border-left-color:#ffc107;">
             <div class="stat-info"><div class="stat-title">Pending</div><div class="stat-number"><?= $gPending ?></div></div>
@@ -819,12 +813,17 @@ foreach ($rows as $row):
             <label class="filter-checkbox-wrap">
                 <input type="checkbox" id="filterGuestConfirmed" checked onchange="renderGuestDots()">
                 <span class="filter-dot confirmed"></span>
-                <span class="filter-text">Confirmed</span>
+                <span class="filter-text">Approved / Checked-in</span>
             </label>
             <label class="filter-checkbox-wrap">
                 <input type="checkbox" id="filterGuestPending" checked onchange="renderGuestDots()">
                 <span class="filter-dot pending"></span>
                 <span class="filter-text">Pending</span>
+            </label>
+            <label class="filter-checkbox-wrap">
+                <input type="checkbox" id="filterGuestPencil" checked onchange="renderGuestDots()">
+                <span class="filter-dot pencil"></span>
+                <span class="filter-text">Pencil Booked</span>
             </label>
             <!-- Legend -->
             <div style="margin-left:auto;display:flex;gap:0.9rem;align-items:center;font-size:0.78rem;color:#6c757d;">
@@ -854,7 +853,8 @@ foreach ($rows as $row):
                 echo  '<div class="day-number">'.$day;
                 echo   '<span class="event-badges">';
                 echo    '<span class="event-count-badge confirmed-badge" id="gcb-'.$date.'"></span>';
-                echo    '<span class="event-count-badge gp-badge"        id="gpb-'.$date.'"></span>';
+                echo    '<span class="event-count-badge pending-badge"   id="gpb-'.$date.'"></span>';
+                echo    '<span class="event-count-badge pencil-badge"    id="gpeb-'.$date.'"></span>';
                 echo   '</span>';
                 echo  '</div>';
                 echo  '<div class="event-indicator" id="gdots-'.$date.'"></div>';
@@ -880,19 +880,25 @@ foreach ($rows as $row):
     </div>
 
     <?php
-    $guest_events_json = json_encode($guest_by_date, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);
+    $guest_events_json = json_encode($guest_by_date,   JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);
+    $guest_stays_json  = json_encode($guest_stays_raw, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);
     ?>
     <script>
     (function () {
         'use strict';
 
-        var guestData = <?= $guest_events_json ?>;
+        var guestData  = <?= $guest_events_json ?>;  // keyed by check-in date
+        var guestStays = <?= $guest_stays_json ?>;   // flat array for stay-bars
 
-        /* Deduplicate events on a date by reservation id + event_type priority:
-           If same id appears as checkin AND stay (straddles month boundary), keep checkin.
-           Priority: checkin > checkout > stay */
+        /* ── normStatus helper ──────────────────────────────────────────── */
+        function normStatus(s) {
+            if (s === null || s === undefined) return 'pending';
+            s = String(s);
+            return s === '' ? 'pending' : s;
+        }
+
+        /* ── Deduplicate events on a date (keep highest-priority event_type) ─ */
         var TYPE_PRIO = { checkin: 0, checkout: 1, stay: 2 };
-
         function dedupeForDate(events) {
             var best = {};
             events.forEach(function (ev) {
@@ -904,102 +910,149 @@ foreach ($rows as $row):
             return Object.values(best);
         }
 
-        /* ── Render dots ─────────────────────────────────────────────────── */
+        /* ── Render dots (one dot per reservation, on check-in date only) ──── */
         function renderGuestDots() {
-            var showC = document.getElementById('filterGuestConfirmed').checked;
-            var showP = document.getElementById('filterGuestPending').checked;
+            var showC  = document.getElementById('filterGuestConfirmed').checked;
+            var showP  = document.getElementById('filterGuestPending').checked;
+            var showPB = document.getElementById('filterGuestPencil').checked;
 
+            // Clear all dot containers first
+            document.querySelectorAll('[id^="gdots-"]').forEach(function(el) { el.innerHTML = ''; });
+            document.querySelectorAll('[id^="gcb-"],[id^="gpb-"],[id^="gpeb-"]').forEach(function(el) {
+                el.style.display = 'none';
+            });
+
+            // Render one dot per reservation on its check-in date
             Object.keys(guestData).forEach(function (date) {
-                var dotsEl = document.getElementById('gdots-' + date);
-                var cBadge = document.getElementById('gcb-'   + date);
-                var pBadge = document.getElementById('gpb-'   + date);
+                var dotsEl  = document.getElementById('gdots-'  + date);
+                var cBadge  = document.getElementById('gcb-'    + date);
+                var pBadge  = document.getElementById('gpb-'    + date);
+                var pbBadge = document.getElementById('gpeb-'   + date);
                 if (!dotsEl) return;
 
                 dotsEl.innerHTML = '';
                 var evs   = dedupeForDate(guestData[date] || []);
-                var cEvs  = evs.filter(function (e) { return (e.status === 'confirmed' || e.status === 'checked_in'); });
-                var pEvs  = evs.filter(function (e) { return e.status === 'pending';   });
+                var cEvs  = evs.filter(function (e) { var s = normStatus(e.status); return s === 'confirmed' || s === 'checked_in'; });
+                var pEvs  = evs.filter(function (e) { return normStatus(e.status) === 'pending'; });
+                var pbEvs = evs.filter(function (e) { return normStatus(e.status) === 'pencil_booked'; });
 
-                /* badge counts */
-                if (showC && cEvs.length) {
-                    cBadge.textContent = cEvs.length; cBadge.style.display = 'inline-block';
-                } else { cBadge.style.display = 'none'; }
+                // Badge counts
+                if (showC  && cEvs.length)  { cBadge.textContent  = cEvs.length;  cBadge.style.display  = 'inline-block'; }
+                if (showP  && pEvs.length)  { pBadge.textContent  = pEvs.length;  pBadge.style.display  = 'inline-block'; }
+                if (showPB && pbEvs.length) { pbBadge.textContent = pbEvs.length; pbBadge.style.display = 'inline-block'; }
 
-                if (showP && pEvs.length) {
-                    pBadge.textContent = pEvs.length; pBadge.style.display = 'inline-block';
-                } else { pBadge.style.display = 'none'; }
-
-                /* dots – show up to 4, one per unique reservation, filtered by status */
+                // One dot per reservation + a small "nights" label
                 var shown = [];
-                if (showC) shown = shown.concat(cEvs.slice(0, 4));
-                if (showP) shown = shown.concat(pEvs.slice(0, Math.max(0, 4 - shown.length)));
+                if (showC)  shown = shown.concat(cEvs.slice(0, 4));
+                if (showP)  shown = shown.concat(pEvs.slice(0,  Math.max(0, 4 - shown.length)));
+                if (showPB) shown = shown.concat(pbEvs.slice(0, Math.max(0, 4 - shown.length)));
 
                 shown.forEach(function (ev) {
+                    var st     = normStatus(ev.status);
+                    var color  = (st === 'confirmed' || st === 'checked_in') ? '#28a745'
+                               : st === 'pencil_booked' ? '#5e3c8b' : '#ffc107';
+                    var nights = Math.round((new Date(ev.departure_date) - new Date(ev.arrival_date)) / 86400000);
+
+                    // Stay-bar: a pill that shows room name + night count
+                    var bar = document.createElement('div');
+                    bar.style.cssText = 'display:flex;align-items:center;gap:3px;'
+                        + 'background:' + color + '22;'
+                        + 'border-left:3px solid ' + color + ';'
+                        + 'border-radius:3px;padding:1px 4px;margin-top:2px;'
+                        + 'font-size:0.58rem;line-height:1.3;cursor:pointer;'
+                        + 'white-space:nowrap;overflow:hidden;max-width:100%;';
+                    bar.title = ev.guest_name + ' \u2013 ' + ev.room_name + ' (' + nights + ' night' + (nights !== 1 ? 's' : '') + ')';
+
                     var dot = document.createElement('span');
-                    dot.className = 'event-dot';
-                    dot.style.background = (ev.status === 'confirmed' || ev.status === 'checked_in') ? '#28a745' : '#ffc107';
-                    if (ev.status === 'pending') dot.style.border = '1px solid #e0a800';
-                    dot.title = (ev.guest_name || '') + ' – ' + ev.room_name;
-                    dotsEl.appendChild(dot);
+                    dot.style.cssText = 'width:6px;height:6px;border-radius:50%;flex-shrink:0;background:' + color;
+                    bar.appendChild(dot);
+
+                    var lbl = document.createElement('span');
+                    lbl.style.cssText = 'color:#333;overflow:hidden;text-overflow:ellipsis;font-weight:600;';
+                    lbl.textContent   = ev.room_name + ' \u00b7 ' + nights + 'n';
+                    bar.appendChild(lbl);
+
+                    dotsEl.appendChild(bar);
                 });
             });
         }
 
         /* ── Open guest modal ────────────────────────────────────────────── */
         function showGuestEvents(date) {
-            var showC = document.getElementById('filterGuestConfirmed').checked;
-            var showP = document.getElementById('filterGuestPending').checked;
+            var showC  = document.getElementById('filterGuestConfirmed').checked;
+            var showP  = document.getElementById('filterGuestPending').checked;
+            var showPB = document.getElementById('filterGuestPencil').checked;
 
             var opts = { month: 'long', day: 'numeric', year: 'numeric' };
             document.getElementById('guestModalDate').textContent =
                 new Date(date + 'T00:00:00').toLocaleDateString('en-US', opts);
 
-            var raw = guestData[date] || [];
-            var evs = dedupeForDate(raw).filter(function (e) {
-                var isConfirmedLike = (e.status === 'confirmed' || e.status === 'checked_in');
+            // Find all reservations whose stay INCLUDES this date
+            // (not just check-in date, so clicking any day in the stay range opens the modal)
+            var clickedTs = new Date(date).getTime();
+
+            var all = guestStays.filter(function (ev) {
+                var inTs  = new Date(ev.arrival_date).getTime();
+                var outTs = new Date(ev.departure_date).getTime();
+                return clickedTs >= inTs && clickedTs < outTs;
+            });
+
+            // Dedupe by id (take first occurrence)
+            var seen = {};
+            var evs  = all.filter(function (ev) {
+                if (seen[ev.id]) return false;
+                seen[ev.id] = true;
+                return true;
+            });
+
+            // Apply status filters
+            evs = evs.filter(function (ev) {
+                var st = normStatus(ev.status);
+                var isConfirmedLike = (st === 'confirmed' || st === 'checked_in');
                 return (showC && isConfirmedLike) ||
-                       (showP && e.status === 'pending');
+                       (showP && st === 'pending') ||
+                       (showPB && st === 'pencil_booked');
             });
 
             var body = '';
             if (evs.length === 0) {
-                body = '<div class="text-center py-5 text-muted"><i class="bi bi-calendar-x fs-1 d-block mb-2"></i>No guest stays visible on this day.<br><small>Try enabling more filters.</small></div>';
+                body = '<div class="text-center py-5 text-muted">'
+                     + '<i class="bi bi-calendar-x fs-1 d-block mb-2"></i>'
+                     + 'No guest stays on this day.<br><small>Try enabling more filters.</small></div>';
             } else {
-                /* Sort: checkin first, then checkout, then staying */
-                evs.sort(function (a, b) {
-                    return TYPE_PRIO[a.event_type] - TYPE_PRIO[b.event_type];
-                });
-
                 evs.forEach(function (ev) {
-                    var isConfirmedLike = (ev.status === 'confirmed' || ev.status === 'checked_in');
-                    var statusClass  = isConfirmedLike ? 'confirmed' : 'pending';
-                    var pillClass    = isConfirmedLike ? 'pill-approved' : 'pill-pending';
-                    var typeLabel    = ev.event_type === 'checkin'  ? '<i class="bi bi-box-arrow-in-right"></i> Check-in'
-                                    : ev.event_type === 'checkout' ? '<i class="bi bi-box-arrow-right"></i> Check-out'
-                                    :                                '<i class="bi bi-moon-stars"></i> Staying';
-                    var typeClass    = ev.event_type === 'checkin'  ? 'stay-checkin'
-                                    : ev.event_type === 'checkout' ? 'stay-checkout'
-                                    :                                'stay-stay';
-                    var guestFull    = esc(ev.guest_name || '(No name)');
-                    var nightsDiff   = Math.round((new Date(ev.departure_date) - new Date(ev.arrival_date)) / 86400000);
-                    var priceStr     = ev.total_price ? '₱' + parseFloat(ev.total_price).toLocaleString('en-PH', {minimumFractionDigits:2}) : '';
+                    var st      = normStatus(ev.status);
+                    var isConf  = (st === 'confirmed' || st === 'checked_in');
+                    var pillCls = isConf ? 'pill-approved' : (st === 'pencil_booked' ? 'pill-pencil' : 'pill-pending');
+                    var nights  = Math.round((new Date(ev.departure_date) - new Date(ev.arrival_date)) / 86400000);
 
-                    body += '<div class="event-card ' + statusClass + '">' +
-                        '<div class="event-header">' +
-                            '<span class="event-title">' + guestFull + '</span>' +
-                            '<span class="event-status-pill ' + pillClass + '">' + ev.status.toUpperCase() + '</span>' +
-                        '</div>' +
-                        '<span class="stay-type-badge ' + typeClass + '">' + typeLabel + '</span>' +
-                        '<div class="event-details">' +
-                            '<div class="event-detail-item"><i class="bi bi-door-open"></i><span>' + esc(ev.room_name) + ' · ' + esc(ev.room_floor) + '</span></div>' +
-                            '<div class="event-detail-item"><i class="bi bi-calendar2-check"></i><span>Check-in: ' + fmtDate(ev.arrival_date) + '</span></div>' +
-                            '<div class="event-detail-item"><i class="bi bi-calendar2-x"></i><span>Check-out: ' + fmtDate(ev.departure_date) + '</span></div>' +
-                            '<div class="event-detail-item"><i class="bi bi-moon-stars"></i><span>' + nightsDiff + ' night' + (nightsDiff !== 1 ? 's' : '') + '</span></div>' +
-                            '<div class="event-detail-item"><i class="bi bi-people-fill"></i><span>' + (ev.num_guests || 1) + ' guest(s)</span></div>' +
-                            (priceStr ? '<div class="event-detail-item"><i class="bi bi-cash"></i><span>' + priceStr + '</span></div>' : '') +
-                        '</div>' +
-                        '<div class="view-link"><a href="guest_reservation_details.php?id=' + ev.id + '">View Details <i class="bi bi-arrow-right"></i></a></div>' +
-                    '</div>';
+                    // Determine what's happening on the clicked date for this reservation
+                    var isCheckin  = ev.arrival_date   === date;
+                    var isCheckout = ev.departure_date === date;
+                    var stayType   = isCheckin  ? '<span class="stay-type-badge stay-checkin"><i class="bi bi-box-arrow-in-right"></i> Check-in Today</span>'
+                                   : isCheckout ? '<span class="stay-type-badge stay-checkout"><i class="bi bi-box-arrow-right"></i> Check-out Today</span>'
+                                   :              '<span class="stay-type-badge stay-stay"><i class="bi bi-moon-stars"></i> Staying</span>';
+
+                    var priceStr = ev.total_price
+                        ? '\u20b1' + parseFloat(ev.total_price).toLocaleString('en-PH', {minimumFractionDigits:2})
+                        : '';
+
+                    body += '<div class="event-card ' + (isConf ? 'confirmed' : st) + '">'
+                          +   '<div class="event-header">'
+                          +     '<span class="event-title">' + esc(ev.guest_name || '(No name)') + '</span>'
+                          +     '<span class="event-status-pill ' + pillCls + '">' + st.replace('_',' ').toUpperCase() + '</span>'
+                          +   '</div>'
+                          +   stayType
+                          +   '<div class="event-details">'
+                          +     '<div class="event-detail-item"><i class="bi bi-door-open"></i><span>' + esc(ev.room_name) + ' \u00b7 ' + esc(ev.room_floor) + '</span></div>'
+                          +     '<div class="event-detail-item"><i class="bi bi-calendar2-check"></i><span>Check-in: '  + fmtDate(ev.arrival_date)   + '</span></div>'
+                          +     '<div class="event-detail-item"><i class="bi bi-calendar2-x"></i><span>Check-out: ' + fmtDate(ev.departure_date) + '</span></div>'
+                          +     '<div class="event-detail-item"><i class="bi bi-moon-stars"></i><span>' + nights + ' night' + (nights !== 1 ? 's' : '') + '</span></div>'
+                          +     '<div class="event-detail-item"><i class="bi bi-people-fill"></i><span>' + (ev.num_guests || 1) + ' guest(s)</span></div>'
+                          +     (priceStr ? '<div class="event-detail-item"><i class="bi bi-cash"></i><span>' + priceStr + '</span></div>' : '')
+                          +   '</div>'
+                          +   '<div class="view-link"><a href="guest_reservation_details.php?id=' + ev.id + '">View Details <i class="bi bi-arrow-right"></i></a></div>'
+                          + '</div>';
                 });
             }
 
@@ -1019,12 +1072,12 @@ foreach ($rows as $row):
         }
 
         function fmtDate(ds) {
-            if (!ds) return '—';
+            if (!ds) return '\u2014';
             var d = new Date(ds + 'T00:00:00');
             return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
         }
 
-        /* ── Keyboard + backdrop close ───────────────────────────────────── */
+        
         document.addEventListener('keydown', function (e) {
             if (e.key === 'Escape') closeGuestModal();
         });
@@ -1032,18 +1085,18 @@ foreach ($rows as $row):
             if (e.target === this) closeGuestModal();
         });
 
-        /* ── Expose for inline onclick ───────────────────────────────────── */
+       
         window.renderGuestDots  = renderGuestDots;
         window.showGuestEvents  = showGuestEvents;
         window.closeGuestModal  = closeGuestModal;
 
-        /* ── Init ────────────────────────────────────────────────────────── */
+       
         renderGuestDots();
     }());
     </script>
 
-    <?php endif; /* end view === 'guest' */ ?>
+    <?php endif; ?>
 
-</div><!-- .content-area -->
+</div>
 
 <?php require_once __DIR__ . '/inc/footer.php'; ?>

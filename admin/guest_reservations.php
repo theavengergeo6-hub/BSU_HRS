@@ -2,9 +2,10 @@
 $pageTitle = 'Guest Reservations';
 require_once __DIR__ . '/inc/header.php';
 
-// Get filter parameters
-$status_filter_raw = isset($_GET['status']) ? $_GET['status'] : '';
-$status_filter = ($status_filter_raw === 'completed') ? 'checked_out' : $status_filter_raw;
+// Get filter parameters (support multiple status checkboxes)
+$status_raw = $_GET['status'] ?? '';
+$status_arr = is_array($status_raw) ? $status_raw : ($status_raw ? [$status_raw] : []);
+$status_filter = array_map(function($s) { return $s === 'completed' ? 'checked_out' : $s; }, $status_arr);
 $date_filter = isset($_GET['date']) ? $_GET['date'] : '';
 $search = isset($_GET['search']) ? clean($_GET['search']) : '';
 
@@ -16,16 +17,21 @@ $query = "SELECT
               gr.check_in_date AS arrival_date,
               gr.check_out_date AS departure_date
           FROM guest_room_reservations gr
-          JOIN guest_rooms g ON gr.guest_room_id = g.id
+          LEFT JOIN guest_rooms g ON gr.guest_room_id = g.id
           WHERE gr.deleted = 0";
 
 $params = [];
 $types = "";
 
-if ($status_filter) {
-    $query .= " AND gr.status = ?";
-    $params[] = $status_filter;
-    $types .= "s";
+if (!empty($status_filter)) {
+    // If pending is selected, also include invalid/blank enum values so old/broken rows still show up.
+    if (in_array('pending', $status_filter, true) && !in_array('', $status_filter, true)) {
+        $status_filter[] = '';
+    }
+    $placeholders = implode(',', array_fill(0, count($status_filter), '?'));
+    $query .= " AND gr.status IN ($placeholders)";
+    foreach ($status_filter as $s) $params[] = $s;
+    $types .= str_repeat('s', count($status_filter));
 }
 
 if ($date_filter === 'today') {
@@ -74,7 +80,8 @@ $reservations = $stmt->get_result();
 
 // Get counts for each status
 $status_counts = [
-    'pending' => $conn->query("SELECT COUNT(*) as count FROM guest_room_reservations WHERE deleted=0 AND status = 'pending'")->fetch_assoc()['count'],
+    'pending' => $conn->query("SELECT COUNT(*) as count FROM guest_room_reservations WHERE deleted=0 AND (status = 'pending' OR status = '' OR status IS NULL)")->fetch_assoc()['count'],
+    'pencil_booked' => $conn->query("SELECT COUNT(*) as count FROM guest_room_reservations WHERE deleted=0 AND status = 'pencil_booked'")->fetch_assoc()['count'],
     'confirmed' => $conn->query("SELECT COUNT(*) as count FROM guest_room_reservations WHERE deleted=0 AND status = 'confirmed'")->fetch_assoc()['count'],
     'cancelled' => $conn->query("SELECT COUNT(*) as count FROM guest_room_reservations WHERE deleted=0 AND status = 'cancelled'")->fetch_assoc()['count'],
     'completed' => $conn->query("SELECT COUNT(*) as count FROM guest_room_reservations WHERE deleted=0 AND status IN ('checked_out')")->fetch_assoc()['count']
@@ -83,7 +90,9 @@ $status_counts = [
 function getStatusBadgeClass($status) {
     switch (strtolower($status)) {
         case 'pending': return 'status-pending';
+        case 'pencil_booked': return 'status-pencil';
         case 'confirmed': return 'status-approved';
+        case 'checked_in': return 'status-checked-in';
         case 'cancelled': return 'status-cancelled';
         case 'checked_out': return 'status-completed';
         default: return 'status-default';
@@ -495,8 +504,12 @@ tr:hover {
             <div class="stat-label">Pending</div>
         </div>
         <div class="stat-card">
+            <div class="stat-number"><?= $status_counts['pencil_booked'] ?></div>
+            <div class="stat-label">Pencil Booked</div>
+        </div>
+        <div class="stat-card">
             <div class="stat-number"><?= $status_counts['confirmed'] ?></div>
-            <div class="stat-label">Confirmed</div>
+            <div class="stat-label">Approved</div>
         </div>
         <div class="stat-card">
             <div class="stat-number"><?= $status_counts['completed'] ?></div>
@@ -515,23 +528,28 @@ tr:hover {
                 <label><i class="bi bi-tags me-1"></i>Status</label>
                 <div class="checkbox-group">
                     <label class="checkbox-label">
-                        <input type="checkbox" name="status" value="pending" 
-                            <?= $status_filter === 'pending' ? 'checked' : '' ?>>
+                        <input type="checkbox" name="status[]" value="pending" 
+                            <?= in_array('pending', $status_filter) ? 'checked' : '' ?>>
                         Pending <span class="count">(<?= $status_counts['pending'] ?>)</span>
                     </label>
                     <label class="checkbox-label">
-                        <input type="checkbox" name="status" value="confirmed" 
-                            <?= $status_filter === 'confirmed' ? 'checked' : '' ?>>
-                        Confirmed <span class="count">(<?= $status_counts['confirmed'] ?>)</span>
+                        <input type="checkbox" name="status[]" value="pencil_booked" 
+                            <?= in_array('pencil_booked', $status_filter) ? 'checked' : '' ?>>
+                        Pencil Booked <span class="count">(<?= $status_counts['pencil_booked'] ?>)</span>
                     </label>
                     <label class="checkbox-label">
-                        <input type="checkbox" name="status" value="completed" 
-                            <?= $status_filter_raw === 'completed' ? 'checked' : '' ?>>
+                        <input type="checkbox" name="status[]" value="confirmed" 
+                            <?= in_array('confirmed', $status_filter) ? 'checked' : '' ?>>
+                        Approved <span class="count">(<?= $status_counts['confirmed'] ?>)</span>
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="status[]" value="completed" 
+                            <?= in_array('checked_out', $status_filter) ? 'checked' : '' ?>>
                         Completed <span class="count">(<?= $status_counts['completed'] ?>)</span>
                     </label>
                     <label class="checkbox-label">
-                        <input type="checkbox" name="status" value="cancelled" 
-                            <?= $status_filter === 'cancelled' ? 'checked' : '' ?>>
+                        <input type="checkbox" name="status[]" value="cancelled" 
+                            <?= in_array('cancelled', $status_filter) ? 'checked' : '' ?>>
                         Cancelled <span class="count">(<?= $status_counts['cancelled'] ?>)</span>
                     </label>
                 </div>
@@ -594,6 +612,7 @@ tr:hover {
                             if (!empty($guest['name'])) $total_guests++;
                         }
                     }
+                    $status_norm = ($row['status'] === '' || $row['status'] === null) ? 'pending' : $row['status'];
                 ?>
                 <tr>
                     <td>
@@ -632,8 +651,8 @@ tr:hover {
                         </div>
                     </td>
                     <td>
-                        <span class="status-badge <?= getStatusBadgeClass($row['status']) ?>">
-                            <?= strtoupper($row['status']) ?>
+                        <span class="status-badge <?= getStatusBadgeClass($status_norm) ?>">
+                            <?= strtoupper($status_norm) ?>
                         </span>
                     </td>
                     <td>
@@ -641,7 +660,7 @@ tr:hover {
                             <a href="guest_reservation_details.php?id=<?= $row['id'] ?>" class="btn-view" title="View Details">
                                 <i class="bi bi-eye"></i>
                             </a>
-                            <?php if ($row['status'] === 'pending'): ?>
+                            <?php if ($status_norm === 'pending'): ?>
                             <a href="guest_reservation_details.php?id=<?= $row['id'] ?>#admin-actions" class="btn-view" title="Review" style="background: #fff3cd; border-color: #856404; color: #856404;">
                                 <i class="bi bi-hourglass-split"></i>
                             </a>
@@ -665,12 +684,10 @@ tr:hover {
 // Preserve checkbox states on page load
 document.addEventListener('DOMContentLoaded', function() {
     const urlParams = new URLSearchParams(window.location.search);
-    const statusValues = urlParams.getAll('status');
+    const statusValues = urlParams.getAll('status[]').concat(urlParams.getAll('status'));
     
-    document.querySelectorAll('input[name="status"]').forEach(checkbox => {
-        if (statusValues.includes(checkbox.value)) {
-            checkbox.checked = true;
-        }
+    document.querySelectorAll('input[name="status[]"]').forEach(checkbox => {
+        if (statusValues.includes(checkbox.value)) checkbox.checked = true;
     });
 });
 </script>

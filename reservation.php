@@ -1094,63 +1094,15 @@ if ($selected_customer_type) {
                             </div>
                         </div>
 
-                             <!-- Room Selection -->
-                        <div class="guest-form-section">
-                            <h4><i class="bi bi-door-open"></i> Room Selection</h4>
-                            
-                            <div class="room-selector">
-                                <div class="form-group">
-                                    <label>Room *</label>
-                                    <select class="form-select" name="guest_room_id" id="guest_room_id" required onchange="updateRoomCapacity(this)">
-                                        <option value="">Select Room</option>
-                                        <?php foreach ($guest_venues as $room): ?>
-                                        <option value="<?= $room['id'] ?>" data-capacity="<?= $room['capacity'] ?>" data-name="<?= htmlspecialchars($room['name']) ?>">
-                                            <?= htmlspecialchars($room['name']) ?> (Max <?= $room['capacity'] ?> guests)
-                                        </option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                </div>
-                            </div>
-                            
-                            <div class="mt-3">
-                                <div class="form-group">
-                                    <label>Remarks / Special Arrangements</label>
-                                    <textarea class="form-control" name="guest_remarks" id="guest_remarks" rows="3" placeholder="Any special requests or arrangements...(Extra Beds, etc.)"></textarea>
-                                </div>
-                            </div>
-                        </div>
-
-                        
-                        <!-- Other Guest Names - Dynamic Cards -->
-                        <div class="guest-form-section">
-                            <h4><i class="bi bi-people-fill"></i> Other Guest Names</h4>
-                            <p class="small text-muted mb-2">Click "Add Guests" button to add more guests. Each room has a maximum capacity.</p>
-                            
-                            <div id="guests-container" class="guests-container">
-                                <!-- Guest cards will be dynamically added here -->
-                            </div>
-                            
-                            <button type="button" class="btn-add-guests" onclick="showGuestInputDialog()">
-                                <i class="bi bi-plus-circle"></i> Add Guests
-                            </button>
-                            
-                            <div class="mt-2">
-                                <small class="text-muted">
-                                    <i class="bi bi-info-circle"></i> 
-                                    <span id="roomLimitInfo">Select a room to see guest limits</span>
-                                </small>
-                            </div>
-                        </div>
-                        
-                        <!-- Arrival & Departure -->
-                        <div class="guest-form-section">
+                          <!-- Arrival & Departure -->
+                          <div class="guest-form-section">
                             <h4><i class="bi bi-calendar-check"></i> Stay Details</h4>
                             
                             <div class="arrival-departure-grid">
                                 <div>
                                     <div class="form-group">
                                         <label>Arrival Date *</label>
-                                        <input type="date" class="form-control" name="arrival_date" id="arrival_date" min="<?= date('Y-m-d') ?>" required>
+                                        <input type="date" class="form-control" name="arrival_date" id="arrival_date" min="<?= date('Y-m-d') ?>" required onchange="scheduleAvailabilityCheck(); updateDepartureDateMin(this.value);">
                                     </div>
                                     <div class="time-grid-small">
                                         <div class="form-group">
@@ -1185,7 +1137,7 @@ if ($selected_customer_type) {
                                 <div>
                                     <div class="form-group">
                                         <label>Departure Date *</label>
-                                        <input type="date" class="form-control" name="departure_date" id="departure_date" min="<?= date('Y-m-d', strtotime('+1 day')) ?>" required>
+                                        <input type="date" class="form-control" name="departure_date" id="departure_date" min="<?= date('Y-m-d', strtotime('+1 day')) ?>" required onchange="scheduleAvailabilityCheck();">
                                     </div>
                                     <div class="row">
                                         <div class="col-6">
@@ -1205,6 +1157,62 @@ if ($selected_customer_type) {
                             </div>
                         </div>
 
+
+                             <!-- Room Selection -->
+                        <div class="guest-form-section">
+                            <h4><i class="bi bi-door-open"></i> Room Selection</h4>
+                            
+                            <div class="room-selector">
+                                <div class="form-group">
+                                    <label>Room *</label>
+                                    <select class="form-select" name="guest_room_id" id="guest_room_id" required onchange="updateRoomCapacity(this)">
+                                        <option value="">Select Room</option>
+                                        <?php foreach ($guest_venues as $room): ?>
+                                        <option value="<?= $room['id'] ?>"
+                                            data-capacity="<?= $room['capacity'] ?>"
+                                            data-name="<?= htmlspecialchars($room['name']) ?>"
+                                            data-price="<?= $room['price'] ?>"
+                                            data-floor="<?= htmlspecialchars($room['floor']) ?>"
+                                            data-extra-bed="<?= $room['extra_bed_available'] ?>"
+                                            data-extra-bed-price="<?= $room['extra_bed_price'] ?>">
+                                            <?= htmlspecialchars($room['name']) ?> — <?= htmlspecialchars($room['floor']) ?> (Max <?= $room['capacity'] ?> guests)
+                                        </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                                <div id="roomAvailabilityStatus" style="margin-top:0.5rem;font-size:0.85rem;"></div>
+                            </div>
+                            
+                            <div class="mt-3">
+                                <div class="form-group">
+                                    <label>Remarks / Special Arrangements</label>
+                                    <textarea class="form-control" name="guest_remarks" id="guest_remarks" rows="3" placeholder="Any special requests or arrangements...(Extra Beds, etc.)"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+                        <!-- Other Guest Names - Dynamic Cards -->
+                        <div class="guest-form-section">
+                            <h4><i class="bi bi-people-fill"></i> Other Guest Names</h4>
+                            <p class="small text-muted mb-2">Click "Add Guests" button to add more guests. Each room has a maximum capacity.</p>
+                            
+                            <div id="guests-container" class="guests-container">
+                                <!-- Guest cards will be dynamically added here -->
+                            </div>
+                            
+                            <button type="button" class="btn-add-guests" onclick="showGuestInputDialog()">
+                                <i class="bi bi-plus-circle"></i> Add Guests
+                            </button>
+                            
+                            <div class="mt-2">
+                                <small class="text-muted">
+                                    <i class="bi bi-info-circle"></i> 
+                                    <span id="roomLimitInfo">Select a room to see guest limits</span>
+                                </small>
+                            </div>
+                        </div>
+                        
                         
                         <!-- Registered By -->
                         <div class="guest-form-section">
@@ -1887,6 +1895,127 @@ function updateRoomCapacity(select) {
         limitInfo.innerHTML = '<i class="bi bi-info-circle"></i> Select a room to see guest limits';
     }
     validateGuestCountAgainstCapacity();
+    checkRoomAvailabilityStatus(); // refresh the "unavailable" badge when room changes
+}
+
+// ── Room Availability Check ────────────────────────────────────────────────────
+// Called when arrival_date, departure_date, or guest_room_id changes.
+// Fetches get_available_rooms.php and marks unavailable options as disabled.
+
+var _availCheckTimer = null;
+
+function scheduleAvailabilityCheck() {
+    clearTimeout(_availCheckTimer);
+    _availCheckTimer = setTimeout(checkRoomAvailability, 400); // debounce 400ms
+}
+
+function checkRoomAvailability() {
+    var arrival   = document.getElementById('arrival_date')?.value;
+    var departure = document.getElementById('departure_date')?.value;
+    var roomSel   = document.getElementById('guest_room_id');
+    if (!arrival || !departure || !roomSel) return;
+    if (new Date(departure) <= new Date(arrival)) return;
+
+    var url = '<?= $base ?>/ajax/get_available_rooms.php'
+            + '?check_in='  + encodeURIComponent(arrival)
+            + '&check_out=' + encodeURIComponent(departure);
+
+    // Show loading state
+    Array.from(roomSel.options).forEach(function(opt) {
+        if (opt.value) opt.disabled = false; // reset first
+    });
+
+    fetch(url)
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            if (!data.success) return;
+            var prevVal = roomSel.value;
+
+            data.rooms.forEach(function(room) {
+                var opt = roomSel.querySelector('option[value="' + room.id + '"]');
+                if (!opt) return;
+                if (room.available) {
+                    opt.disabled = false;
+                    // Restore original label
+                    opt.textContent = room.name + ' — ' + room.floor
+                        + ' (Max ' + room.capacity + ' guests)';
+                } else {
+                    opt.disabled = true;
+                    opt.textContent = room.name + ' — ' + room.floor
+                        + ' (Max ' + room.capacity + ' guests) — ❌ UNAVAILABLE';
+                    // If this room was selected, deselect it
+                    if (roomSel.value == room.id) {
+                        roomSel.value = '';
+                        document.getElementById('roomLimitInfo').innerHTML =
+                            '<i class="bi bi-info-circle"></i> Select a room to see guest limits';
+                    }
+                }
+            });
+
+            // Restore selection if it's still available
+            if (prevVal && roomSel.querySelector('option[value="' + prevVal + '"]:not([disabled])')) {
+                roomSel.value = prevVal;
+            }
+
+            checkRoomAvailabilityStatus();
+        })
+        .catch(function() { /* silently ignore network errors */ });
+}
+
+function checkRoomAvailabilityStatus() {
+    var roomSel = document.getElementById('guest_room_id');
+    var statusEl = document.getElementById('roomAvailabilityStatus');
+    if (!roomSel || !statusEl) return;
+
+    var arrival   = document.getElementById('arrival_date')?.value;
+    var departure = document.getElementById('departure_date')?.value;
+
+    if (!arrival || !departure) {
+        statusEl.innerHTML = '';
+        return;
+    }
+
+    var selOpt = roomSel.options[roomSel.selectedIndex];
+    if (!roomSel.value) {
+        // Count how many rooms are still available
+        var avail = Array.from(roomSel.options).filter(function(o) {
+            return o.value && !o.disabled;
+        }).length;
+        var total = Array.from(roomSel.options).filter(function(o) { return o.value; }).length;
+        if (total > 0) {
+            statusEl.innerHTML = avail > 0
+                ? '<span style="color:#166534;"><i class="bi bi-check-circle-fill"></i> '
+                  + avail + ' of ' + total + ' room(s) available for the selected dates</span>'
+                : '<span style="color:#991b1b;"><i class="bi bi-x-circle-fill"></i> '
+                  + 'No rooms available for the selected dates. Please choose different dates.</span>';
+        }
+    } else if (selOpt && selOpt.disabled) {
+        statusEl.innerHTML = '<span style="color:#991b1b;"><i class="bi bi-x-circle-fill"></i> '
+            + 'This room is not available for the selected dates.</span>';
+    } else if (selOpt && roomSel.value) {
+        statusEl.innerHTML = '<span style="color:#166534;"><i class="bi bi-check-circle-fill"></i> '
+            + htmlEsc(selOpt.getAttribute('data-name') || selOpt.textContent.split('—')[0].trim())
+            + ' is available for your dates</span>';
+    } else {
+        statusEl.innerHTML = '';
+    }
+}
+
+function htmlEsc(str) {
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function updateDepartureDateMin(arrivalVal) {
+    if (!arrivalVal) return;
+    var dep = document.getElementById('departure_date');
+    if (!dep) return;
+    var minDep = new Date(arrivalVal);
+    minDep.setDate(minDep.getDate() + 1);
+    dep.min = minDep.toISOString().split('T')[0];
+    if (dep.value && dep.value <= arrivalVal) {
+        dep.value = dep.min;
+        scheduleAvailabilityCheck();
+    }
 }
 
 function validateGuestCountAgainstCapacity() {
