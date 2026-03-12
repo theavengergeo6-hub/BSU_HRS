@@ -361,9 +361,14 @@ $total_nights = (strtotime($reservation['departure_date']) - strtotime($reservat
             <i class="bi bi-door-open me-2" style="color: var(--bsu-red);"></i>
             Guest Reservation Details
         </h1>
-        <a href="guest_reservations.php" class="btn-back">
-            <i class="bi bi-arrow-left"></i> Back to Guest Reservations
-        </a>
+        <div class="d-flex gap-2 flex-wrap">
+            <a href="guest_reservation_pdf.php?id=<?= (int)$reservation['id'] ?>" class="btn-back" target="_blank" rel="noopener">
+                <i class="bi bi-printer"></i> Print / Download PDF
+            </a>
+            <a href="guest_reservations.php" class="btn-back">
+                <i class="bi bi-arrow-left"></i> Back to Guest Reservations
+            </a>
+        </div>
     </div>
 
     <?php display_messages(); ?>

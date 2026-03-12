@@ -1,0 +1,12 @@
+{
+    "name": "bsu/hrs",
+    "description": "BSU Hostel Reservation System",
+    "require": {
+        "php": ">=7.4",
+        "phpmailer/phpmailer": "^6.9",
+        "tecnickcom/tcpdf": "^6.7"
+    },
+    "config": {
+        "vendor-dir": "vendor"
+    }
+}

@@ -359,6 +359,69 @@ try {
     $venue_insert_stmt->close();
     write_log("Inserted $venues_inserted venue(s) into reservation_venues for reservation ID $insert_id");
 
+    // ----- PDF generation and email (do not fail reservation on error) -----
+    try {
+        $res_row = $conn->query("
+            SELECT fr.*,
+                   ot.name AS office_type_name,
+                   o.name AS office_name,
+                   b.name AS banquet_name,
+                   vs.name AS venue_setup_name
+            FROM facility_reservations fr
+            LEFT JOIN office_types ot ON fr.office_type_id = ot.id
+            LEFT JOIN offices o ON fr.office_id = o.id
+            LEFT JOIN banquet b ON fr.banquet_style_id = b.id
+            LEFT JOIN venue_setups vs ON fr.venue_setup_id = vs.id
+            WHERE fr.id = $insert_id
+        ")->fetch_assoc();
+        if ($res_row) {
+            $venue_names_q = $conn->query("
+                SELECT v.name FROM reservation_venues rv
+                JOIN venues v ON rv.venue_id = v.id
+                WHERE rv.reservation_id = $insert_id ORDER BY v.name
+            ");
+            $venue_names = [];
+            while ($vn = $venue_names_q->fetch_assoc()) {
+                $venue_names[] = $vn['name'];
+            }
+            $res_row['venue_names'] = implode(', ', $venue_names);
+            $res_row['office_display'] = ($res_row['office_type_name'] ?? '') === 'External'
+                ? ($res_row['external_office_name'] ?? '')
+                : trim(($res_row['office_type_name'] ?? '') . ' - ' . ($res_row['office_name'] ?? ''));
+
+            $base = dirname(__DIR__);
+            $logoHostel = $base . '/assets/images/hostel.jpg';
+            $logoBsu   = $base . '/assets/images/bsu-logo.jpg';
+            if (!file_exists($logoHostel)) $logoHostel = '';
+            if (!file_exists($logoBsu))   $logoBsu = '';
+
+            require_once $base . '/inc/FunctionRoomPDF.php';
+            require_once $base . '/inc/EmailSender.php';
+            $pdfGen = new FunctionRoomPDF($res_row, $logoHostel, $logoBsu);
+            $pdfContent = $pdfGen->generate();
+            $pdfFilename = 'Reservation-' . $booking_no . '.pdf';
+
+            $emailConfig = require $base . '/inc/email_config.php';
+            $sender = new EmailSender($emailConfig);
+            $requestorName = trim($res_row['last_name'] . ', ' . $res_row['first_name'] . (trim($res_row['middle_initial'] ?? '') !== '' ? ' ' . trim($res_row['middle_initial']) . '.' : ''));
+            $sent = $sender->sendFunctionRoomConfirmation(
+                $res_row['email'],
+                $requestorName,
+                $booking_no,
+                $res_row['activity_name'],
+                $pdfContent,
+                $pdfFilename
+            );
+            if ($sent) {
+                write_log("Confirmation email sent to " . $res_row['email']);
+            } else {
+                write_log("Email send failed: " . $sender->getLastError());
+            }
+        }
+    } catch (Throwable $pdfMailEx) {
+        write_log("PDF/Email error (reservation still saved): " . $pdfMailEx->getMessage());
+    }
+
     echo json_encode([
         'success' => true,
         'message' => 'Reservation submitted successfully!',
