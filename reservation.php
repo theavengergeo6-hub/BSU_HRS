@@ -2267,10 +2267,72 @@ function saveFormData() {
     });
     
     console.log('Saving form data:', formData);
-    
-    sessionStorage.setItem('reservationFormData', JSON.stringify(formData));
-    sessionStorage.setItem('reservationStep', currentStep);
-    
+
+    // Only persist a "resume" session when there is meaningful user-entered data.
+    // This prevents the banner from showing due to default values (e.g. participants=1).
+    function hasMeaningfulSavedData(d) {
+        if (!d) return false;
+        var t = (d.reservationType || '').toString().trim();
+        if (!t) return false;
+
+        function nonEmptyStr(v) { return v !== null && v !== undefined && String(v).trim() !== ''; }
+
+        if (t === 'function') {
+            var p = d.personal || {};
+            var o = d.office || {};
+            var e = d.event || {};
+
+            var hasCore =
+                nonEmptyStr(p.last_name) || nonEmptyStr(p.first_name) || nonEmptyStr(p.email) || nonEmptyStr(p.contact) ||
+                nonEmptyStr(o.type) || nonEmptyStr(o.externalName) || nonEmptyStr(o.selectedOffice) ||
+                nonEmptyStr(e.activity) || nonEmptyStr(e.type);
+
+            var hasVenues = Array.isArray(d.venues) && d.venues.length > 0;
+            var hasSchedules = d.schedules && typeof d.schedules === 'object' && Object.keys(d.schedules).length > 0;
+            var hasBanquet = d.banquet && nonEmptyStr(d.banquet.styleId);
+            var hasAdditional = nonEmptyStr(d.additional);
+            var hasTermsName = d.terms && (nonEmptyStr(d.terms.fullName) || nonEmptyStr(d.terms.position));
+
+            var hasMisc = false;
+            if (d.misc && typeof d.misc === 'object') {
+                hasMisc = Object.keys(d.misc).some(function(k){
+                    var v = d.misc[k];
+                    if (v === null || v === undefined) return false;
+                    if (typeof v === 'boolean') return v === true;
+                    if (typeof v === 'number') return v > 0;
+                    if (typeof v === 'string') return v.trim() !== '' && v !== '0';
+                    if (typeof v === 'object') return true;
+                    return false;
+                });
+            }
+
+            return hasCore || hasVenues || hasSchedules || hasBanquet || hasAdditional || hasTermsName || hasMisc;
+        }
+
+        if (t === 'guest') {
+            var g = d.guest || {};
+            var hasGuestCore =
+                nonEmptyStr(g.last_name) || nonEmptyStr(g.first_name) || nonEmptyStr(g.dob) || nonEmptyStr(g.address) ||
+                nonEmptyStr(g.email) || nonEmptyStr(g.contact) || nonEmptyStr(g.arrival_date) || nonEmptyStr(g.departure_date) ||
+                nonEmptyStr(g.checkin_time) || nonEmptyStr(g.checkout_time) || nonEmptyStr(g.guest_room_id) ||
+                nonEmptyStr(g.registered_by) || nonEmptyStr(g.guest_signature) ||
+                (Array.isArray(g.other_guests) && g.other_guests.length > 0);
+
+            return hasGuestCore || nonEmptyStr(d.additional);
+        }
+
+        return false;
+    }
+
+    // Save only after leaving Step 0 and when we have real data.
+    if (hasMeaningfulSavedData(formData) && (typeof currentStep !== 'undefined') && parseInt(currentStep, 10) > 0) {
+        sessionStorage.setItem('reservationFormData', JSON.stringify(formData));
+        sessionStorage.setItem('reservationStep', String(currentStep));
+    } else {
+        sessionStorage.removeItem('reservationFormData');
+        sessionStorage.removeItem('reservationStep');
+    }
+
     checkForSavedData();
 }
 
@@ -2486,13 +2548,50 @@ function checkForSavedData() {
     var container = document.getElementById('resumeBookingContainer');
     
     if (container) {
+        var ok = false;
         if (step && parseInt(step, 10) > 0 && data) {
+            try {
+                var parsed = JSON.parse(data);
+                ok = !!(parsed && parsed.reservationType && String(parsed.reservationType).trim() !== '');
+                // Extra guard: reject empty payloads that only contain defaults.
+                if (ok) {
+                    var t = String(parsed.reservationType).trim();
+                    if (t === 'function') {
+                        ok = !!(
+                            (parsed.personal && (parsed.personal.last_name || parsed.personal.first_name || parsed.personal.email || parsed.personal.contact)) ||
+                            (parsed.office && (parsed.office.type || parsed.office.externalName || parsed.office.selectedOffice)) ||
+                            (parsed.event && (parsed.event.activity || parsed.event.type)) ||
+                            (Array.isArray(parsed.venues) && parsed.venues.length) ||
+                            (parsed.schedules && Object.keys(parsed.schedules).length) ||
+                            (parsed.banquet && parsed.banquet.styleId) ||
+                            (parsed.additional && String(parsed.additional).trim() !== '') ||
+                            (parsed.terms && (parsed.terms.fullName || parsed.terms.position))
+                        );
+                    } else if (t === 'guest') {
+                        var g = parsed.guest || {};
+                        ok = !!(
+                            g.last_name || g.first_name || g.dob || g.address || g.email || g.contact ||
+                            g.arrival_date || g.departure_date || g.checkin_time || g.checkout_time ||
+                            g.guest_room_id || g.registered_by || g.guest_signature ||
+                            (Array.isArray(g.other_guests) && g.other_guests.length) ||
+                            (parsed.additional && String(parsed.additional).trim() !== '')
+                        );
+                    }
+                }
+            } catch (e) {
+                ok = false;
+            }
+        }
+
+        if (ok) {
             var stepLabels = ['Type','Info','Rooms','Schedule','Terms','Misc','Summary'];
             var label = stepLabels[parseInt(step, 10)] || ('Step ' + step);
             var msgEl = container.querySelector('.resume-msg');
             if (msgEl) msgEl.textContent = 'You have an incomplete reservation from your last session (saved at: ' + label + ').';
             container.style.display = 'block';
         } else {
+            sessionStorage.removeItem('reservationFormData');
+            sessionStorage.removeItem('reservationStep');
             container.style.display = 'none';
         }
     }
@@ -2502,6 +2601,12 @@ function resumeSavedSession() {
     var savedStep = sessionStorage.getItem('reservationStep');
     var savedData  = sessionStorage.getItem('reservationFormData');
     if (!savedStep || !savedData) return;
+    try {
+        var parsed = JSON.parse(savedData);
+        if (!parsed || !parsed.reservationType) return;
+    } catch (e) {
+        return;
+    }
     // Hide the banner immediately
     var container = document.getElementById('resumeBookingContainer');
     if (container) container.style.display = 'none';
@@ -4561,8 +4666,25 @@ document.addEventListener('DOMContentLoaded', function() {
     
     loadBanquetStyles();
     
-    // Automatically resume session to prevent data loss on accidental refresh
-    if (sessionStorage.getItem('reservationFormData') && sessionStorage.getItem('reservationStep')) {
+    // If type=function or type=guest in URL (e.g. from rooms_showcase CTA), skip step 0 and open step 1
+    var urlParams = new URLSearchParams(window.location.search);
+    var typeParam = (urlParams.get('type') || '').toLowerCase();
+    if (typeParam === 'function' || typeParam === 'guest') {
+        reservationType = typeParam;
+        document.querySelectorAll('.type-option').forEach(function(opt) { opt.classList.remove('selected'); });
+        var optId = 'type' + typeParam.charAt(0).toUpperCase() + typeParam.slice(1) + 'Option';
+        var optEl = document.getElementById(optId);
+        if (optEl) optEl.classList.add('selected');
+        var radio = document.getElementById('type' + typeParam.charAt(0).toUpperCase() + typeParam.slice(1));
+        if (radio) radio.checked = true;
+        goToStep(1);
+        // Optional: clean URL without reload (keeps form state)
+        if (window.history && window.history.replaceState) {
+            var cleanUrl = window.location.pathname;
+            window.history.replaceState({}, '', cleanUrl);
+        }
+    } else if (sessionStorage.getItem('reservationFormData') && sessionStorage.getItem('reservationStep')) {
+        // Automatically resume session to prevent data loss on accidental refresh
         resumeSavedSession();
     }
     

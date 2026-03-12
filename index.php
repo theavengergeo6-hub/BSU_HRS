@@ -10,8 +10,7 @@ $footer_settings = $site_info['settings'];
 if (empty($carousel_slides)) {
     $carousel_slides = [
         ['title' => 'Welcome to BSU Hostel', 'subtitle' => 'The perfect venue for your events. Spacious function rooms and comfortable guest rooms for meetings, celebrations, and group stays. Reserve your space today.', 'button_text' => 'View Rooms', 'button_url' => 'rooms_showcase.php', 'image_path' => 'hostel/hostel2.png'],
-        ['title' => 'Book Your Function or Guest Room', 'subtitle' => 'Check availability and reserve your stay in minutes.', 'button_text' => 'Check Availability', 'button_url' => 'rooms_showcase.php', 'image_path' => 'rooms/IMG_19689.jfif'],
-        ['title' => 'Your Comfort, Our Priority', 'subtitle' => 'Modern amenities and a welcoming environment for every guest.', 'button_text' => 'See Amenities', 'button_url' => 'facilities.php', 'image_path' => 'rooms/IMG_85146.png'],
+        ['title' => 'Book Your Function or Guest Room', 'subtitle' => 'Check availability and reserve your stay in minutes.', 'button_text' => 'Check Availability', 'button_url' => 'calendar.php', 'image_path' => 'hostel/hostel2.png'],
         ['title' => 'Stay With Us', 'subtitle' => 'Ideal for students, groups, and travelers visiting BSU.', 'button_text' => 'Get in Touch', 'button_url' => 'contact.php', 'image_path' => 'hostel/hostel2.png'],
     ];
 }

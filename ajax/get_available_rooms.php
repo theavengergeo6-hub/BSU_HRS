@@ -1,14 +1,5 @@
 <?php
-// =============================================================================
-// ajax/get_available_rooms.php
-// Returns JSON list of guest rooms with availability status for a date range.
-// Called by reservation.php when arrival_date or departure_date changes.
-//
-// GET params:
-//   check_in  (Y-m-d)
-//   check_out (Y-m-d)
-//   exclude_id (optional int) — reservation id to exclude (for edit flows)
-// =============================================================================
+
 ob_start();
 require_once __DIR__ . '/../inc/db_config.php';
 require_once __DIR__ . '/../inc/essentials.php';

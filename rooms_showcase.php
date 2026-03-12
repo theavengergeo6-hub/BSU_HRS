@@ -840,7 +840,7 @@ body {
     opacity: 0;
     transform: translateX(60px);
     transition: opacity 1s var(--ease-expo) 0.15s, transform 1s var(--ease-expo) 0.15s;
-    overflow-y: auto;
+    overflow: visible;
 }
 
 .gr-card.even .gr-body {
@@ -1168,7 +1168,7 @@ body {
                 <em>Spaces</em>
             </h1>
             <p class="rs-hero-sub">
-                From grand function rooms built for memorable events to restful guest accommodations — every space is designed to inspire.
+    Our space are made for different needs. From large function rooms for events and gatherings to comfortable guest rooms for rest, each area is prepared to make guests feel welcome and comfortable. 
             </p>
             <div class="hero-cta-row">
                 <a href="reservation.php" class="btn-primary-hero">Reserve a Space</a>
@@ -1471,8 +1471,8 @@ body {
         <h2 class="cta-headline">Book Your Perfect Space Today</h2>
         <p class="cta-sub">Simple online reservation, fast confirmation — we handle the rest.</p>
         <div class="cta-buttons">
-            <a href="reservation.php" class="btn-cta-primary">Reserve a Function Room</a>
-            <a href="guest_reservation.php" class="btn-cta-ghost">Book a Guest Room</a>
+            <a href="reservation.php?type=function" class="btn-cta-primary">Reserve a Function Room</a>
+            <a href="reservation.php?type=guest" class="btn-cta-ghost">Book a Guest Room</a>
         </div>
     </div>
 
