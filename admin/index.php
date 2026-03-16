@@ -629,7 +629,7 @@ $guest_preview = $conn->query("
         </a>
 
         <!-- Pending Approval Card -->
-        <a href="reservations.php?status=pending" class="nav-card">
+        <a href="reservations_pending.php" class="nav-card">
             <div class="nav-card-icon">
                 <i class="bi bi-hourglass-split"></i>
             </div>
@@ -643,7 +643,7 @@ $guest_preview = $conn->query("
         </a>
 
         <!-- Pencil Booked Card -->
-        <a href="reservations.php?status=pencil_booked" class="nav-card pencil-card">
+        <a href="reservations_pending.php" class="nav-card pencil-card">
             <div class="nav-card-icon">
                 <i class="bi bi-pencil"></i>
             </div>
@@ -675,7 +675,7 @@ $guest_preview = $conn->query("
             <div class="card-header">
                 <h3><i class="bi bi-hourglass-split" style="color: var(--bsu-red);"></i> Pending Reviews</h3>
                 <?php if ($pending_count > 0): ?>
-                    <a href="reservations.php?status=pending">View All <i class="bi bi-arrow-right"></i></a>
+                    <a href="reservations_pending.php">View All <i class="bi bi-arrow-right"></i></a>
                 <?php endif; ?>
             </div>
             
@@ -726,7 +726,7 @@ $guest_preview = $conn->query("
             <div class="card-header">
                 <h3><i class="bi bi-pencil" style="color: #5e3c8b;"></i> Pencil Booked</h3>
                 <?php if ($pencil_count > 0): ?>
-                    <a href="reservations.php?status=pencil_booked">View All <i class="bi bi-arrow-right"></i></a>
+                    <a href="reservations_pending.php">View All <i class="bi bi-arrow-right"></i></a>
                 <?php endif; ?>
             </div>
             
@@ -824,12 +824,12 @@ $guest_preview = $conn->query("
                 <h3><i class="bi bi-lightning-charge" style="color: var(--bsu-red);"></i> Quick Actions</h3>
             </div>
             <div class="quick-actions-grid">
-                <a href="reservations.php?view=function&status=pending" class="quick-action-btn" style="background: #fff3cd; color: #856404;">
+                <a href="reservations_pending.php" class="quick-action-btn" style="background: #fff3cd; color: #856404;">
                     <i class="bi bi-hourglass-split"></i>
                     <div>Pending</div>
                     <small><?= $pending_count ?></small>
                 </a>
-                <a href="reservations.php?view=function&status=pencil_booked" class="quick-action-btn" style="background: #e2d5f1; color: #5e3c8b;">
+                <a href="reservations_pending.php" class="quick-action-btn" style="background: #e2d5f1; color: #5e3c8b;">
                     <i class="bi bi-pencil"></i>
                     <div>Pencil</div>
                     <small><?= $pencil_count ?></small>

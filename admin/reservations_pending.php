@@ -7,18 +7,28 @@ $message = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     $id = (int)$_POST['id'];
     $action = $_POST['action'];
+    $resType = $_POST['resType'] ?? 'function';
     
     if (in_array($action, ['approve', 'pencil', 'deny'])) {
-        if ($action === 'approve') {
-            $status = 'approved';
-        } elseif ($action === 'pencil') {
-            $status = 'pencil_booked';
+        if ($resType === 'guest') {
+            if ($action === 'approve') {
+                $status = 'confirmed';
+            } elseif ($action === 'pencil') {
+                $status = 'pencil_booked';
+            } else {
+                $status = 'cancelled';
+            }
+            $stmt = $conn->prepare("UPDATE guest_room_reservations SET status = ? WHERE id = ?");
         } else {
-            $status = 'denied';
+            if ($action === 'approve') {
+                $status = 'approved';
+            } elseif ($action === 'pencil') {
+                $status = 'pencil_booked';
+            } else {
+                $status = 'denied';
+            }
+            $stmt = $conn->prepare("UPDATE facility_reservations SET status = ? WHERE id = ?");
         }
-        
-        // Update reservation status
-        $stmt = $conn->prepare("UPDATE facility_reservations SET status = ? WHERE id = ?");
         $stmt->bind_param("si", $status, $id);
         
         if ($stmt->execute()) {
@@ -26,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             $message = '<div class="alert alert-success">Reservation ' . $action_text . ' successfully!</div>';
             
             // Log the action
-            logAdminAction($conn, "Reservation $action", "Reservation ID: $id");
+            logAdminAction($conn, "Reservation $action", "Reservation ID: $id (" . ucfirst($resType) . ")");
         } else {
             $message = '<div class="alert alert-danger">Error updating reservation.</div>';
         }
@@ -35,24 +45,63 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
 // Get all pending and pencil booked reservations
 $reservations = $conn->query("
-    SELECT r.*, 
-           v.name as venue_name, 
-           v.floor,
-           CONCAT(r.last_name, ', ', r.first_name) as requester_name
-    FROM facility_reservations r
-    JOIN venues v ON r.venue_id = v.id
-    WHERE r.status IN ('pending', 'pencil_booked')
+    SELECT * FROM (
+        SELECT 
+            'function' AS res_type,
+            r.id, 
+            r.activity_name,
+            r.status,
+            r.start_datetime,
+            r.end_datetime,
+            r.participants_count,
+            r.additional_instruction,
+            v.name as venue_name, 
+            v.floor,
+            CONCAT(r.last_name, ', ', r.first_name) as requester_name
+        FROM facility_reservations r
+        JOIN venues v ON r.venue_id = v.id
+        WHERE r.status IN ('pending', 'pencil_booked')
+        
+        UNION ALL
+        
+        SELECT
+            'guest' AS res_type,
+            gr.id,
+            CONCAT('Guest Room - ', g.room_name) AS activity_name,
+            gr.status,
+            CONCAT(gr.check_in_date, ' 14:00:00') AS start_datetime,
+            CONCAT(gr.check_out_date, ' 12:00:00') AS end_datetime,
+            gr.total_guests AS participants_count,
+            gr.special_requests AS additional_instruction,
+            g.room_name AS venue_name,
+            g.floor AS floor,
+            gr.guest_name AS requester_name
+        FROM guest_room_reservations gr
+        JOIN guest_rooms g ON gr.guest_room_id = g.id
+        WHERE gr.status IN ('pending', 'pencil_booked') AND gr.deleted = 0
+    ) AS combined
     ORDER BY 
-        CASE r.status 
+        CASE status 
             WHEN 'pending' THEN 1 
             WHEN 'pencil_booked' THEN 2 
         END,
-        r.start_datetime ASC
+        start_datetime ASC
 ");
 
 // Get separate counts
-$pending_count = $conn->query("SELECT COUNT(*) as count FROM facility_reservations WHERE status = 'pending'")->fetch_assoc()['count'];
-$pencil_count = $conn->query("SELECT COUNT(*) as count FROM facility_reservations WHERE status = 'pencil_booked'")->fetch_assoc()['count'];
+$pending_count = $conn->query("
+    SELECT (
+        (SELECT COUNT(*) FROM facility_reservations WHERE status = 'pending') +
+        (SELECT COUNT(*) FROM guest_room_reservations WHERE status = 'pending' AND deleted = 0)
+    ) as count
+")->fetch_assoc()['count'];
+
+$pencil_count = $conn->query("
+    SELECT (
+        (SELECT COUNT(*) FROM facility_reservations WHERE status = 'pencil_booked') +
+        (SELECT COUNT(*) FROM guest_room_reservations WHERE status = 'pencil_booked' AND deleted = 0)
+    ) as count
+")->fetch_assoc()['count'];
 $total_count = $pending_count + $pencil_count;
 ?>
 
@@ -646,14 +695,35 @@ $total_count = $pending_count + $pencil_count;
 
     <!-- Quick Stats -->
     <?php
-    $oldest_pending = $conn->query("SELECT MIN(start_datetime) as oldest FROM facility_reservations WHERE status = 'pending'")->fetch_assoc()['oldest'];
-    $oldest_pencil = $conn->query("SELECT MIN(start_datetime) as oldest FROM facility_reservations WHERE status = 'pencil_booked'")->fetch_assoc()['oldest'];
+    $oldest_pending = $conn->query("
+        SELECT MIN(start_datetime) as oldest FROM (
+            SELECT start_datetime FROM facility_reservations WHERE status = 'pending'
+            UNION ALL
+            SELECT CONCAT(check_in_date, ' 14:00:00') as start_datetime FROM guest_room_reservations WHERE status = 'pending' AND deleted = 0
+        ) as combined
+    ")->fetch_assoc()['oldest'];
+    
+    $oldest_pencil = $conn->query("
+        SELECT MIN(start_datetime) as oldest FROM (
+            SELECT start_datetime FROM facility_reservations WHERE status = 'pencil_booked'
+            UNION ALL
+            SELECT CONCAT(check_in_date, ' 14:00:00') as start_datetime FROM guest_room_reservations WHERE status = 'pencil_booked' AND deleted = 0
+        ) as combined
+    ")->fetch_assoc()['oldest'];
+    
     $most_requested = $conn->query("
-        SELECT v.name, COUNT(*) as count 
-        FROM facility_reservations r 
-        JOIN venues v ON r.venue_id = v.id 
-        WHERE r.status IN ('pending', 'pencil_booked')
-        GROUP BY v.name 
+        SELECT venue_name AS name, COUNT(*) as count FROM (
+            SELECT v.name as venue_name 
+            FROM facility_reservations r 
+            JOIN venues v ON r.venue_id = v.id 
+            WHERE r.status IN ('pending', 'pencil_booked')
+            UNION ALL
+            SELECT g.room_name as venue_name
+            FROM guest_room_reservations gr
+            JOIN guest_rooms g ON gr.guest_room_id = g.id
+            WHERE gr.status IN ('pending', 'pencil_booked') AND gr.deleted = 0
+        ) as combined
+        GROUP BY venue_name 
         ORDER BY count DESC 
         LIMIT 1
     ")->fetch_assoc();
@@ -743,24 +813,24 @@ $total_count = $pending_count + $pencil_count;
                 <div class="reservation-footer">
                     <?php if ($is_pending): ?>
                         <button class="btn-action btn-approve" 
-                            onclick="handleAction(<?= $row['id'] ?>, 'approve', '<?= htmlspecialchars(addslashes($row['activity_name'])) ?>')">
+                            onclick="handleAction(<?= $row['id'] ?>, 'approve', '<?= htmlspecialchars(addslashes($row['activity_name'])) ?>', '<?= $row['res_type'] ?>')">
                             <i class="bi bi-check-lg"></i> Approve
                         </button>
                         <button class="btn-action btn-pencil" 
-                            onclick="handleAction(<?= $row['id'] ?>, 'pencil', '<?= htmlspecialchars(addslashes($row['activity_name'])) ?>')">
+                            onclick="handleAction(<?= $row['id'] ?>, 'pencil', '<?= htmlspecialchars(addslashes($row['activity_name'])) ?>', '<?= $row['res_type'] ?>')">
                             <i class="bi bi-pencil"></i> Pencil
                         </button>
                     <?php else: ?>
                         <button class="btn-action btn-approve" 
-                            onclick="handleAction(<?= $row['id'] ?>, 'approve', '<?= htmlspecialchars(addslashes($row['activity_name'])) ?>')">
+                            onclick="handleAction(<?= $row['id'] ?>, 'approve', '<?= htmlspecialchars(addslashes($row['activity_name'])) ?>', '<?= $row['res_type'] ?>')">
                             <i class="bi bi-check-lg"></i> Approve
                         </button>
                     <?php endif; ?>
                     <button class="btn-action btn-deny" 
-                        onclick="handleAction(<?= $row['id'] ?>, 'deny', '<?= htmlspecialchars(addslashes($row['activity_name'])) ?>')">
+                        onclick="handleAction(<?= $row['id'] ?>, 'deny', '<?= htmlspecialchars(addslashes($row['activity_name'])) ?>', '<?= $row['res_type'] ?>')">
                         <i class="bi bi-x-lg"></i> Deny
                     </button>
-                    <button class="btn-action btn-view" onclick="viewDetails(<?= $row['id'] ?>)">
+                    <button class="btn-action btn-view" onclick="viewDetails(<?= $row['id'] ?>, '<?= $row['res_type'] ?>')">
                         <i class="bi bi-eye"></i>
                     </button>
                 </div>
@@ -804,16 +874,19 @@ $total_count = $pending_count + $pencil_count;
 <form id="actionForm" method="POST" style="display: none;">
     <input type="hidden" name="id" id="actionId">
     <input type="hidden" name="action" id="actionType">
+    <input type="hidden" name="resType" id="actionResType">
 </form>
 
 <script>
 // Store pending action details
 let pendingActionId = null;
 let pendingActionType = null;
+let pendingActionResType = null;
 
-function handleAction(id, action, activityName) {
+function handleAction(id, action, activityName, resType) {
     pendingActionId = id;
     pendingActionType = action;
+    pendingActionResType = resType;
 
     const isApprove = action === 'approve';
     const isPencil = action === 'pencil';
@@ -868,6 +941,7 @@ function submitAction() {
 
     document.getElementById('actionId').value = pendingActionId;
     document.getElementById('actionType').value = pendingActionType;
+    document.getElementById('actionResType').value = pendingActionResType;
     document.getElementById('actionForm').submit();
 }
 
@@ -898,6 +972,17 @@ function filterReservations(status) {
     });
 }
 
+// Auto filter on load based on URL parameters
+document.addEventListener('DOMContentLoaded', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const status = urlParams.get('status');
+    if (status === 'pending') {
+        filterReservations('pending');
+    } else if (status === 'pencil_booked' || status === 'pencil') {
+        filterReservations('pencil');
+    }
+});
+
 // Close modal when clicking the backdrop
 document.getElementById('confirmOverlay').addEventListener('click', function(e) {
     if (e.target === this) {
@@ -912,8 +997,12 @@ document.addEventListener('keydown', function(e) {
     }
 });
 
-function viewDetails(id) {
-    window.location.href = 'reservation_details.php?id=' + id;
+function viewDetails(id, resType) {
+    if (resType === 'guest') {
+        window.location.href = 'guest_reservation_details.php?id=' + id;
+    } else {
+        window.location.href = 'reservation_details.php?id=' + id;
+    }
 }
 
 // Real-time updates — reload every 30 seconds
