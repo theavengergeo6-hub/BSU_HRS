@@ -6,27 +6,50 @@ require_once __DIR__ . '/inc/header.php';
 $today = date('Y-m-d');
 $next_week = date('Y-m-d', strtotime('+5 days'));
 
-// Today's reservations
-$today_count = $conn->query("
+// Today's reservations (function + guest)
+$today_fac = $conn->query("
     SELECT COUNT(*) as count 
     FROM facility_reservations 
     WHERE DATE(start_datetime) = '$today' 
-    AND status IN ('approved', 'pencil_booked')
-")->fetch_assoc()['count'];
+      AND status IN ('approved', 'pencil_booked')
+")->fetch_assoc()['count'] ?? 0;
+$today_guest = $conn->query("
+    SELECT COUNT(*) as count
+    FROM guest_room_reservations
+    WHERE deleted = 0
+      AND status IN ('confirmed', 'checked_in', 'pencil_booked', 'pending')
+      AND check_in_date <= '$today'
+      AND check_out_date >= '$today'
+")->fetch_assoc()['count'] ?? 0;
+$today_count = (int)$today_fac + (int)$today_guest;
 
-// Pending approvals
-$pending_count = $conn->query("
+// Pending approvals (function + guest)
+$pending_fac = $conn->query("
     SELECT COUNT(*) as count 
     FROM facility_reservations 
     WHERE status = 'pending'
-")->fetch_assoc()['count'];
+")->fetch_assoc()['count'] ?? 0;
+$pending_guest = $conn->query("
+    SELECT COUNT(*) as count
+    FROM guest_room_reservations
+    WHERE status = 'pending'
+      AND deleted = 0
+")->fetch_assoc()['count'] ?? 0;
+$pending_count = (int)$pending_fac + (int)$pending_guest;
 
-// Pencil booked count
-$pencil_count = $conn->query("
+// Pencil booked count (function + guest)
+$pencil_fac = $conn->query("
     SELECT COUNT(*) as count 
     FROM facility_reservations 
     WHERE status = 'pencil_booked'
-")->fetch_assoc()['count'];
+")->fetch_assoc()['count'] ?? 0;
+$pencil_guest = $conn->query("
+    SELECT COUNT(*) as count
+    FROM guest_room_reservations
+    WHERE status = 'pencil_booked'
+      AND deleted = 0
+")->fetch_assoc()['count'] ?? 0;
+$pencil_count = (int)$pencil_fac + (int)$pencil_guest;
 
 // Available rooms today
 $occupied_rooms = $conn->query("
@@ -53,24 +76,69 @@ $upcoming = $conn->query("
 
 $upcoming_count = $upcoming->num_rows;
 
-// Get pending reservations for quick view
+// Get pending reservations for quick view (function + guest)
 $pending_preview = $conn->query("
-    SELECT r.*, v.name as venue_name
-    FROM facility_reservations r
-    JOIN venues v ON r.venue_id = v.id
-    WHERE r.status = 'pending'
-    ORDER BY r.created_at ASC
+    SELECT * FROM (
+        SELECT 
+            'function' AS res_type,
+            fr.id,
+            fr.activity_name,
+            fr.last_name,
+            v.name AS venue_name,
+            fr.start_datetime,
+            fr.created_at
+        FROM facility_reservations fr
+        JOIN venues v ON fr.venue_id = v.id
+        WHERE fr.status = 'pending'
+        
+        UNION ALL
+        
+        SELECT
+            'guest' AS res_type,
+            gr.id,
+            CONCAT('Guest Room - ', g.room_name) AS activity_name,
+            gr.guest_name AS last_name,
+            g.room_name AS venue_name,
+            CONCAT(gr.check_in_date, ' 14:00:00') AS start_datetime,
+            gr.created_at
+        FROM guest_room_reservations gr
+        JOIN guest_rooms g ON gr.guest_room_id = g.id
+        WHERE gr.status = 'pending'
+          AND gr.deleted = 0
+    ) AS all_pending
+    ORDER BY created_at ASC
     LIMIT 3
 ");
 
-// Get pencil booked reservations for quick view
-// Get pencil booked reservations for quick view
+// Get pencil booked reservations for quick view (function + guest)
 $pencil_preview = $conn->query("
-    SELECT r.*, v.name as venue_name
-    FROM facility_reservations r
-    JOIN venues v ON r.venue_id = v.id
-    WHERE r.status = 'pencil_booked'
-    ORDER BY r.start_datetime ASC
+    SELECT * FROM (
+        SELECT 
+            'function' AS res_type,
+            fr.id,
+            fr.activity_name,
+            fr.last_name,
+            v.name AS venue_name,
+            fr.start_datetime
+        FROM facility_reservations fr
+        JOIN venues v ON fr.venue_id = v.id
+        WHERE fr.status = 'pencil_booked'
+        
+        UNION ALL
+        
+        SELECT
+            'guest' AS res_type,
+            gr.id,
+            CONCAT('Guest Room - ', g.room_name) AS activity_name,
+            gr.guest_name AS last_name,
+            g.room_name AS venue_name,
+            CONCAT(gr.check_in_date, ' 14:00:00') AS start_datetime
+        FROM guest_room_reservations gr
+        JOIN guest_rooms g ON gr.guest_room_id = g.id
+        WHERE gr.status = 'pencil_booked'
+          AND gr.deleted = 0
+    ) AS all_pencil
+    ORDER BY start_datetime ASC
     LIMIT 3
 ");
 
@@ -613,7 +681,13 @@ $guest_preview = $conn->query("
             
             <?php if ($pending_preview && $pending_preview->num_rows > 0): ?>
                 <ul class="pending-list">
-                    <?php while ($row = $pending_preview->fetch_assoc()): ?>
+                    <?php while ($row = $pending_preview->fetch_assoc()):
+                        $isGuest = ($row['res_type'] === 'guest');
+                        $detailUrl = $isGuest
+                            ? 'guest_reservation_details.php?id=' . (int)$row['id']
+                            : 'reservation_details.php?id=' . (int)$row['id'];
+                        $typeLabel = $isGuest ? 'Guest Room' : 'Function Room';
+                    ?>
                     <li class="pending-item">
                         <div class="pending-item-icon">
                             <i class="bi bi-clock"></i>
@@ -622,6 +696,7 @@ $guest_preview = $conn->query("
                             <div class="pending-item-title">
                                 <?= htmlspecialchars(substr($row['activity_name'], 0, 25)) ?>
                                 <?= strlen($row['activity_name']) > 25 ? '...' : '' ?>
+                                <small style="font-size:0.65rem;color:#6c757d;font-weight:600;"><?= $typeLabel ?></small>
                                 <span class="status-badge-small status-pending-small">PENDING</span>
                             </div>
                             <div class="pending-item-meta">
@@ -631,7 +706,7 @@ $guest_preview = $conn->query("
                             </div>
                         </div>
                         <div class="pending-item-action">
-                            <a href="reservation_details.php?id=<?= $row['id'] ?>" title="Review">
+                            <a href="<?= $detailUrl ?>" title="Review">
                                 <i class="bi bi-chevron-right"></i>
                             </a>
                         </div>
@@ -657,7 +732,13 @@ $guest_preview = $conn->query("
             
             <?php if ($pencil_preview && $pencil_preview->num_rows > 0): ?>
                 <ul class="pending-list">
-                    <?php while ($row = $pencil_preview->fetch_assoc()): ?>
+                    <?php while ($row = $pencil_preview->fetch_assoc()):
+                        $isGuest = ($row['res_type'] === 'guest');
+                        $detailUrl = $isGuest
+                            ? 'guest_reservation_details.php?id=' . (int)$row['id']
+                            : 'reservation_details.php?id=' . (int)$row['id'];
+                        $typeLabel = $isGuest ? 'Guest Room' : 'Function Room';
+                    ?>
                     <li class="pending-item">
                         <div class="pending-item-icon" style="background: #e2d5f1; color: #5e3c8b;">
                             <i class="bi bi-pencil"></i>
@@ -666,6 +747,7 @@ $guest_preview = $conn->query("
                             <div class="pending-item-title">
                                 <?= htmlspecialchars(substr($row['activity_name'], 0, 25)) ?>
                                 <?= strlen($row['activity_name']) > 25 ? '...' : '' ?>
+                                <small style="font-size:0.65rem;color:#6c757d;font-weight:600;"><?= $typeLabel ?></small>
                                 <span class="status-badge-small status-pencil-small">PENCIL</span>
                             </div>
                             <div class="pending-item-meta">
@@ -675,7 +757,7 @@ $guest_preview = $conn->query("
                             </div>
                         </div>
                         <div class="pending-item-action">
-                            <a href="reservation_details.php?id=<?= $row['id'] ?>" title="View">
+                            <a href="<?= $detailUrl ?>" title="View">
                                 <i class="bi bi-chevron-right"></i>
                             </a>
                         </div>
