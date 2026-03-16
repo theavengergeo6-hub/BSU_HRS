@@ -80,6 +80,16 @@ class GuestRoomPDF
         $pdf->Cell(0, 0, $text, 0, 0, 'L', false, '', 0, false, 'T', 'M');
     }
 
+    private function putCenter(\TCPDF $pdf, float $x, float $y, float $w, string $text, float $size = 9.5): void
+    {
+        $text = trim($text);
+        if ($text === '') return;
+        $pdf->SetFont('helvetica', '', $size);
+        $pdf->SetTextColor(0, 0, 0);
+        $pdf->SetXY($x, $y);
+        $pdf->Cell($w, 0, $text, 0, 0, 'C', false, '', 0, false, 'T', 'M');
+    }
+
     // ── Page 1 ────────────────────────────────────────────────────────────────
 
     private function renderPage1(\TCPDF $pdf): void
@@ -91,51 +101,51 @@ class GuestRoomPDF
         [$last, $first, $mi] = $this->splitName((string)($d['guest_name'] ?? ''));
 
         // Principal guest name
-        $this->put($pdf,  72.0, 83.0,  $last);
-        $this->put($pdf, 125.0, 83.0,  $first);
-        $this->put($pdf, 172.0, 83.0,  $mi);
+        $this->putCenter($pdf,  62, 79.5, 70.0, $last);
+        $this->putCenter($pdf, 107, 79.5, 55.0, $first);
+        $this->putCenter($pdf, 155.0, 79.5, 25.0, $mi);
 
         // Personal info
-        $this->put($pdf, 48.0,  91.5, $this->fmtDate((string)($d['guest_dob']      ?? '')));
-        $this->put($pdf, 48.0,  99.5, $this->trunc((string)($d['guest_address']    ?? ''), 65));
-        $this->put($pdf, 48.0, 107.5, (string)($d['guest_email']   ?? ''));
-        $this->put($pdf, 48.0, 115.5, (string)($d['guest_contact'] ?? ''));
+        $this->put($pdf, 110.0,  94.5, $this->fmtDate((string)($d['guest_dob']      ?? '')));
+        $this->put($pdf, 105.0, 100.0, $this->trunc((string)($d['guest_address']    ?? ''), 80));
+        $this->put($pdf, 105.0, 107.5, (string)($d['guest_email']   ?? ''));
+        $this->put($pdf, 110.0, 114.0, (string)($d['guest_contact'] ?? ''));
 
         // Other guests — 4 slots on page 1
         $others = $this->decodeGuests($d['other_guests'] ?? '[]');
-        $guestYs = [129.5, 137.5, 145.5, 153.5];
+        $guestYs = [134.5, 141.5, 147.5, 154.5];
         foreach ($guestYs as $i => $gy) {
             $g    = $others[$i] ?? null;
             $name = $g ? trim((string)($g['name'] ?? '')) : '';
             $age  = $g ? trim((string)($g['age']  ?? '')) : '';
             $dob  = $g ? $this->fmtDateShort((string)($g['dob'] ?? '')) : '';
-            if ($name !== '') $this->put($pdf,  28.0, $gy, $this->trunc($name, 30));
-            if ($age  !== '') $this->put($pdf, 108.0, $gy, $age);
-            if ($dob  !== '') $this->put($pdf, 130.0, $gy, $dob);
+            if ($name !== '') $this->put($pdf,  38.0, $gy, $this->trunc($name, 30));
+            if ($age  !== '') $this->putCenter($pdf, 100.0, $gy, 17.5, $age);
+            if ($dob  !== '') $this->putCenter($pdf, 125.0, $gy, 55.0, $dob);
         }
 
         // Stay details
-        $this->put($pdf,  48.0, 170.0, $this->fmtDateShort($d['check_in_date']  ?? ''));
-        $this->put($pdf, 140.0, 170.0, $this->fmtDateShort($d['check_out_date'] ?? ''));
-        $this->put($pdf,  48.0, 175.5, $this->fmtTime($d['check_in_time']  ?? ''));
-        $this->put($pdf, 140.0, 175.5, $this->fmtTime($d['check_out_time'] ?? ''));
-        $this->put($pdf,  48.0, 181.0, (string)(int)($d['adults_count']   ?? 0));
-        $this->put($pdf, 140.0, 181.0, (string)(int)($d['children_count'] ?? 0));
-        $this->put($pdf,  48.0, 186.5, (string)($d['room_name'] ?? ''));
-        $this->put($pdf, 140.0, 186.5, ucfirst((string)($d['room_type'] ?? '')));
+        $this->put($pdf,  66.5, 168.5, $this->fmtDateShort($d['check_in_date']  ?? ''));
+        $this->put($pdf, 150.0, 168.5, $this->fmtDateShort($d['check_out_date'] ?? ''));
+        $this->put($pdf,  67, 174.5, $this->fmtTime($d['check_in_time']  ?? ''));
+        $this->put($pdf, 150.0, 174.5, $this->fmtTime($d['check_out_time'] ?? ''));
+        $this->put($pdf,  68.0, 181, (string)(int)($d['adults_count']   ?? 0));
+        $this->put($pdf, 150.0, 181.0, (string)(int)($d['children_count'] ?? 0));
+        $this->put($pdf,  63, 187.5, (string)($d['room_name'] ?? ''));
+        $this->put($pdf, 150.0, 187.5, ucfirst((string)($d['room_type'] ?? '')));
 
         // Remarks
         $remarks = trim((string)($d['special_requests'] ?? ''));
         if ($remarks !== '') {
             $pdf->SetFont('helvetica', '', 9);
             $pdf->SetTextColor(0, 0, 0);
-            $pdf->SetXY(14.0, 196.0);
+            $pdf->SetXY(25.0, 202.0);
             $pdf->MultiCell(182.0, 4.5, $remarks, 0, 'L', false, 1);
         }
 
         // Registered by
         $regBy = trim((string)($d['terms_accepted_by'] ?? $d['registered_by'] ?? ''));
-        $this->put($pdf, 48.0, 216.0, $regBy);
+        $this->put($pdf, 80.0, 215.0, $regBy);
     }
 
     // ── Page 2 ────────────────────────────────────────────────────────────────
@@ -146,18 +156,18 @@ class GuestRoomPDF
         $this->bg($pdf, self::PAGE2_B64);
 
         $others = $this->decodeGuests($this->data['other_guests'] ?? '[]');
-        $startY = 79.5;
-        $lineH  = 7.0;
+        $startY = 81.0;
+        $lineH  = 6.69;
 
         for ($i = 0; $i < 24; $i++) {
-            $g    = $others[$i] ?? null;
+            $g    = $others[$i + 4] ?? null;
             $name = $g ? trim((string)($g['name'] ?? '')) : '';
             $age  = $g ? trim((string)($g['age']  ?? '')) : '';
             $dob  = $g ? $this->fmtDateShort((string)($g['dob'] ?? '')) : '';
             $y    = $startY + ($i * $lineH);
-            if ($name !== '') $this->put($pdf,  28.0, $y, $this->trunc($name, 30));
-            if ($age  !== '') $this->put($pdf, 108.0, $y, $age);
-            if ($dob  !== '') $this->put($pdf, 130.0, $y, $dob);
+            if ($name !== '') $this->put($pdf,  38.0, $y, $this->trunc($name, 30));
+            if ($age  !== '') $this->putCenter($pdf, 102.0, $y, 15.0, $age);
+            if ($dob  !== '') $this->putCenter($pdf, 125.0, $y, 55.0, $dob);
         }
     }
 

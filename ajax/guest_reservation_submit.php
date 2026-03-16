@@ -49,10 +49,10 @@ $adults_count   = max(1, (int)($_POST['adults_count'] ?? 1));
 $children_count = max(0, (int)($_POST['kids_count']   ?? 0));
 $guest_room_id  = (int)($_POST['room_id'] ?? 0);
 $special_requests = clean($_POST['remarks']       ?? '');
-$registered_by  = clean($_POST['registered_by']  ?? '');
+$registered_by  = strtoupper(clean($_POST['registered_by']  ?? ''));
 $data_privacy   = (int)($_POST['data_privacy_consent'] ?? 0);
 $digital_sig    = clean($_POST['digital_signature']    ?? '');
-$terms_by       = clean($_POST['terms_agreed_by']      ?? '');
+$terms_by       = strtoupper(clean($_POST['terms_agreed_by']      ?? ''));
 
 // Build full guest name
 $guest_name = trim(
@@ -60,7 +60,16 @@ $guest_name = trim(
     ($middle_initial ? ' ' . $middle_initial . '. ' : ' ') .
     $last_name
 );
-$total_guests = $adults_count + $children_count;
+
+// Auto-calculate guest counts based on Other Guests list + Principal Guest
+$decoded_others = json_decode($other_guests, true) ?: [];
+$named_count = 0;
+foreach($decoded_others as $og) {
+    if (!empty($og['name'])) $named_count++;
+}
+$adults_count = 1 + $named_count; // Principal + Others
+$children_count = 0; // Usually counted within the list or kept separate if needed
+$total_guests = $adults_count;
 
 // ── Validate required fields ──────────────────────────────────────────────────
 $missing = [];

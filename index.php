@@ -78,8 +78,7 @@ $assets_base = $base . '/assets/images/';
                     <h6 class="section-subtitle">About Us</h6>
                     <h2 class="section-title float-element-slow">Empowering Communities Through Lifelong Learning</h2>
                     <p class="mission-vision-text">
-                        We are dedicated to creating empowered and inclusive communities by providing equitable access to modern, gender-responsive training and 
-                        education opportunities that foster sustainable development and self-sufficiency.</p>
+                        BatStateU ARASOF-Nasugbu Hostel provides comfortable and affordable accommodation for students, faculty, guests, and visitors. Our reservation system is designed to make booking your stay simple, secure, and seamless, ensuring that your focus remains on your purpose, whether academic, professional, or personal.</p>
                     <a href="#" class="btn-learn-more">Learn More About Us →</a>
                 </div>
                 <div class="col-lg-6">
@@ -88,14 +87,16 @@ $assets_base = $base . '/assets/images/';
                             <div class="vision-card float-element">
                                 <div class="icon-box"><i class="bi bi-eye-fill"></i></div>
                                 <h4>Our Vision</h4>
-                                <p class="mission-vision-text">Empowered and inclusive communities thrive through equitable access to modern, gender-responsive livelihood training and lifelong learning opportunities.</p>
+                                <p class="mission-vision-text">To be the leading university-hostel in the region, known for its excellent service, secure facilities, and welcoming environment that supports the academic and professional community.</p>
                             </div>
                         </div>
                         <div class="col-md-6 mb-4 scroll-animate slide-right delay-2">
                             <div class="mission-card float-element-slow">
                                 <div class="icon-box"><i class="bi bi-flag-fill"></i></div>
                                 <h4>Our Mission</h4>
-                                <p class="mission-vision-text">To deliver gender-responsive, skills-focused training that promotes self-sufficiency, equality, and sustainable development.</p>
+                                <p class="mission-vision-text">We are committed to providing clean, safe, and accessible lodging through a streamlined and user-friendly reservation system ensuring every guest enjoys a hassle-free stay while fostering a sense of community and belonging within the university.
+
+</p>
                             </div>
                         </div>
                     </div>

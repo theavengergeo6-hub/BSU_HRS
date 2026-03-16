@@ -1143,7 +1143,7 @@ if ($selected_customer_type) {
                                         <div class="col-6">
                                             <div class="form-group">
                                                 <label>No. of Adults *</label>
-                                                <input type="number" class="form-control" name="adults_count" id="adults_count" min="1" max="10" value="1" required>
+                                                <input type="number" class="form-control" name="adults_count" id="adults_count" min="1" max="50" value="1" required>
                                             </div>
                                         </div>
                                         <div class="col-6">
@@ -2617,10 +2617,10 @@ function resumeSavedSession() {
     }, 400);
 }
 
-function clearSavedData() {
+function clearSavedData(reload = true) {
     sessionStorage.removeItem('reservationFormData');
     sessionStorage.removeItem('reservationStep');
-    location.reload();
+    if (reload) location.reload();
 }
 
 function saveAndGo(n) {
@@ -4626,7 +4626,7 @@ function submitToServer(formData, url) {
                 (data.booking_no ? '<p><strong>Booking No:</strong> ' + data.booking_no + '</p>' : '') +
                 '<p class="text-muted" style="font-size:0.875rem;">You will be notified once your reservation is confirmed.</p>' +
                 '<button type="button" class="btn-res btn-next mt-3" onclick="closeResultModal(); window.location.href=\'index.php\';">OK, Go to Home</button>';
-            clearSavedData();
+            clearSavedData(false);
         } else {
             content.innerHTML =
                 '<button type="button" class="modal-close-btn" onclick="closeResultModal()">&times;</button>' +
