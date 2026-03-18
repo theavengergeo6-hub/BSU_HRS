@@ -67,9 +67,17 @@ $named_count = 0;
 foreach($decoded_others as $og) {
     if (!empty($og['name'])) $named_count++;
 }
-$adults_count = 1 + $named_count; // Principal + Others
-$children_count = 0; // Usually counted within the list or kept separate if needed
-$total_guests = $adults_count;
+
+// source_adults is from line 48: $adults_count = max(1, (int)($_POST['adults_count'] ?? 1));
+// source_kids is from line 49: $children_count = max(0, (int)($_POST['kids_count']   ?? 0));
+
+$list_adults_count = 1 + $named_count; // Principal + Others
+
+// We take the maximum of the manually entered count and the list count
+$adults_count = max($adults_count, $list_adults_count);
+// preserve children_count from the form
+$total_guests = $adults_count + $children_count;
+
 
 // ── Validate required fields ──────────────────────────────────────────────────
 $missing = [];
@@ -211,6 +219,59 @@ $ins->bind_param("ssssssssssiiiidddssiiss",
 );
 
 if ($ins->execute()) {
+    $insert_id = $conn->insert_id;
+    
+    // ----- PDF generation and email (do not fail reservation on error) -----
+    try {
+        $res_row = $conn->query("
+            SELECT grr.*, gr.name AS room_name, gr.room_type
+            FROM guest_room_reservations grr
+            LEFT JOIN guest_rooms gr ON grr.guest_room_id = gr.id
+            WHERE grr.id = $insert_id
+        ")->fetch_assoc();
+
+        if ($res_row) {
+            $base = dirname(__DIR__);
+            require_once $base . '/inc/GuestRoomPDF.php';
+            require_once $base . '/inc/EmailSender.php';
+
+            $pdfGen = new GuestRoomPDF($res_row);
+            $pdfContent = $pdfGen->generate();
+            $pdfFilename = 'Registration-' . $booking_no . '.pdf';
+
+            $emailConfig = require $base . '/inc/email_config.php';
+            $sender = new EmailSender($emailConfig);
+            
+            // Build body for guest email (reusing generic or custom method)
+            $subject = 'Hostel Room Registration Confirmation - ' . $booking_no;
+            $customerName = $res_row['guest_name'];
+            $htmlBody = "<!DOCTYPE html><html><body style='font-family: Arial, sans-serif; padding: 20px;'>
+                <div style='max-width: 600px; margin: 0 auto; background: #fff; border: 1px solid #eee; border-radius: 8px; overflow: hidden;'>
+                <div style='background: #b71c1c; color: #fff; padding: 20px; text-align: center;'>
+                    <h1 style='margin: 0;'>BATANGAS STATE UNIVERSITY</h1>
+                    <p>BatStateU Hostel Room Registration</p>
+                </div>
+                <div style='padding: 20px;'>
+                    <p>Dear <strong>$customerName</strong>,</p>
+                    <p>Your room registration has been submitted successfully. Please find your registration form attached to this email.</p>
+                    <p><strong>Booking Reference:</strong> $booking_no</p>
+                    <p><strong>Check-in:</strong> " . date('M d, Y', strtotime($res_row['check_in_date'])) . " at " . date('h:i A', strtotime($res_row['check_in_time'])) . "</p>
+                    <p><strong>Check-out:</strong> " . date('M d, Y', strtotime($res_row['check_out_date'])) . " at " . date('h:i A', strtotime($res_row['check_out_time'])) . "</p>
+                    <br>
+                    <p>For any inquiries, please contact us at hostel.nasugbu@g.batstate-u.edu.ph.</p>
+                </div>
+                <div style='padding: 10px; background: #f9f9f9; text-align: center; font-size: 12px; color: #777;'>
+                    This is an automated message from BatStateU Hostel Reservation System.
+                </div>
+                </div></body></html>";
+
+            $sent = $sender->sendWithAttachment($res_row['guest_email'], $subject, $htmlBody, $pdfContent, $pdfFilename);
+        }
+    } catch (Throwable $e) {
+        // Log error but don't stop success response
+        error_log("Guest PDF/Email Error: " . $e->getMessage());
+    }
+
     jsonOut([
         'success'    => true,
         'message'    => 'Guest reservation submitted! You will be notified once confirmed.',
@@ -218,4 +279,4 @@ if ($ins->execute()) {
     ]);
 } else {
     jsonOut(['success' => false, 'message' => 'Database error: ' . $conn->error]);
-}
+}

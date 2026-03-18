@@ -261,7 +261,14 @@ try {
         write_log("External pricing total: $estimated_total");
     }
 
+    // Capture terms/signature info
+    $misc_data['_terms_agreed_by'] = clean($_POST['terms_agreed_by'] ?? '');
+    $misc_data['_terms_position']  = clean($_POST['terms_position'] ?? '');
+    $misc_data['_terms_date']      = clean($_POST['terms_date'] ?? date('F j, Y'));
+    write_log("Terms info captured: " . $misc_data['_terms_agreed_by'] . " | " . $misc_data['_terms_position']);
+
     $miscellaneous_items = json_encode($misc_data);
+
 
     // Insert into database
     $sql = "INSERT INTO facility_reservations (

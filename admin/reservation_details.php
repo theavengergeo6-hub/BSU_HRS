@@ -650,10 +650,25 @@ body {
             <i class="bi bi-file-earmark-text me-1" style="color:var(--red)"></i>
             Reservation <span>Details</span>
         </h1>
-        <a href="reservations.php" class="btn-back">
-            <i class="bi bi-arrow-left"></i> Back to Reservations
-        </a>
+        <div class="d-flex gap-2 flex-wrap align-items-center">
+            <a href="function_room_pdf.php?id=<?= $id ?>" target="_blank"
+               style="display:inline-flex;align-items:center;gap:.4rem;padding:.5rem 1rem;background:#fdeae8;color:var(--red);border:1.5px solid #fecaca;border-radius:50px;font-size:.83rem;font-weight:600;text-decoration:none;transition:all .2s;"
+               onmouseover="this.style.background='var(--red)';this.style.color='#fff';"
+               onmouseout="this.style.background='#fdeae8';this.style.color='var(--red)';">
+                <i class="bi bi-file-earmark-pdf"></i> View PDF Form
+            </a>
+            <a href="function_room_pdf.php?id=<?= $id ?>&download=1"
+               style="display:inline-flex;align-items:center;gap:.4rem;padding:.5rem 1rem;background:#f8f9fa;color:#555;border:1.5px solid #dee2e6;border-radius:50px;font-size:.83rem;font-weight:600;text-decoration:none;transition:all .2s;"
+               onmouseover="this.style.background='#555';this.style.color='#fff';"
+               onmouseout="this.style.background='#f8f9fa';this.style.color='#555';">
+                <i class="bi bi-download"></i> Download PDF
+            </a>
+            <a href="reservations.php" class="btn-back">
+                <i class="bi bi-arrow-left"></i> Back to Reservations
+            </a>
+        </div>
     </div>
+
 
     <?php display_messages(); ?>
 

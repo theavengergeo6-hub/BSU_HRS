@@ -2171,3 +2171,240 @@ Stack trace:
 [2026-03-10 10:51:31] Success! Inserted ID: 28
 [2026-03-10 10:51:31] Inserted activity_name: CAS Meeting
 [2026-03-10 10:51:31] Inserted 1 venue(s) into reservation_venues for reservation ID 28
+[2026-03-18 01:45:20] ========== START reservation_submit.php ==========
+[2026-03-18 08:45:20] RAW POST data: Array
+(
+    [reservation_type] => function
+    [last_name] => De Guzman
+    [first_name] => Geo Mar
+    [middle_initial] => C
+    [email] => geomarc789@gmail.com
+    [contact] => 09087547440
+    [office_type_id] => 1
+    [office_id] => 7
+    [event_type_id] => 5
+    [activity_name] => Grade 9 Quiz Bee
+    [participants] => 60
+    [banquet_style_id] => 14
+    [guest_last_name] => 
+    [guest_first_name] => 
+    [guest_middle_initial] => 
+    [guest_dob] => 
+    [guest_address] => 
+    [guest_email] => 
+    [guest_contact] => 
+    [arrival_date] => 
+    [checkin_time] => 
+    [checkout_time] => 
+    [departure_date] => 
+    [adults_count] => 1
+    [kids_count] => 0
+    [guest_room_id] => 
+    [guest_remarks] => 
+    [registered_by] => 
+    [venue_ids] => Array
+        (
+            [0] => 1
+            [1] => 2
+        )
+
+    [view_board_qty] => 1
+    [additional_instruction] => 
+    [action] => submit_function
+    [event_type] => Programs and Special Events
+    [venue_id] => 1
+    [facilities_schedules] => {"venues":[{"id":"1","name":"Function Room A","floor":"Ground Floor"},{"id":"2","name":"Function Room B","floor":"Ground Floor"}],"schedules":{"1":[{"date":"2026-03-20","start":"07:00","end":"12:00"}],"2":[{"date":"2026-03-20","start":"07:00","end":"12:00"}]}}
+    [miscellaneous_items] => {"basic_sound_system":{"speaker":1,"mic":1},"banquet_chairs":{"quantity":60},"view_board":{"requested":true}}
+    [terms_agreed_by] => De Guzman, Geo Mar C.
+    [terms_position] => Student
+    [terms_date] => March 18, 2026
+)
+
+[2026-03-18 08:45:20] SPECIFIC CHECK - activity_name: 'Grade 9 Quiz Bee'
+[2026-03-18 08:45:20] SPECIFIC CHECK - event_type_id: '5'
+[2026-03-18 08:45:20] Generated numbers - booking_no: FAC-20260318-081, reservation_no: RES-20260318-490
+[2026-03-18 08:45:20] BEFORE CLEAN - activity_name: 'Grade 9 Quiz Bee'
+[2026-03-18 08:45:20] AFTER CLEAN - activity_name: 'Grade 9 Quiz Bee'
+[2026-03-18 08:45:20] event_type_id: 5
+[2026-03-18 08:45:20] FINAL activity_name: 'Grade 9 Quiz Bee'
+[2026-03-18 08:45:20] facilities_schedules decoded: Array
+(
+    [venues] => Array
+        (
+            [0] => Array
+                (
+                    [id] => 1
+                    [name] => Function Room A
+                    [floor] => Ground Floor
+                )
+
+            [1] => Array
+                (
+                    [id] => 2
+                    [name] => Function Room B
+                    [floor] => Ground Floor
+                )
+
+        )
+
+    [schedules] => Array
+        (
+            [1] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-03-20
+                            [start] => 07:00
+                            [end] => 12:00
+                        )
+
+                )
+
+            [2] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-03-20
+                            [start] => 07:00
+                            [end] => 12:00
+                        )
+
+                )
+
+        )
+
+)
+
+[2026-03-18 08:45:20] Times - start_datetime: 2026-03-20 07:00, end_datetime: 2026-03-20 12:00
+[2026-03-18 08:45:20] Conflict check passed for all venues
+[2026-03-18 08:45:20] Terms info captured: De Guzman, Geo Mar C. | Student
+[2026-03-18 08:45:20] SQL: INSERT INTO facility_reservations (
+        booking_no, reservation_no, last_name, first_name, middle_initial, 
+        email, contact_number, office_type_id, office_id, external_office_name, 
+        activity_name, event_type_id, venue_id, venue_setup_id, banquet_style_id,
+        start_datetime, end_datetime, participants_count, miscellaneous_items, 
+        additional_instruction
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+[2026-03-18 08:45:20] Success! Inserted ID: 29
+[2026-03-18 08:45:20] Inserted activity_name: Grade 9 Quiz Bee
+[2026-03-18 08:45:20] Inserted 2 venue(s) into reservation_venues for reservation ID 29
+[2026-03-18 08:45:25] Email send failed: SMTP Error: Could not authenticate.
+[2026-03-18 02:22:42] ========== START reservation_submit.php ==========
+[2026-03-18 09:22:42] RAW POST data: Array
+(
+    [reservation_type] => function
+    [last_name] => Weeknd
+    [first_name] => The
+    [middle_initial] => 
+    [email] => theavengergeo6@gmail.com
+    [contact] => 09087547440
+    [office_type_id] => 4
+    [office_external_name] => Golden State Warriors 
+    [event_type_id] => 5
+    [activity_name] => Warriors Championship Ceremony
+    [participants] => 80
+    [banquet_style_id] => 3
+    [guest_last_name] => 
+    [guest_first_name] => 
+    [guest_middle_initial] => 
+    [guest_dob] => 
+    [guest_address] => 
+    [guest_email] => 
+    [guest_contact] => 
+    [arrival_date] => 
+    [checkin_time] => 
+    [checkout_time] => 
+    [departure_date] => 
+    [adults_count] => 1
+    [kids_count] => 0
+    [guest_room_id] => 
+    [guest_remarks] => 
+    [registered_by] => 
+    [venue_ids] => Array
+        (
+            [0] => 1
+            [1] => 2
+        )
+
+    [view_board_qty] => 1
+    [additional_instruction] => 
+    [action] => submit_function
+    [event_type] => Programs and Special Events
+    [venue_id] => 1
+    [facilities_schedules] => {"venues":[{"id":"1","name":"Function Room A","floor":"Ground Floor"},{"id":"2","name":"Function Room B","floor":"Ground Floor"}],"schedules":{"1":[{"date":"2026-03-20","start":"13:00","end":"22:00"}],"2":[{"date":"2026-03-20","start":"13:00","end":"22:00"}]}}
+    [miscellaneous_items] => {"basic_sound_system":{"speaker":2,"mic":2},"banquet_chairs":{"quantity":80},"rectangular_table":{"quantity":1}}
+    [terms_agreed_by] => The Weeknd
+    [terms_position] => Event Coordinator
+    [terms_date] => March 18, 2026
+)
+
+[2026-03-18 09:22:42] SPECIFIC CHECK - activity_name: 'Warriors Championship Ceremony'
+[2026-03-18 09:22:42] SPECIFIC CHECK - event_type_id: '5'
+[2026-03-18 09:22:42] Generated numbers - booking_no: FAC-20260318-600, reservation_no: RES-20260318-245
+[2026-03-18 09:22:42] BEFORE CLEAN - activity_name: 'Warriors Championship Ceremony'
+[2026-03-18 09:22:42] AFTER CLEAN - activity_name: 'Warriors Championship Ceremony'
+[2026-03-18 09:22:42] event_type_id: 5
+[2026-03-18 09:22:42] FINAL activity_name: 'Warriors Championship Ceremony'
+[2026-03-18 09:22:42] facilities_schedules decoded: Array
+(
+    [venues] => Array
+        (
+            [0] => Array
+                (
+                    [id] => 1
+                    [name] => Function Room A
+                    [floor] => Ground Floor
+                )
+
+            [1] => Array
+                (
+                    [id] => 2
+                    [name] => Function Room B
+                    [floor] => Ground Floor
+                )
+
+        )
+
+    [schedules] => Array
+        (
+            [1] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-03-20
+                            [start] => 13:00
+                            [end] => 22:00
+                        )
+
+                )
+
+            [2] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-03-20
+                            [start] => 13:00
+                            [end] => 22:00
+                        )
+
+                )
+
+        )
+
+)
+
+[2026-03-18 09:22:42] Times - start_datetime: 2026-03-20 13:00, end_datetime: 2026-03-20 22:00
+[2026-03-18 09:22:42] Conflict check passed for all venues
+[2026-03-18 09:22:42] External pricing total: 8300
+[2026-03-18 09:22:42] Terms info captured: The Weeknd | Event Coordinator
+[2026-03-18 09:22:42] SQL: INSERT INTO facility_reservations (
+        booking_no, reservation_no, last_name, first_name, middle_initial, 
+        email, contact_number, office_type_id, office_id, external_office_name, 
+        activity_name, event_type_id, venue_id, venue_setup_id, banquet_style_id,
+        start_datetime, end_datetime, participants_count, miscellaneous_items, 
+        additional_instruction
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+[2026-03-18 09:22:42] Success! Inserted ID: 30
+[2026-03-18 09:22:42] Inserted activity_name: Warriors Championship Ceremony
+[2026-03-18 09:22:42] Inserted 2 venue(s) into reservation_venues for reservation ID 30
+[2026-03-18 09:22:48] Email send failed: SMTP Error: Could not authenticate.

@@ -69,14 +69,27 @@ class EmailSender {
             $mail->isSMTP();
             $mail->Host       = $this->config['smtp_host'] ?? 'smtp.gmail.com';
             $mail->SMTPAuth   = true;
-            $mail->Username   = $this->config['smtp_username'] ?? '';
-            $mail->Password   = $this->config['smtp_password'] ?? '';
+            $smtpUser = trim((string)($this->config['smtp_username'] ?? ''));
+            $smtpPass = trim((string)($this->config['smtp_password'] ?? ''));
+            if ($smtpUser === '' || $smtpPass === '') {
+                $this->lastError = 'SMTP credentials missing. Set smtp_username and smtp_password in inc/email_config.local.php';
+                return false;
+            }
+            $mail->Username   = $smtpUser;
+            $mail->Password   = $smtpPass;
             $mail->SMTPSecure = $this->config['smtp_secure'] ?? 'tls';
             $mail->Port       = (int)($this->config['smtp_port'] ?? 587);
             $mail->CharSet    = 'UTF-8';
             $mail->Encoding   = 'base64';
 
-            $mail->setFrom($this->config['from_email'] ?? '', $this->config['from_name'] ?? 'BSU Hostel');
+            // Gmail SMTP usually requires the From address to match the authenticated account.
+            // Use the SMTP username as the sender, and set the hostel email as Reply-To if provided.
+            $fromName = $this->config['from_name'] ?? 'BSU Hostel';
+            $replyTo = trim((string)($this->config['from_email'] ?? ''));
+            $mail->setFrom($smtpUser, $fromName);
+            if ($replyTo !== '' && strcasecmp($replyTo, $smtpUser) !== 0) {
+                $mail->addReplyTo($replyTo, $fromName);
+            }
             $mail->addAddress($toEmail);
             if (!empty($this->config['bcc_email'])) {
                 $mail->addBCC($this->config['bcc_email']);

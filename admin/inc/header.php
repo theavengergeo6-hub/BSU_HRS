@@ -444,10 +444,7 @@ if ($result) {
                     <i class="bi bi-images"></i>
                     Carousel
                 </a>
-                <a href="settings.php" class="<?= $current_page == 'settings.php' ? 'active' : '' ?>">
-                    <i class="bi bi-gear"></i>
-                    Settings
-                </a>
+
                 <a href="reports.php" class="<?= $current_page == 'reports.php' ? 'active' : '' ?>">
                     <i class="bi bi-file-text"></i>
                     Reports

@@ -1221,7 +1221,8 @@ if ($selected_customer_type) {
                                 <div class="col-md-12">
                                     <div class="form-group">
                                         <label>Name of Person Registering *</label>
-                                        <input type="text" class="form-control" name="registered_by" id="registered_by" placeholder="Full name of the person filling out this form" required>
+                                        <input type="text" class="form-control" name="registered_by" id="registered_by" placeholder="Full name of the person filling out this form" required style="text-transform: uppercase;">
+
                                     </div>
                                 </div>
                             </div>
@@ -1307,7 +1308,7 @@ if ($selected_customer_type) {
                                     <li>Additional fees apply for overtime work on <strong>weekends &amp; evening events on weekdays</strong></li>
                                     <li>Air-conditioning is turned on <strong>30 minutes before</strong> scheduled event</li>
                                     <li>Advance setup subject to approval (AC off during setup)</li>
-                                    <li><strong>No Wi-Fi</strong> service included</li>
+                                    <li><strong>Wi-Fi</strong> service included</li>
                                     <li>Balloons and adhesives <strong>not allowed</strong></li>
                                     <li><strong>No disposable water bottles</strong></li>
                                     <li>Buffet-style food arrangement <strong>only</strong></li>
@@ -1412,9 +1413,27 @@ if ($selected_customer_type) {
                         <!-- Content will be loaded here -->
                     </div>
                     
-                    <input type="hidden" id="termsFullName" value="">
-                    <input type="hidden" id="termsPosition" value="">
-                    <input type="hidden" id="termsDate" value="<?= date('F j, Y') ?>">
+                    <div class="row mt-3">
+                        <div class="col-md-5">
+                            <div class="form-group">
+                                <label class="small text-muted fw-bold">REQUESTOR NAME (Last, First, MI)</label>
+                                <input type="text" id="termsFullName" class="form-control" placeholder="e.g. DELA CRUZ, JUAN P." required>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label class="small text-muted fw-bold">OFFICE / POSITION</label>
+                                <input type="text" id="termsPosition" class="form-control" placeholder="e.g. Dean / Professor" required>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label class="small text-muted fw-bold">DATE</label>
+                                <input type="text" id="termsDate" class="form-control-plaintext text-danger fw-bold" value="<?= date('F j, Y') ?>" readonly>
+                            </div>
+                        </div>
+                    </div>
+
 
                     <div class="form-check mt-3">
                             <input class="form-check-input" type="checkbox" id="termsAgree" disabled>
@@ -1505,6 +1524,20 @@ if ($selected_customer_type) {
                                 <input type="number" class="form-control misc-qty-inline" data-key="rectangular_table" 
                                        min="0" max="10" value="0" placeholder="Quantity" disabled>
                                 <span class="limit-hint">max 10</span>
+                            </div>
+                        </div>
+
+                        <!-- Mono Block Chairs -->
+                        <div class="misc-item">
+                            <label class="misc-main-label">
+                                <input type="checkbox" class="misc-cb" data-key="mono_block_chairs"> 
+                                <span class="misc-title">Mono Block Chairs</span>
+                                <span class="misc-limits">(Max: 100)</span>
+                            </label>
+                            <div class="misc-single-item">
+                                <input type="number" class="form-control misc-qty-inline" data-key="mono_block_chairs" 
+                                       min="0" max="100" value="0" placeholder="Quantity" disabled>
+                                <span class="limit-hint">max 100</span>
                             </div>
                         </div>
                     </div>
@@ -3048,8 +3081,10 @@ function setupTermsScrollListener() {
                 var lastName = document.getElementById('last_name')?.value || '';
                 var middleInitial = document.getElementById('middle_initial')?.value || '';
                 
-                var fullName = firstName + ' ' + (middleInitial ? middleInitial + ' ' : '') + lastName;
+                var fullName = lastName + ', ' + firstName;
+                if (middleInitial) fullName += ' ' + middleInitial + '.';
                 fullNameInput.value = fullName.trim();
+
                 
                 fullNameInput.style.background = '#fff3e0';
                 fullNameInput.style.borderColor = '#b71c1c';
