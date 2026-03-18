@@ -147,7 +147,7 @@ class FunctionRoomPDF {
         $leftColW = 77.0;   // space from $xLeft to the centre divider
 
         // Right column value areas — set per row for better alignment
-        $xOffice  = 160.0;
+        $xOffice  = 155.0;
         $xVenue   = 160.0;
         $xSetup   = 160.0;
         $xContact = 160.0;
@@ -161,7 +161,7 @@ class FunctionRoomPDF {
         // Measured from the top of the A4 page (0 mm) to the top of the row's
         // value area. Each row is ~14 mm tall; values sit ~2 mm from the top.
         $yEvent = 77.5;   // "Event No." line near the top
-        $y1     = 92.0;   // Row 1 — Name / Office
+        $y1     = 87.0;   // Row 1 — Name / Office
         $y2     = 110.0;   // Row 2 — Activity / Venue
         $y3     = 125.0;   // Row 3 — Date & Time / Venue set-up
         $y4     = 137.5;   // Row 4 — Participants / Contact
@@ -174,14 +174,33 @@ class FunctionRoomPDF {
         // Force 2-line office display like:
         // Golden State
         // Warriors
-        $office = trim((string)($d['office_display'] ?? ''));
-        if ($office !== '' && str_contains($office, ' ')) {
-            $parts = preg_split('/\s+/', $office, 2);
-            if (is_array($parts) && count($parts) === 2) {
-                $office = $parts[0] . "\n" . $parts[1];
-            }
+      // Office on the right — wrap into multiple short lines to stay inside the cell
+$office = trim((string)($d['office_display'] ?? ''));
+if ($office !== '') {
+    $words  = preg_split('/\s+/', $office);
+    $lines  = [];
+    $current = '';
+
+    // max ~28 characters per line works well for this cell
+    $maxChars = 28;
+
+    foreach ($words as $w) {
+        $try = $current === '' ? $w : $current . ' ' . $w;
+        if (strlen($try) > $maxChars && $current !== '') {
+            $lines[] = $current;
+            $current = $w;
+        } else {
+            $current = $try;
         }
-        $putMulti($xOffice, $y1, $office, $rightColWOffice, 8.5, 4.0);
+    }
+    if ($current !== '') {
+        $lines[] = $current;
+    }
+
+    $office = implode("\n", $lines);
+}
+
+$putMulti($xOffice, $y1, $office, $rightColWOffice, 8.0, 3.8);
 
         // Row 2 — Activity | Venue (may be multiple rooms)
         $putMulti($xLeft,  $y2, (string)($d['activity_name'] ?? ''), $leftColW,  9.2, 4.2);
@@ -241,53 +260,53 @@ class FunctionRoomPDF {
 
         // ── Checkbox positions — LEFT column ────────────────────────────────
         // Row 1: Basic Sound System
-        $cbYBasic = 205.0;
-        $cb(44.0, $cbYBasic, $basicOn);
+        $cbYBasic = 161.5;
+        $cb(20.0, $cbYBasic, $basicOn);
 
         // Row 2: Round Table
-        $cbYRound = 212.5;
-        $cb(44.0, $cbYRound, $roundQty > 0);
+        $cbYRound = 166.5;
+        $cb(20.0, $cbYRound, $roundQty > 0);
 
         // Row 3: Banquet Chairs
-        $cbYBanq = 220.0;
-        $cb(44.0, $cbYBanq, $banqQty > 0);
+        $cbYBanq = 171.5;
+        $cb(20.0, $cbYBanq, $banqQty > 0);
 
         // Row 4: View Board
-        $cbYView = 227.5;
-        $cb(44.0, $cbYView, $viewOn);
+        $cbYView = 176.5;
+        $cb(20.0, $cbYView, $viewOn);
 
         // ── Checkbox positions — RIGHT column ───────────────────────────────
         // Row 1: Rectangular Table
-        $cbYRect = 205.0;
-        $cb(112.0, $cbYRect, $rectQty > 0);
+        $cbYRect = 167;
+        $cb(135.5 , $cbYRect, $rectQty > 0);
 
         // Row 2: Mono Block Chairs
-        $cbYMono = 212.5;
-        $cb(112.0, $cbYMono, $monoQty > 0);
+        $cbYMono = 172.5;
+        $cb(135.5, $cbYMono, $monoQty > 0);
 
         // ── Quantity / value blanks ──────────────────────────────────────────
         // Basic Sound System — always print counts if > 0 (even if checkbox logic is off)
-        if ($spCnt > 0) $put(92.0,  $cbYBasic + 1.2, (string)$spCnt, 9.0);
-        if ($mcCnt > 0) $put(145.0, $cbYBasic + 1.2, (string)$mcCnt, 9.0);
+        if ($spCnt > 0) $put(70.0,  $cbYBasic + 0.2, (string)$spCnt, 9.0);
+        if ($mcCnt > 0) $put(110.0, $cbYBasic + 0.2, (string)$mcCnt, 9.0);
 
         // Round Table quantity
         if ($roundQty > 0) {
-            $put(92.0, $cbYRound + 1.2, (string)$roundQty, 9.0);
+            $put(80.0, $cbYRound + 0.2, (string)$roundQty, 9.0);
         }
 
         // Banquet Chairs quantity
         if ($banqQty > 0) {
-            $put(92.0, $cbYBanq + 1.2, (string)$banqQty, 9.0);
+            $put(80.0, $cbYBanq + 1.2, (string)$banqQty, 9.0);
         }
 
         // Rectangular Table quantity
         if ($rectQty > 0) {
-            $put(140.0, $cbYRect + 1.2, (string)$rectQty, 9.0);
+            $put(185.0, $cbYRect + 0.2, (string)$rectQty, 9.0);
         }
 
         // Mono Block Chairs quantity
         if ($monoQty > 0) {
-            $put(160.0, $cbYMono + 1.2, (string)$monoQty, 9.0);
+            $put(185.0, $cbYMono + 0.2, (string)$monoQty, 9.0);
         }
 
         // Others — positioned to the right of the Mono Block row on template
@@ -301,8 +320,8 @@ class FunctionRoomPDF {
         if ($inst !== '') {
             $pdf->SetFont('helvetica', '', 9.0);
             $pdf->SetTextColor(0, 0, 0);
-            $pdf->SetXY(32.0, 244.0);
-            $pdf->MultiCell(170.0, 4.5, $inst, 0, 'L', false, 1);
+            $pdf->SetXY(67.0, 187.0);
+            $pdf->MultiCell(120.0, 4.5, $inst, 0, 'L', false, 1);
         }
     }
 

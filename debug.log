@@ -2408,3 +2408,121 @@ Stack trace:
 [2026-03-18 09:22:42] Inserted activity_name: Warriors Championship Ceremony
 [2026-03-18 09:22:42] Inserted 2 venue(s) into reservation_venues for reservation ID 30
 [2026-03-18 09:22:48] Email send failed: SMTP Error: Could not authenticate.
+[2026-03-18 06:25:18] ========== START reservation_submit.php ==========
+[2026-03-18 13:25:18] RAW POST data: Array
+(
+    [reservation_type] => function
+    [last_name] => De Guzman
+    [first_name] => Gomari
+    [middle_initial] => C
+    [email] => theavengergeo6@gmail.com
+    [contact] => 09087547440
+    [office_type_id] => 3
+    [office_id] => 135
+    [event_type_id] => 4
+    [activity_name] => 4th year OJT Orientation
+    [participants] => 80
+    [banquet_style_id] => 3
+    [guest_last_name] => 
+    [guest_first_name] => 
+    [guest_middle_initial] => 
+    [guest_dob] => 
+    [guest_address] => 
+    [guest_email] => 
+    [guest_contact] => 
+    [arrival_date] => 
+    [checkin_time] => 
+    [checkout_time] => 
+    [departure_date] => 
+    [adults_count] => 1
+    [kids_count] => 0
+    [guest_room_id] => 
+    [guest_remarks] => 
+    [registered_by] => 
+    [venue_ids] => Array
+        (
+            [0] => 1
+            [1] => 2
+        )
+
+    [view_board_qty] => 1
+    [additional_instruction] => 
+    [action] => submit_function
+    [event_type] => Orientation and Presentation
+    [venue_id] => 1
+    [facilities_schedules] => {"venues":[{"id":"1","name":"Function Room A","floor":"Ground Floor"},{"id":"2","name":"Function Room B","floor":"Ground Floor"}],"schedules":{"1":[{"date":"2026-03-19","start":"13:00","end":"18:00"}],"2":[{"date":"2026-03-19","start":"13:00","end":"18:00"}]}}
+    [miscellaneous_items] => {"basic_sound_system":{"speaker":2,"mic":2},"round_table":{"quantity":2},"banquet_chairs":{"quantity":80},"view_board":{"requested":true},"rectangular_table":{"quantity":2},"mono_block_chairs":{"quantity":2}}
+    [terms_agreed_by] => De Guzman, Gomari C.
+    [terms_position] => Event Coordinator
+    [terms_date] => March 18, 2026
+)
+
+[2026-03-18 13:25:18] SPECIFIC CHECK - activity_name: '4th year OJT Orientation'
+[2026-03-18 13:25:18] SPECIFIC CHECK - event_type_id: '4'
+[2026-03-18 13:25:18] Generated numbers - booking_no: FAC-20260318-089, reservation_no: RES-20260318-213
+[2026-03-18 13:25:18] BEFORE CLEAN - activity_name: '4th year OJT Orientation'
+[2026-03-18 13:25:18] AFTER CLEAN - activity_name: '4th year OJT Orientation'
+[2026-03-18 13:25:18] event_type_id: 4
+[2026-03-18 13:25:18] FINAL activity_name: '4th year OJT Orientation'
+[2026-03-18 13:25:18] facilities_schedules decoded: Array
+(
+    [venues] => Array
+        (
+            [0] => Array
+                (
+                    [id] => 1
+                    [name] => Function Room A
+                    [floor] => Ground Floor
+                )
+
+            [1] => Array
+                (
+                    [id] => 2
+                    [name] => Function Room B
+                    [floor] => Ground Floor
+                )
+
+        )
+
+    [schedules] => Array
+        (
+            [1] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-03-19
+                            [start] => 13:00
+                            [end] => 18:00
+                        )
+
+                )
+
+            [2] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-03-19
+                            [start] => 13:00
+                            [end] => 18:00
+                        )
+
+                )
+
+        )
+
+)
+
+[2026-03-18 13:25:18] Times - start_datetime: 2026-03-19 13:00, end_datetime: 2026-03-19 18:00
+[2026-03-18 13:25:18] Conflict check passed for all venues
+[2026-03-18 13:25:18] Terms info captured: De Guzman, Gomari C. | Event Coordinator
+[2026-03-18 13:25:18] SQL: INSERT INTO facility_reservations (
+        booking_no, reservation_no, last_name, first_name, middle_initial, 
+        email, contact_number, office_type_id, office_id, external_office_name, 
+        activity_name, event_type_id, venue_id, venue_setup_id, banquet_style_id,
+        start_datetime, end_datetime, participants_count, miscellaneous_items, 
+        additional_instruction
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+[2026-03-18 13:25:18] Success! Inserted ID: 31
+[2026-03-18 13:25:18] Inserted activity_name: 4th year OJT Orientation
+[2026-03-18 13:25:18] Inserted 2 venue(s) into reservation_venues for reservation ID 31
+[2026-03-18 13:25:30] Confirmation email sent to theavengergeo6@gmail.com
