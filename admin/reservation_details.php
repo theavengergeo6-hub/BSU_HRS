@@ -149,9 +149,11 @@ body {
 }
 
 .content-area {
-    padding: 1.75rem 2rem;
-    max-width: 1400px;
-    margin: 0 auto;
+    padding: 1.25rem 1.25rem;
+    /* No max-width — the admin shell already constrains the available width */
+    box-sizing: border-box;
+    width: 100%;
+    overflow-x: hidden;
 }
 
 /* ── Page header ── */
@@ -165,11 +167,13 @@ body {
 }
 
 .page-title {
-    font-size: 1.35rem;
+    font-size: 1.2rem;
     font-weight: 700;
     color: var(--text-main);
     margin: 0;
     letter-spacing: -0.3px;
+    flex-shrink: 1;
+    min-width: 0;
 }
 
 .page-title span { color: var(--red); }
@@ -198,25 +202,29 @@ body {
 .booking-hero {
     background: linear-gradient(120deg, var(--red) 0%, var(--red-dark) 100%);
     border-radius: var(--radius-lg);
-    padding: 1.25rem 1.75rem;
-    margin-bottom: 1.75rem;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.25rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 1rem;
+    gap: 0.75rem;
     flex-wrap: wrap;
     box-shadow: 0 6px 24px rgba(183,28,28,0.22);
+    min-width: 0;
+    overflow: hidden;
 }
 
-.booking-hero-left { display: flex; flex-direction: column; gap: 0.2rem; }
+.booking-hero-left { display: flex; flex-direction: column; gap: 0.2rem; min-width: 0; flex: 1 1 auto; }
 
 .booking-no {
     font-family: 'DM Mono', monospace;
-    font-size: 1.4rem;
+    font-size: 1.15rem;
     font-weight: 500;
     color: #fff;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.3px;
     line-height: 1.2;
+    word-break: break-all;
+    min-width: 0;
 }
 
 .booking-meta {
@@ -230,6 +238,7 @@ body {
     flex-direction: column;
     align-items: flex-end;
     gap: 0.35rem;
+    flex-shrink: 0;
 }
 
 .status-pill {
@@ -266,13 +275,15 @@ body {
 /* ── Layout: left main + right sidebar ── */
 .rd-layout {
     display: grid;
-    grid-template-columns: 1fr 340px;
-    gap: 1.5rem;
+    grid-template-columns: 1fr minmax(0, 280px);
+    gap: 1.25rem;
     align-items: start;
+    width: 100%;
+    min-width: 0;
 }
 
-.rd-main { display: flex; flex-direction: column; gap: 1.25rem; }
-.rd-sidebar { display: flex; flex-direction: column; gap: 1.25rem; }
+.rd-main { display: flex; flex-direction: column; gap: 1.25rem; min-width: 0; }
+.rd-sidebar { display: flex; flex-direction: column; gap: 1.25rem; min-width: 0; }
 
 /* ── Cards ── */
 .rd-card {
@@ -361,6 +372,9 @@ body {
     font-weight: 500;
     color: var(--text-main);
     line-height: 1.4;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    min-width: 0;
 }
 
 .f-value.muted { color: var(--text-sub); font-style: italic; font-weight: 400; }
@@ -627,7 +641,7 @@ body {
 }
 
 /* Responsive */
-@media (max-width: 1100px) {
+@media (max-width: 1200px) {
     .rd-layout { grid-template-columns: 1fr; }
     .rd-sidebar { flex-direction: row; flex-wrap: wrap; }
     .rd-sidebar .rd-card { flex: 1 1 280px; }

@@ -26,7 +26,8 @@ class FunctionRoomPDF {
      *                                  participants_count, miscellaneous_items,
      *                                  additional_instruction, terms_agreed_by,
      *                                  terms_position, terms_date,
-     *                                  office_display, venue_names, banquet_name
+     *                                  office_display, venue_names, banquet_name,
+ *                                  office_type_id (1=College,2=Office,3=Student Org,4=External)
      * @param string $logoHostelPath   Absolute path to hostel.jpg (optional)
      * @param string $logoBsuPath      Absolute path to bsu-logo.jpg (optional)
      */
@@ -83,9 +84,58 @@ class FunctionRoomPDF {
         $pdf->setPrintFooter(false);
         $pdf->SetMargins(0, 0, 0);
         $pdf->SetAutoPageBreak(false, 0);
+
+        // ── Page 1: Reservation form ─────────────────────────────────────────
         $pdf->AddPage();
         $this->drawTemplateOrFallback($pdf);
+
+        // ── Page 2+: Guidelines (appended as image pages) ────────────────────
+        $this->appendGuidelinePages($pdf);
+
         return $pdf;
+    }
+
+    /**
+     * Appends the correct guideline document pages after the reservation form.
+     *
+     * College / Student Organization  → CABEIHM Memo No.3.s.2025 (2 pages)
+     *   Expected files (JPG exports of each page):
+     *     documents/memo_guidelines_page1.jpg
+     *     documents/memo_guidelines_page2.jpg
+     *
+     * Office / External               → Function Rooms House Rules 2026 (variable pages)
+     *   Expected files:
+     *     documents/house_rules_page1.jpg
+     *     documents/house_rules_page2.jpg   (add more as needed)
+     *
+     * If image files are not found, the pages are silently skipped so the
+     * reservation form PDF is always generated successfully.
+     */
+    private function appendGuidelinePages(\TCPDF $pdf): void {
+        $docDir = dirname(__DIR__) . '/documents/';
+
+        if ($this->isCollegeOrStudentOrg()) {
+            // CABEIHM Memo No.3.s.2025 — Guidelines for Utilizing the Hostel Function Rooms
+            $pages = [
+                $docDir . 'memo_guidelines_page1.jpg',
+                $docDir . 'memo_guidelines_page2.jpg',
+            ];
+        } else {
+            // Function Rooms House Rules 2026
+            $pages = [
+                $docDir . 'house_rules_page1.jpg',
+                $docDir . 'house_rules_page2.jpg',
+            ];
+        }
+
+        foreach ($pages as $imgPath) {
+            if (!file_exists($imgPath)) continue;
+            $pdf->SetMargins(0, 0, 0);
+            $pdf->SetAutoPageBreak(false, 0);
+            $pdf->AddPage();
+            // Render the page image full-bleed on A4 (210 × 297 mm)
+            $pdf->Image($imgPath, 0, 0, 210, 297, '', '', '', false, 300, '', false, false, 0, false, false, false);
+        }
     }
 
     private function drawTemplateOrFallback(\TCPDF $pdf): void {
@@ -516,10 +566,10 @@ $putMulti($xOffice, $y1, $office, $rightColWOffice, 8.0, 3.8);
             $pdf->Rect($lm + $p * $panelW, $y, $panelW, $panelH, 'D');
         }
 
-        // Panel 0 — Requested by
+        // Panel 0 — Requested by (name from reservation, First Last MI, all caps)
         $this->sigPanel($pdf, $lm + 1, $y + 2, $panelW - 2,
             'Requested by:',
-            $d['terms_agreed_by'] ?? '',
+            $this->requestedByName(),
             $d['terms_position']  ?? '',
             $d['terms_date']      ?? ''
         );
@@ -727,6 +777,36 @@ $putMulti($xOffice, $y1, $office, $rightColWOffice, 8.0, 3.8);
         $name = $l . ($f !== '' ? ', ' . $f : '');
         if ($m !== '') $name .= ' ' . $m . '.';
         return $name;
+    }
+
+    /**
+     * Returns the name for the "Requested by" signature panel:
+     * format is "FIRSTNAME LASTNAME MI." — all uppercase.
+     * e.g. "THE WEEKND J."
+     */
+    private function requestedByName(): string {
+        $l = trim($this->data['last_name']      ?? '');
+        $f = trim($this->data['first_name']     ?? '');
+        $m = trim($this->data['middle_initial'] ?? '');
+        if ($l === '' && $f === '') return '';
+        $parts = array_filter([$f, $l]);
+        $name  = implode(' ', $parts);
+        if ($m !== '') $name .= ' ' . rtrim($m, '.') . '.';
+        return strtoupper($name);
+    }
+
+    /**
+     * Returns true when the client is a College or Student Organization.
+     * These get the CABEIHM Memo No.3 guideline pages.
+     * Offices and External clients get the House Rules pages instead.
+     */
+    private function isCollegeOrStudentOrg(): bool {
+        // office_type_id: 1=College, 2=Office, 3=Student Org, 4=External
+        $tid = (string)($this->data['office_type_id'] ?? '');
+        // Also accept a string label stored in _client_type by older code
+        $ct  = strtolower((string)($this->data['_client_type'] ?? ''));
+        return in_array($tid, ['1', '3'], true)
+            || in_array($ct, ['college', 'student_org', 'student organization'], true);
     }
 
     private function formatDateTimeRange(): string {
