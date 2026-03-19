@@ -49,16 +49,24 @@ $adults_count   = max(1, (int)($_POST['adults_count'] ?? 1));
 $children_count = max(0, (int)($_POST['kids_count']   ?? 0));
 $guest_room_id  = (int)($_POST['room_id'] ?? 0);
 $special_requests = clean($_POST['remarks']       ?? '');
-$registered_by  = strtoupper(clean($_POST['registered_by']  ?? ''));
+$registered_by  = clean($_POST['registered_by']  ?? '');
 $data_privacy   = (int)($_POST['data_privacy_consent'] ?? 0);
 $digital_sig    = clean($_POST['digital_signature']    ?? '');
-$terms_by       = strtoupper(clean($_POST['terms_agreed_by']      ?? ''));
+// "Registered By" on the PDF must match the principal guest's name format:
+//   First name + Middle initial + Last name (ALL CAPS)
+$miClean   = rtrim(strtoupper(trim((string)$middle_initial)), '.');
+$miDot     = $miClean !== '' ? ($miClean . '.') : '';
+$terms_by  = strtoupper(trim($first_name . ' ' . $miDot . ' ' . $last_name));
+$terms_accepted_at = date('Y-m-d H:i:s');
 
-// Build full guest name
+// Build guest_name in a consistent, parseable format:
+//   "LAST NAME, FIRST NAME MI."
+// Example: "DE GUZMAN, GEO MAR C."
 $guest_name = trim(
+    $last_name .
+    ', ' .
     $first_name .
-    ($middle_initial ? ' ' . $middle_initial . '. ' : ' ') .
-    $last_name
+    ($middle_initial ? ' ' . $middle_initial . '.' : '')
 );
 
 // Auto-calculate guest counts based on Other Guests list + Principal Guest
@@ -161,7 +169,7 @@ $ins = $conn->prepare("
         room_price_per_night, extra_bed_price_per_night,
         subtotal, discount_amount, total_amount,
         other_guests, digital_signature, data_privacy_consent,
-        terms_accepted, terms_accepted_by,
+        terms_accepted, terms_accepted_by, terms_accepted_at,
         special_requests, status
     ) VALUES (
         ?,
@@ -173,13 +181,13 @@ $ins = $conn->prepare("
         ?, 0.00,
         ?, 0.00, ?,
         ?, ?, ?,
-        ?, ?,
+        ?, ?, ?,
         ?, 'pending'
     )
 ");
 if (!$ins) jsonOut(['success' => false, 'message' => 'DB prepare error: ' . $conn->error]);
 
-// Type string: 26 params
+// Type string: 27 params
 // s  booking_no
 // s  guest_name
 // s  guest_email
@@ -202,10 +210,11 @@ if (!$ins) jsonOut(['success' => false, 'message' => 'DB prepare error: ' . $con
 // i  data_privacy_consent
 // i  terms_accepted
 // s  terms_accepted_by
+// s  terms_accepted_at
 // s  special_requests
-$terms_accepted = $terms_by ? 1 : 0;
+$terms_accepted = 1;
 
-$ins->bind_param("ssssssssssiiiidddssiiss",
+$ins->bind_param("ssssssssssiiiidddssiisss",
     $booking_no,
     $guest_name, $guest_email, $guest_contact, $guest_address, $guest_dob,
     $check_in_date, $check_out_date, $check_in_time, $check_out_time,
@@ -214,7 +223,7 @@ $ins->bind_param("ssssssssssiiiidddssiiss",
     $price_per_night,
     $subtotal, $total_amount,
     $other_guests, $digital_sig, $data_privacy,
-    $terms_accepted, $terms_by,
+    $terms_accepted, $terms_by, $terms_accepted_at,
     $special_requests
 );
 
@@ -279,4 +288,4 @@ if ($ins->execute()) {
     ]);
 } else {
     jsonOut(['success' => false, 'message' => 'Database error: ' . $conn->error]);
-}
+}

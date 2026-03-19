@@ -73,7 +73,8 @@ class GuestRoomPDF
     private function put(\TCPDF $pdf, float $x, float $y, string $text, float $size = 9.5): void
     {
         $text = trim($text);
-        if ($text === '') return;
+        if ($text === '')
+            return;
         $pdf->SetFont('helvetica', '', $size);
         $pdf->SetTextColor(0, 0, 0);
         $pdf->SetXY($x, $y);
@@ -83,11 +84,13 @@ class GuestRoomPDF
     private function putCenter(\TCPDF $pdf, float $x, float $y, float $w, string $text, float $size = 9.5): void
     {
         $text = trim($text);
-        if ($text === '') return;
+        if ($text === '')
+            return;
         $pdf->SetFont('helvetica', '', $size);
         $pdf->SetTextColor(0, 0, 0);
         $pdf->SetXY($x, $y);
-        $pdf->Cell($w, 0, $text, 0, 0, 'C', false, '', 0, false, 'T', 'M');
+        // Use a non-zero cell height so Y behaves consistently.
+        $pdf->Cell($w, 5, $text, 0, 0, 'C', false, '', 0, false, 'T', 'M');
     }
 
     // ── Page 1 ────────────────────────────────────────────────────────────────
@@ -101,37 +104,40 @@ class GuestRoomPDF
         [$last, $first, $mi] = $this->splitName((string)($d['guest_name'] ?? ''));
 
         // Principal guest name
-        $this->putCenter($pdf,  62, 79.5, 70.0, $last);
-        $this->putCenter($pdf, 107, 79.5, 55.0, $first);
-        $this->putCenter($pdf, 155.0, 79.5, 25.0, $mi);
+        $this->putCenter($pdf, 62, 79.5, 70.0, mb_strtoupper($last));
+        $this->putCenter($pdf, 107, 79.5, 55.0, mb_strtoupper($first));
+        $this->putCenter($pdf, 155.0, 79.5, 25.0, mb_strtoupper($mi));
 
         // Personal info
-        $this->put($pdf, 110.0,  94.5, $this->fmtDate((string)($d['guest_dob']      ?? '')));
-        $this->put($pdf, 105.0, 100.0, $this->trunc((string)($d['guest_address']    ?? ''), 80));
-        $this->put($pdf, 105.0, 107.5, (string)($d['guest_email']   ?? ''));
+        $this->put($pdf, 110.0, 94.5, $this->fmtDate((string)($d['guest_dob'] ?? '')));
+        $this->put($pdf, 105.0, 100.0, $this->trunc((string)($d['guest_address'] ?? ''), 80));
+        $this->put($pdf, 105.0, 107.5, (string)($d['guest_email'] ?? ''));
         $this->put($pdf, 110.0, 114.0, (string)($d['guest_contact'] ?? ''));
 
         // Other guests — 4 slots on page 1
         $others = $this->decodeGuests($d['other_guests'] ?? '[]');
         $guestYs = [134.5, 141.5, 147.5, 154.5];
         foreach ($guestYs as $i => $gy) {
-            $g    = $others[$i] ?? null;
+            $g = $others[$i] ?? null;
             $name = $g ? trim((string)($g['name'] ?? '')) : '';
-            $age  = $g ? trim((string)($g['age']  ?? '')) : '';
-            $dob  = $g ? $this->fmtDateShort((string)($g['dob'] ?? '')) : '';
-            if ($name !== '') $this->put($pdf,  38.0, $gy, $this->trunc($name, 30));
-            if ($age  !== '') $this->putCenter($pdf, 100.0, $gy, 17.5, $age);
-            if ($dob  !== '') $this->putCenter($pdf, 125.0, $gy, 55.0, $dob);
+            $age = $g ? trim((string)($g['age'] ?? '')) : '';
+            $dob = $g ? $this->fmtDateShort((string)($g['dob'] ?? '')) : '';
+            if ($name !== '')
+                $this->put($pdf, 36.0, $gy, $this->trunc($name, 30));
+            if ($age !== '')
+                $this->putCenter($pdf, 100.0, $gy, 18.5, $age);
+            if ($dob !== '')
+                $this->putCenter($pdf, 125.0, $gy, 55.0, $dob);
         }
 
         // Stay details
-        $this->put($pdf,  66.5, 168.5, $this->fmtDateShort($d['check_in_date']  ?? ''));
+        $this->put($pdf, 66.5, 168.5, $this->fmtDateShort($d['check_in_date'] ?? ''));
         $this->put($pdf, 150.0, 168.5, $this->fmtDateShort($d['check_out_date'] ?? ''));
-        $this->put($pdf,  67, 174.5, $this->fmtTime($d['check_in_time']  ?? ''));
+        $this->put($pdf, 67, 174.5, $this->fmtTime($d['check_in_time'] ?? ''));
         $this->put($pdf, 150.0, 174.5, $this->fmtTime($d['check_out_time'] ?? ''));
-        $this->put($pdf,  68.0, 181, (string)(int)($d['adults_count']   ?? 0));
+        $this->put($pdf, 68.0, 181, (string)(int)($d['adults_count'] ?? 0));
         $this->put($pdf, 150.0, 181.0, (string)(int)($d['children_count'] ?? 0));
-        $this->put($pdf,  63, 187.5, (string)($d['room_name'] ?? ''));
+        $this->put($pdf, 63, 187.5, (string)($d['room_name'] ?? ''));
         $this->put($pdf, 150.0, 187.5, ucfirst((string)($d['room_type'] ?? '')));
 
         // Remarks
@@ -146,6 +152,31 @@ class GuestRoomPDF
         // Registered by
         $regBy = trim((string)($d['terms_accepted_by'] ?? $d['registered_by'] ?? ''));
         $this->put($pdf, 80.0, 215.0, $regBy);
+
+        // Digital signature (page 1)
+        $sig = trim((string)($d['digital_signature'] ?? ''));
+        $this->drawDigitalSignature($pdf, $sig);
+
+        // Principal guest printed name (ALL CAPS) for the signature block (page 1)
+        $principalLine = $this->principalGuestPrintedNameLineAllCaps();
+        if ($principalLine !== '') {
+            // Get the width of the text at font size 10
+            $pdf->SetFont('helvetica', '', 10.0);
+            $textWidth = $pdf->GetStringWidth($principalLine);
+
+            // Signature image position and width
+            $signatureX = 75.0;
+            $signatureWidth = 60.0;
+
+            // Calculate center position with a slight adjustment if needed
+            $signatureCenter = $signatureX + ($signatureWidth / 2);
+            $adjustment = 0; // Add or subtract mm here if you want fine-tuning
+            $nameX = ($signatureCenter + $adjustment) - ($textWidth / 2);
+
+            // Draw the name
+            $pdf->SetXY($nameX, 264.5);
+            $pdf->Cell($textWidth, 5, $principalLine, 0, 0, 'L', false, '', 0, false, 'T', 'M');
+        }
     }
 
     // ── Page 2 ────────────────────────────────────────────────────────────────
@@ -157,56 +188,185 @@ class GuestRoomPDF
 
         $others = $this->decodeGuests($this->data['other_guests'] ?? '[]');
         $startY = 81.0;
-        $lineH  = 6.69;
+        $lineH = 6.69;
 
         for ($i = 0; $i < 24; $i++) {
-            $g    = $others[$i + 4] ?? null;
+            $g = $others[$i + 4] ?? null;
             $name = $g ? trim((string)($g['name'] ?? '')) : '';
-            $age  = $g ? trim((string)($g['age']  ?? '')) : '';
-            $dob  = $g ? $this->fmtDateShort((string)($g['dob'] ?? '')) : '';
-            $y    = $startY + ($i * $lineH);
-            if ($name !== '') $this->put($pdf,  38.0, $y, $this->trunc($name, 30));
-            if ($age  !== '') $this->putCenter($pdf, 102.0, $y, 15.0, $age);
-            if ($dob  !== '') $this->putCenter($pdf, 125.0, $y, 55.0, $dob);
+            $age = $g ? trim((string)($g['age'] ?? '')) : '';
+            $dob = $g ? $this->fmtDateShort((string)($g['dob'] ?? '')) : '';
+            $y = $startY + ($i * $lineH);
+            if ($name !== '')
+                $this->put($pdf, 38.0, $y, $this->trunc($name, 30));
+            if ($age !== '')
+                $this->putCenter($pdf, 102.0, $y, 15.0, $age);
+            if ($dob !== '')
+                $this->putCenter($pdf, 125.0, $y, 55.0, $dob);
+        }
+
+        // Principal guest printed name (ALL CAPS) for manual signing (page 2)
+        $principalLine = $this->principalGuestPrintedNameLineAllCaps();
+        if ($principalLine !== '') {
+            $this->putCenter($pdf, 0.0, 265.5, 210.0, $principalLine, 10.0);
         }
     }
 
     // ── Page 3 ────────────────────────────────────────────────────────────────
 
-    private function renderPage3(\TCPDF $pdf): void
-    {
+    // ── Page 3 ────────────────────────────────────────────────────────────────
+
+    private function renderPage3(\TCPDF $pdf): void    {
         $pdf->AddPage();
         $this->bg($pdf, self::PAGE3_B64);
-        // Static guidelines page — no data to overlay
-    }
 
+        $fullPrintedName = $this->principalGuestPrintedNameLineAllCaps();
+        if ($fullPrintedName !== '') {
+            $pdf->SetFont('helvetica', '', 10.0);
+            $textWidth = $pdf->GetStringWidth($fullPrintedName);
+
+            $fieldX = 23.0;
+            $fieldY = 273.5;
+            $fieldWidth = 60.0;
+
+            $fieldCenter = $fieldX + ($fieldWidth / 2);
+            $nameX = $fieldCenter - ($textWidth / 2);
+
+            $pdf->SetXY($nameX, $fieldY);
+            $pdf->Cell($textWidth, 5, $fullPrintedName, 0, 0, 'L', false, '', 0, false, 'T', 'M');
+        }    }
     // ── Helpers ───────────────────────────────────────────────────────────────
 
     private function splitName(string $full): array
     {
         $full = trim($full);
-        if ($full === '') return ['', '', ''];
+        if ($full === '')
+            return ['', '', ''];
         $last = $first = $mi = '';
         if (str_contains($full, ',')) {
+            // Expected: "LAST NAME, FIRST NAME MI."
             [$lastPart, $rest] = array_map('trim', explode(',', $full, 2));
-            $last  = $lastPart;
-            $parts = preg_split('/\s+/', $rest) ?: [];
-            $first = $parts[0] ?? '';
-            $mi    = rtrim($parts[1] ?? '', '.');
-        } else {
-            $parts = preg_split('/\s+/', $full) ?: [];
-            $n = count($parts);
-            if ($n === 1) { $first = $parts[0]; }
-            elseif ($n === 2) { [$first, $last] = $parts; }
-            else { $first = $parts[0]; $last = $parts[$n - 1]; $mi = rtrim($parts[1], '.'); }
+            $last = $lastPart;
+
+            $tokens = preg_split('/\s+/', $rest) ?: [];
+            if (count($tokens) >= 2) {
+                $miToken = (string)end($tokens);
+                $mi = rtrim($miToken, '.');
+                array_pop($tokens);
+                $first = implode(' ', $tokens);
+            }
+            elseif (count($tokens) === 1) {
+                $first = $tokens[0];
+            }
         }
-        if ($mi !== '' && mb_strlen($mi) > 1) $mi = mb_strtoupper(mb_substr($mi, 0, 1));
+        else {
+            // Legacy format: "FIRST NAME MI. LAST NAME (may include spaces)"
+            $tokens = preg_split('/\s+/', $full) ?: [];
+            $miIndex = null;
+            foreach ($tokens as $i => $tok) {
+                // Common pattern: middle initial token ends with a dot, e.g. "C."
+                if (str_ends_with($tok, '.')) {
+                    $candidate = rtrim($tok, '.');
+                    if (mb_strlen($candidate) === 1) {
+                        $miIndex = $i;
+                        $mi = $candidate;
+                        break;
+                    }
+                }
+            }
+
+            if ($miIndex !== null) {
+                $first = implode(' ', array_slice($tokens, 0, $miIndex));
+                $last = implode(' ', array_slice($tokens, $miIndex + 1));
+            }
+            else {
+                // Fallback: best-effort for simple cases
+                $parts = $tokens;
+                $n = count($parts);
+                if ($n === 1) {
+                    $first = $parts[0];
+                }
+                elseif ($n === 2) {
+                    [$first, $last] = $parts;
+                }
+                else {
+                    $first = $parts[0];
+                    $last = $parts[$n - 1];
+                    $mi = rtrim($parts[1], '.');
+                }
+            }
+        }
+
+        $mi = trim((string)$mi);
+        if ($mi !== '' && mb_strlen($mi) > 1)
+            $mi = mb_strtoupper(mb_substr($mi, 0, 1));
         return [$last, $first, $mi];
+    }
+
+    private function principalGuestPrintedNameLineAllCaps(): string
+    {
+        $guestName = (string)($this->data['guest_name'] ?? '');
+        if (trim($guestName) === '')
+            return '';
+
+        [$last, $first, $mi] = $this->splitName($guestName);
+        if (trim($last) === '' && trim($first) === '' && trim($mi) === '')
+            return '';
+
+        $lastU = mb_strtoupper(trim((string)$last));
+        $firstU = mb_strtoupper(trim((string)$first));
+        $miU = mb_strtoupper(trim((string)$mi));
+
+        // Required printed name order: First name + Middle initial + Last name
+        // Example: "GEO MAR C. DE GUZMAN"
+        $line = trim($firstU);
+        if ($miU !== '')
+            $line .= ($line !== '' ? ' ' : '') . $miU . '.';
+        if ($lastU !== '')
+            $line .= ($line !== '' ? ' ' : '') . $lastU;
+        return trim($line);
+    }
+
+    private function drawDigitalSignature(\TCPDF $pdf, string $dataUrl): void
+    {
+        $dataUrl = trim($dataUrl);
+        if ($dataUrl === '')
+            return;
+
+        $imgType = stripos($dataUrl, 'image/png') !== false ? 'PNG' : 'JPG';
+
+        $b64 = $dataUrl;
+        if (str_starts_with($dataUrl, 'data:image') && strpos($dataUrl, ',') !== false) {
+            $b64 = substr($dataUrl, strpos($dataUrl, ',') + 1);
+        }
+
+        $raw = '@' . base64_decode($b64);
+
+        // Signature line is bottom-centered in the template.
+        $pdf->Image(
+            $raw,
+            75.0,
+            258.0,
+            60.0,
+            12.0,
+            $imgType,
+            '',
+            '',
+            false,
+            300,
+            '',
+            false,
+            false,
+            0,
+            false,
+            false,
+            false
+        );
     }
 
     private function decodeGuests(mixed $raw): array
     {
-        if (is_array($raw)) return $raw;
+        if (is_array($raw))
+            return $raw;
         $decoded = json_decode((string)$raw, true);
         return is_array($decoded) ? $decoded : [];
     }
@@ -214,7 +374,8 @@ class GuestRoomPDF
     private function fmtDate(string $d): string
     {
         $d = trim($d);
-        if ($d === '' || $d === '0000-00-00') return '';
+        if ($d === '' || $d === '0000-00-00')
+            return '';
         $ts = strtotime($d);
         return $ts ? date('F d, Y', $ts) : '';
     }
@@ -222,7 +383,8 @@ class GuestRoomPDF
     private function fmtDateShort(string $d): string
     {
         $d = trim($d);
-        if ($d === '' || $d === '0000-00-00') return '';
+        if ($d === '' || $d === '0000-00-00')
+            return '';
         $ts = strtotime($d);
         return $ts ? date('M d, Y', $ts) : '';
     }
@@ -230,14 +392,16 @@ class GuestRoomPDF
     private function fmtTime(string $t): string
     {
         $t = trim($t);
-        if ($t === '') return '';
+        if ($t === '')
+            return '';
         $ts = strtotime('1970-01-01 ' . $t);
         return $ts ? date('h:i A', $ts) : '';
     }
 
     private function trunc(string $text, int $max): string
     {
-        if (mb_strlen($text) <= $max) return $text;
+        if (mb_strlen($text) <= $max)
+            return $text;
         return mb_substr($text, 0, $max - 1) . '…';
     }
 

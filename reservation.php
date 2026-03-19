@@ -3852,6 +3852,14 @@ function autoCapitalizeMiddleInitial() {
             this.value = this.value.toUpperCase().replace(/[^A-Z]/g, '').substring(0, 1);
         });
     }
+
+    // Ensure "registered_by" value is stored in uppercase (CSS text-transform only affects display).
+    var registeredByInput = document.getElementById('registered_by');
+    if (registeredByInput) {
+        registeredByInput.addEventListener('input', function() {
+            this.value = this.value.toUpperCase();
+        });
+    }
 }
 
 // Call it in DOMContentLoaded

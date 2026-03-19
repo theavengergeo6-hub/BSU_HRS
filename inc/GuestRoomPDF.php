@@ -80,6 +80,17 @@ class GuestRoomPDF
         $pdf->Cell(0, 0, $text, 0, 0, 'L', false, '', 0, false, 'T', 'M');
     }
 
+    private function putCenter(\TCPDF $pdf, float $x, float $y, float $w, string $text, float $size = 9.5): void
+    {
+        $text = trim($text);
+        if ($text === '') return;
+        $pdf->SetFont('helvetica', '', $size);
+        $pdf->SetTextColor(0, 0, 0);
+        $pdf->SetXY($x, $y);
+        // Use non-zero height so Y is consistent.
+        $pdf->Cell($w, 5, $text, 0, 0, 'C', false, '', 0, false, 'T', 'M');
+    }
+
     // ── Page 1 ────────────────────────────────────────────────────────────────
 
     private function renderPage1(\TCPDF $pdf): void
@@ -91,9 +102,9 @@ class GuestRoomPDF
         [$last, $first, $mi] = $this->splitName((string)($d['guest_name'] ?? ''));
 
         // Principal guest name
-        $this->put($pdf,  72.0, 93.5,  $last);
-        $this->put($pdf, 125.0, 93.5,  $first);
-        $this->put($pdf, 172.0, 93.5,  $mi);
+        $this->put($pdf,  72.0, 93.5,  mb_strtoupper($last));
+        $this->put($pdf, 125.0, 93.5,  mb_strtoupper($first));
+        $this->put($pdf, 172.0, 93.5,  mb_strtoupper($mi));
 
         // Personal info
         $this->put($pdf, 48.0, 107.5, $this->fmtDate((string)($d['guest_dob']      ?? '')));
@@ -135,7 +146,18 @@ class GuestRoomPDF
 
         // Registered by
         $regBy = trim((string)($d['terms_accepted_by'] ?? $d['registered_by'] ?? ''));
-        $this->put($pdf, 48.0, 250.0, $regBy);
+        $this->put($pdf, 70.0, 250.0, $regBy);
+
+        // Digital signature (page 1)
+        $sig = trim((string)($d['digital_signature'] ?? ''));
+        $this->drawDigitalSignature($pdf, $sig);
+
+        // Principal guest printed name (ALL CAPS) for the signature block (page 1)
+        $principalLine = $this->principalGuestPrintedNameLineAllCaps();
+        if ($principalLine !== '') {
+            // Move into the bottom signature block (avoid overlapping Data Privacy text).
+            $this->putCenter($pdf, 0.0, 280.0, 210.0, $principalLine, 10.0);
+        }
     }
 
     // ── Page 2 ────────────────────────────────────────────────────────────────
@@ -159,6 +181,12 @@ class GuestRoomPDF
             if ($age  !== '') $this->put($pdf, 108.0, $y, $age);
             if ($dob  !== '') $this->put($pdf, 130.0, $y, $dob);
         }
+
+        // Principal guest printed name (ALL CAPS) for manual signing (page 2)
+        $principalLine = $this->principalGuestPrintedNameLineAllCaps();
+        if ($principalLine !== '') {
+            $this->putCenter($pdf, 0.0, 274.5, 210.0, $principalLine, 10.0);
+        }
     }
 
     // ── Page 3 ────────────────────────────────────────────────────────────────
@@ -178,20 +206,108 @@ class GuestRoomPDF
         if ($full === '') return ['', '', ''];
         $last = $first = $mi = '';
         if (str_contains($full, ',')) {
+            // Expected: "LAST NAME, FIRST NAME MI."
             [$lastPart, $rest] = array_map('trim', explode(',', $full, 2));
-            $last  = $lastPart;
-            $parts = preg_split('/\s+/', $rest) ?: [];
-            $first = $parts[0] ?? '';
-            $mi    = rtrim($parts[1] ?? '', '.');
+            $last = $lastPart;
+
+            $tokens = preg_split('/\s+/', $rest) ?: [];
+            if (count($tokens) >= 2) {
+                $miToken = (string)end($tokens);
+                $mi = rtrim($miToken, '.');
+                array_pop($tokens);
+                $first = implode(' ', $tokens);
+            } elseif (count($tokens) === 1) {
+                $first = $tokens[0];
+            }
         } else {
-            $parts = preg_split('/\s+/', $full) ?: [];
-            $n = count($parts);
-            if ($n === 1) { $first = $parts[0]; }
-            elseif ($n === 2) { [$first, $last] = $parts; }
-            else { $first = $parts[0]; $last = $parts[$n - 1]; $mi = rtrim($parts[1], '.'); }
+            // Legacy format: "FIRST NAME MI. LAST NAME (may include spaces)"
+            $tokens = preg_split('/\s+/', $full) ?: [];
+            $miIndex = null;
+            foreach ($tokens as $i => $tok) {
+                // Common pattern: middle initial token ends with a dot, e.g. "C."
+                if (str_ends_with($tok, '.')) {
+                    $candidate = rtrim($tok, '.');
+                    if (mb_strlen($candidate) === 1) {
+                        $miIndex = $i;
+                        $mi = $candidate;
+                        break;
+                    }
+                }
+            }
+
+            if ($miIndex !== null) {
+                $first = implode(' ', array_slice($tokens, 0, $miIndex));
+                $last  = implode(' ', array_slice($tokens, $miIndex + 1));
+            } else {
+                // Fallback: best-effort for simple cases
+                $parts = $tokens;
+                $n = count($parts);
+                if ($n === 1) { $first = $parts[0]; }
+                elseif ($n === 2) { [$first, $last] = $parts; }
+                else { $first = $parts[0]; $last = $parts[$n - 1]; $mi = rtrim($parts[1], '.'); }
+            }
         }
+
+        $mi = trim((string)$mi);
         if ($mi !== '' && mb_strlen($mi) > 1) $mi = mb_strtoupper(mb_substr($mi, 0, 1));
         return [$last, $first, $mi];
+    }
+
+    private function principalGuestPrintedNameLineAllCaps(): string
+    {
+        $guestName = (string)($this->data['guest_name'] ?? '');
+        if (trim($guestName) === '') return '';
+
+        [$last, $first, $mi] = $this->splitName($guestName);
+        if (trim($last) === '' && trim($first) === '' && trim($mi) === '') return '';
+
+        $lastU  = mb_strtoupper(trim((string)$last));
+        $firstU = mb_strtoupper(trim((string)$first));
+        $miU    = mb_strtoupper(trim((string)$mi));
+
+        // Required printed name order: First name + Middle initial + Last name
+        // Example: "GEO MAR C. DE GUZMAN"
+        $line = trim($firstU);
+        if ($miU !== '') $line .= ($line !== '' ? ' ' : '') . $miU . '.';
+        if ($lastU !== '') $line .= ($line !== '' ? ' ' : '') . $lastU;
+        return trim($line);
+    }
+
+    private function drawDigitalSignature(\TCPDF $pdf, string $dataUrl): void
+    {
+        $dataUrl = trim($dataUrl);
+        if ($dataUrl === '') return;
+
+        $imgType = stripos($dataUrl, 'image/png') !== false ? 'PNG' : 'JPG';
+
+        // data URL: data:image/png;base64,AAAA...
+        $b64 = $dataUrl;
+        if (str_starts_with($dataUrl, 'data:image') && strpos($dataUrl, ',') !== false) {
+            $b64 = substr($dataUrl, strpos($dataUrl, ',') + 1);
+        }
+
+        $raw = '@' . base64_decode($b64);
+
+        // Signature line is bottom-centered in the template.
+        $pdf->Image(
+            $raw,
+            75.0,
+            258.0,
+            60.0,
+            12.0,
+            $imgType,
+            '',
+            '',
+            false,
+            300,
+            '',
+            false,
+            false,
+            0,
+            false,
+            false,
+            false
+        );
     }
 
     private function decodeGuests(mixed $raw): array
