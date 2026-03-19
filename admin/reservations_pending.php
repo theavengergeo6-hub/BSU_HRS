@@ -37,6 +37,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             
             // Log the action
             logAdminAction($conn, "Reservation $action", "Reservation ID: $id (" . ucfirst($resType) . ")");
+            
+            // --- Send Email Notification ---
+            try {
+                require_once __DIR__ . '/../inc/EmailSender.php';
+                $sender = new EmailSender();
+                
+                if ($resType === 'guest') {
+                    $info_stmt = $conn->prepare("SELECT guest_name, guest_email, booking_no FROM guest_room_reservations WHERE id = ?");
+                    $info_stmt->bind_param("i", $id);
+                    $info_stmt->execute();
+                    $info_res = $info_stmt->get_result();
+                    if ($info_res && $info_res->num_rows > 0) {
+                        $info = $info_res->fetch_assoc();
+                        $sender->sendGuestRoomStatusUpdate(
+                            $info['guest_email'],
+                            $info['guest_name'],
+                            $info['booking_no'],
+                            $status
+                        );
+                    }
+                } else {
+                    $info_stmt = $conn->prepare("SELECT first_name, email, booking_no, activity_name FROM facility_reservations WHERE id = ?");
+                    $info_stmt->bind_param("i", $id);
+                    $info_stmt->execute();
+                    $info_res = $info_stmt->get_result();
+                    if ($info_res && $info_res->num_rows > 0) {
+                        $info = $info_res->fetch_assoc();
+                        $sender->sendFunctionRoomStatusUpdate(
+                            $info['email'],
+                            $info['first_name'],
+                            $info['booking_no'],
+                            $info['activity_name'],
+                            $status
+                        );
+                    }
+                }
+            } catch (Exception $e) {
+                error_log("Status Update Email Error: " . $e->getMessage());
+            }
+            // -------------------------------
         } else {
             $message = '<div class="alert alert-danger">Error updating reservation.</div>';
         }

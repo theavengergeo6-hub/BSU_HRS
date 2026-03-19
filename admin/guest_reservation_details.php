@@ -60,6 +60,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 }
             }
             $_SESSION['success_message'] = "Reservation status updated successfully!";
+            
+            // --- Send Email Notification ---
+            try {
+                $info_stmt = $conn->prepare("SELECT guest_name, guest_email, booking_no FROM guest_room_reservations WHERE id = ?");
+                $info_stmt->bind_param("i", $id);
+                $info_stmt->execute();
+                $info_res = $info_stmt->get_result();
+                
+                if ($info_res && $info_res->num_rows > 0) {
+                    $info = $info_res->fetch_assoc();
+                    require_once __DIR__ . '/../inc/EmailSender.php';
+                    $sender = new EmailSender();
+                    $sender->sendGuestRoomStatusUpdate(
+                        $info['guest_email'],
+                        $info['guest_name'],
+                        $info['booking_no'],
+                        $new_status,
+                        $admin_remarks
+                    );
+                }
+            } catch (Exception $e) {
+                error_log("Guest Status Update Email Error: " . $e->getMessage());
+            }
+            // -------------------------------
         } else {
             $_SESSION['error_message'] = "Error updating status: " . $conn->error;
         }

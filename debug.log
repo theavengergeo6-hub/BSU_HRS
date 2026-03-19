@@ -2526,3 +2526,259 @@ Stack trace:
 [2026-03-18 13:25:18] Inserted activity_name: 4th year OJT Orientation
 [2026-03-18 13:25:18] Inserted 2 venue(s) into reservation_venues for reservation ID 31
 [2026-03-18 13:25:30] Confirmation email sent to theavengergeo6@gmail.com
+[2026-03-19 04:38:44] ========== START reservation_submit.php ==========
+[2026-03-19 11:38:44] RAW POST data: Array
+(
+    [reservation_type] => function
+    [last_name] => De Guzman
+    [first_name] => Geo Mar
+    [middle_initial] => C
+    [email] => geomarc789@gmail.com
+    [contact] => 09626970801
+    [office_type_id] => 1
+    [office_id] => 5
+    [event_type_id] => 1
+    [activity_name] => Technoprenuership Pitch
+    [participants] => 70
+    [banquet_style_id] => 3
+    [guest_last_name] => 
+    [guest_first_name] => 
+    [guest_middle_initial] => 
+    [guest_dob] => 
+    [guest_address] => 
+    [guest_email] => 
+    [guest_contact] => 
+    [arrival_date] => 
+    [checkin_time] => 
+    [checkout_time] => 
+    [departure_date] => 
+    [adults_count] => 1
+    [kids_count] => 0
+    [guest_room_id] => 
+    [guest_remarks] => 
+    [registered_by] => 
+    [venue_ids] => Array
+        (
+            [0] => 1
+            [1] => 2
+        )
+
+    [view_board_qty] => 1
+    [additional_instruction] => 
+    [action] => submit_function
+    [event_type] => Meeting and Conference
+    [venue_id] => 1
+    [facilities_schedules] => {"venues":[{"id":"1","name":"Function Room A","floor":"Ground Floor"},{"id":"2","name":"Function Room B","floor":"Ground Floor"}],"schedules":{"1":[{"date":"2026-03-19","start":"07:00","end":"17:00"}],"2":[{"date":"2026-03-19","start":"07:00","end":"17:00"}]}}
+    [miscellaneous_items] => {"basic_sound_system":{"speaker":2,"mic":2},"banquet_chairs":{"quantity":80},"view_board":{"requested":true},"rectangular_table":{"quantity":1}}
+    [terms_agreed_by] => De Guzman, Geo Mar C.
+    [terms_position] => Professor
+    [terms_date] => March 19, 2026
+)
+
+[2026-03-19 11:38:44] SPECIFIC CHECK - activity_name: 'Technoprenuership Pitch'
+[2026-03-19 11:38:44] SPECIFIC CHECK - event_type_id: '1'
+[2026-03-19 11:38:44] Generated numbers - booking_no: FAC-20260319-494, reservation_no: RES-20260319-095
+[2026-03-19 11:38:44] BEFORE CLEAN - activity_name: 'Technoprenuership Pitch'
+[2026-03-19 11:38:44] AFTER CLEAN - activity_name: 'Technoprenuership Pitch'
+[2026-03-19 11:38:44] event_type_id: 1
+[2026-03-19 11:38:44] FINAL activity_name: 'Technoprenuership Pitch'
+[2026-03-19 11:38:44] facilities_schedules decoded: Array
+(
+    [venues] => Array
+        (
+            [0] => Array
+                (
+                    [id] => 1
+                    [name] => Function Room A
+                    [floor] => Ground Floor
+                )
+
+            [1] => Array
+                (
+                    [id] => 2
+                    [name] => Function Room B
+                    [floor] => Ground Floor
+                )
+
+        )
+
+    [schedules] => Array
+        (
+            [1] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-03-19
+                            [start] => 07:00
+                            [end] => 17:00
+                        )
+
+                )
+
+            [2] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-03-19
+                            [start] => 07:00
+                            [end] => 17:00
+                        )
+
+                )
+
+        )
+
+)
+
+[2026-03-19 11:38:44] Times - start_datetime: 2026-03-19 07:00, end_datetime: 2026-03-19 17:00
+[2026-03-19 11:38:44] Conflict check passed for all venues
+[2026-03-19 11:38:44] Terms info captured: De Guzman, Geo Mar C. | Professor
+[2026-03-19 11:38:44] SQL: INSERT INTO facility_reservations (
+        booking_no, reservation_no, last_name, first_name, middle_initial, 
+        email, contact_number, office_type_id, office_id, external_office_name, 
+        activity_name, event_type_id, venue_id, venue_setup_id, banquet_style_id,
+        start_datetime, end_datetime, participants_count, miscellaneous_items, 
+        additional_instruction
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+[2026-03-19 11:38:44] Success! Inserted ID: 32
+[2026-03-19 11:38:44] Inserted activity_name: Technoprenuership Pitch
+[2026-03-19 11:38:44] Inserted 2 venue(s) into reservation_venues for reservation ID 32
+[2026-03-19 11:39:02] Confirmation email sent to geomarc789@gmail.com
+[2026-03-19 04:59:58] ========== START reservation_submit.php ==========
+[2026-03-19 11:59:58] RAW POST data: Array
+(
+    [reservation_type] => function
+    [last_name] => Tomco
+    [first_name] => Greg
+    [middle_initial] => 
+    [email] => imgregtomco@gmail.com
+    [contact] => 09087547440
+    [office_type_id] => 4
+    [office_external_name] => Greg Corporation
+    [event_type_id] => 3
+    [activity_name] => Birthday ni CEO Greg Tomco
+    [participants] => 100
+    [banquet_style_id] => 11
+    [guest_last_name] => 
+    [guest_first_name] => 
+    [guest_middle_initial] => 
+    [guest_dob] => 
+    [guest_address] => 
+    [guest_email] => 
+    [guest_contact] => 
+    [arrival_date] => 
+    [checkin_time] => 
+    [checkout_time] => 
+    [departure_date] => 
+    [adults_count] => 1
+    [kids_count] => 0
+    [guest_room_id] => 
+    [guest_remarks] => 
+    [registered_by] => 
+    [venue_ids] => Array
+        (
+            [0] => 1
+            [1] => 2
+            [2] => 3
+        )
+
+    [view_board_qty] => 1
+    [additional_instruction] => pakilagay lahat ng pagkain sa isang rectangular table, with cloth and decorations
+    [action] => submit_function
+    [event_type] => Buffet and Celebrations
+    [venue_id] => 1
+    [facilities_schedules] => {"venues":[{"id":"1","name":"Function Room A","floor":"Ground Floor"},{"id":"2","name":"Function Room B","floor":"Ground Floor"},{"id":"3","name":"Function Room C","floor":"Ground Floor"}],"schedules":{"1":[{"date":"2026-03-19","start":"07:00","end":"12:00"}],"2":[{"date":"2026-03-19","start":"07:00","end":"12:00"}],"3":[{"date":"2026-03-19","start":"07:00","end":"12:00"}]}}
+    [miscellaneous_items] => {"basic_sound_system":{"speaker":2,"mic":2},"round_table":{"quantity":16},"banquet_chairs":{"quantity":80},"view_board":{"requested":true}}
+    [terms_agreed_by] => Tomco, Greg
+    [terms_position] => Event Coordinator
+    [terms_date] => March 19, 2026
+)
+
+[2026-03-19 11:59:58] SPECIFIC CHECK - activity_name: 'Birthday ni CEO Greg Tomco'
+[2026-03-19 11:59:58] SPECIFIC CHECK - event_type_id: '3'
+[2026-03-19 11:59:58] Generated numbers - booking_no: FAC-20260319-936, reservation_no: RES-20260319-584
+[2026-03-19 11:59:58] BEFORE CLEAN - activity_name: 'Birthday ni CEO Greg Tomco'
+[2026-03-19 11:59:58] AFTER CLEAN - activity_name: 'Birthday ni CEO Greg Tomco'
+[2026-03-19 11:59:58] event_type_id: 3
+[2026-03-19 11:59:58] FINAL activity_name: 'Birthday ni CEO Greg Tomco'
+[2026-03-19 11:59:58] facilities_schedules decoded: Array
+(
+    [venues] => Array
+        (
+            [0] => Array
+                (
+                    [id] => 1
+                    [name] => Function Room A
+                    [floor] => Ground Floor
+                )
+
+            [1] => Array
+                (
+                    [id] => 2
+                    [name] => Function Room B
+                    [floor] => Ground Floor
+                )
+
+            [2] => Array
+                (
+                    [id] => 3
+                    [name] => Function Room C
+                    [floor] => Ground Floor
+                )
+
+        )
+
+    [schedules] => Array
+        (
+            [1] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-03-19
+                            [start] => 07:00
+                            [end] => 12:00
+                        )
+
+                )
+
+            [2] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-03-19
+                            [start] => 07:00
+                            [end] => 12:00
+                        )
+
+                )
+
+            [3] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-03-19
+                            [start] => 07:00
+                            [end] => 12:00
+                        )
+
+                )
+
+        )
+
+)
+
+[2026-03-19 11:59:58] Times - start_datetime: 2026-03-19 07:00, end_datetime: 2026-03-19 12:00
+[2026-03-19 11:59:58] Conflict check passed for all venues
+[2026-03-19 11:59:58] External pricing total: 10500
+[2026-03-19 11:59:58] Terms info captured: Tomco, Greg | Event Coordinator
+[2026-03-19 11:59:58] SQL: INSERT INTO facility_reservations (
+        booking_no, reservation_no, last_name, first_name, middle_initial, 
+        email, contact_number, office_type_id, office_id, external_office_name, 
+        activity_name, event_type_id, venue_id, venue_setup_id, banquet_style_id,
+        start_datetime, end_datetime, participants_count, miscellaneous_items, 
+        additional_instruction
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+[2026-03-19 11:59:58] Success! Inserted ID: 33
+[2026-03-19 11:59:58] Inserted activity_name: Birthday ni CEO Greg Tomco
+[2026-03-19 11:59:58] Inserted 3 venue(s) into reservation_venues for reservation ID 33
+[2026-03-19 12:00:31] Confirmation email sent to imgregtomco@gmail.com

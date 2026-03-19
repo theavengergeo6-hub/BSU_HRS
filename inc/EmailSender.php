@@ -112,6 +112,33 @@ class EmailSender {
         }
     }
 
+    /**
+     * Send status update notification for function room reservation.
+     * @param string $toEmail Customer email
+     * @param string $customerName
+     * @param string $bookingNo
+     * @param string $activityName
+     * @param string $status New status
+     * @param string $adminRemarks Optional admin remarks
+     * @return bool
+     */
+    public function sendFunctionRoomStatusUpdate($toEmail, $customerName, $bookingNo, $activityName, $status, $adminRemarks = '') {
+        $statusLabel = ucfirst(str_replace('_', ' ', $status));
+        $subject = "Reservation Status Update: $statusLabel - $bookingNo";
+        $htmlBody = $this->buildStatusUpdateEmailBody($customerName, $bookingNo, $activityName, $status, $adminRemarks, 'Function Room');
+        return $this->sendWithAttachment($toEmail, $subject, $htmlBody);
+    }
+
+    /**
+     * Send status update notification for guest room reservation.
+     */
+    public function sendGuestRoomStatusUpdate($toEmail, $customerName, $bookingNo, $status, $adminRemarks = '') {
+        $statusLabel = ucfirst(str_replace('_', ' ', $status));
+        $subject = "Room Registration Status Update: $statusLabel - $bookingNo";
+        $htmlBody = $this->buildStatusUpdateEmailBody($customerName, $bookingNo, 'Guest Room Reservation', $status, $adminRemarks, 'Guest Room');
+        return $this->sendWithAttachment($toEmail, $subject, $htmlBody);
+    }
+
     private function buildFunctionRoomEmailBody($customerName, $bookingNo, $activityName) {
         $red = '#b71c1c';
         $html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head><body style="margin:0; font-family: Arial, sans-serif; background:#f5f5f5; padding: 20px;">';
@@ -136,4 +163,56 @@ class EmailSender {
         $html .= '</div></div></body></html>';
         return $html;
     }
+
+    private function buildStatusUpdateEmailBody($customerName, $bookingNo, $activityName, $status, $adminRemarks, $typeLabel = 'Function Room') {
+        $red = '#b71c1c';
+        $statusLabel = strtoupper(str_replace('_', ' ', $status));
+        $statusColor = '#555';
+        
+        // Colors from Admin UI for consistency
+        if ($status === 'approved' || $status === 'confirmed') $statusColor = '#28a745';
+        elseif ($status === 'cancelled' || $status === 'denied') $statusColor = '#dc3545';
+        elseif ($status === 'pencil_booked') $statusColor = '#5e3c8b';
+        elseif ($status === 'checked_in') $statusColor = '#004085';
+        
+        $statusMsg = "The status of your $typeLabel reservation has been updated to <strong>$statusLabel</strong>.";
+        if ($status === 'approved' || $status === 'confirmed') {
+            $statusMsg = "We are pleased to inform you that your $typeLabel reservation has been <strong>APPROVED</strong>.";
+        } elseif ($status === 'denied' || $status === 'cancelled') {
+            $statusMsg = "We regret to inform you that your $typeLabel reservation request has been <strong>" . ($status === 'denied' ? 'DENIED' : 'CANCELLED') . "</strong>.";
+        }
+
+        $html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head><body style="margin:0; font-family: Arial, sans-serif; background:#f5f5f5; padding: 20px;">';
+        $html .= '<div style="max-width: 600px; margin: 0 auto; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">';
+        $html .= '<div style="background: ' . $red . '; color: #fff; padding: 24px 20px; text-align: center;">';
+        $html .= '<h1 style="margin: 0; font-size: 22px;">BATANGAS STATE UNIVERSITY</h1>';
+        $html .= '<p style="margin: 8px 0 0; font-size: 14px; opacity: 0.95;">BatStateU Hostel – Reservation Update</p>';
+        $html .= '</div>';
+        $html .= '<div style="padding: 24px 20px;">';
+        $html .= '<p style="margin: 0 0 16px; color: #333;">Dear ' . htmlspecialchars($customerName) . ',</p>';
+        $html .= '<p style="margin: 0 0 16px; color: #555; line-height: 1.6;">' . $statusMsg . '</p>';
+        $html .= '<table style="width: 100%; border-collapse: collapse; margin: 20px 0;">';
+        $html .= '<tr><td style="padding: 10px 12px; background: #f9f9f9; border: 1px solid #eee; font-weight: bold; width: 140px;">Booking Reference</td><td style="padding: 10px 12px; border: 1px solid #eee;">' . htmlspecialchars($bookingNo) . '</td></tr>';
+        $html .= '<tr><td style="padding: 10px 12px; background: #f9f9f9; border: 1px solid #eee; font-weight: bold;">Reservation Type</td><td style="padding: 10px 12px; border: 1px solid #eee;">' . htmlspecialchars($typeLabel) . '</td></tr>';
+        if ($typeLabel === 'Function Room') {
+            $html .= '<tr><td style="padding: 10px 12px; background: #f9f9f9; border: 1px solid #eee; font-weight: bold;">Activity / Event</td><td style="padding: 10px 12px; border: 1px solid #eee;">' . htmlspecialchars($activityName) . '</td></tr>';
+        }
+        $html .= '<tr><td style="padding: 10px 12px; background: #f9f9f9; border: 1px solid #eee; font-weight: bold;">New Status</td><td style="padding: 10px 12px; border: 1px solid #eee;"><span style="color: ' . $statusColor . '; font-weight: bold;">' . $statusLabel . '</span></td></tr>';
+        $html .= '</table>';
+        
+        if (!empty($adminRemarks)) {
+            $html .= '<div style="margin: 20px 0; padding: 15px; background: #fff8f8; border-left: 4px solid ' . $red . '; font-style: italic; color: #555;">';
+            $html .= '<strong>Admin Remarks:</strong><br>' . nl2br(htmlspecialchars($adminRemarks));
+            $html .= '</div>';
+        }
+
+        $html .= '<p style="margin:0; color: #555; line-height: 1.6;">For inquiries, contact us at <strong>hostel.nasugbu@g.batstate-u.edu.ph</strong>.</p>';
+        $html .= '</div>';
+        $html .= '<div style="padding: 16px 20px; background: #f9f9f9; border-top: 1px solid #eee; text-align: center; font-size: 12px; color: #777;">';
+        $html .= 'This is an automated message from BatStateU Hostel Reservation System.';
+        $html .= '</div></div></body></html>';
+        return $html;
+    }
+
+
 }

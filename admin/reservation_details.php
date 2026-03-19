@@ -23,6 +23,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $update_stmt->bind_param("ssi", $new_status, $remark_entry, $id);
         if ($update_stmt->execute()) {
             $_SESSION['success_message'] = "Reservation status updated successfully!";
+            
+            // --- Send Email Notification ---
+            try {
+                // Fetch basic info for the email
+                $info_stmt = $conn->prepare("SELECT first_name, email, booking_no, activity_name FROM facility_reservations WHERE id = ?");
+                $info_stmt->bind_param("i", $id);
+                $info_stmt->execute();
+                $info_res = $info_stmt->get_result();
+                
+                if ($info_res && $info_res->num_rows > 0) {
+                    $info = $info_res->fetch_assoc();
+                    require_once __DIR__ . '/../inc/EmailSender.php';
+                    $sender = new EmailSender();
+                    $sender->sendFunctionRoomStatusUpdate(
+                        $info['email'],
+                        $info['first_name'],
+                        $info['booking_no'],
+                        $info['activity_name'],
+                        $new_status,
+                        $admin_remarks
+                    );
+                }
+            } catch (Exception $e) {
+                // Log the error but don't stop the user experience
+                error_log("Status Update Email Error: " . $e->getMessage());
+            }
+            // -------------------------------
         } else {
             $_SESSION['error_message'] = "Error updating status: " . $conn->error;
         }

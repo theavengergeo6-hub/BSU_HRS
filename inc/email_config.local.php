@@ -1,12 +1,11 @@
 <?php
 
 return [
-    'smtp_username' => 'b00ker0975@gmail.com',
-    'smtp_password' => 'gkbp abxq alni vply', 
-    // IMPORTANT: for Gmail SMTP, From should usually match smtp_username.
-    // The system will use smtp_username as the actual sender and put this email as Reply-To.
-    'from_email'    => 'hostel.nasugbu@g.batstate-u.edu.ph',
-    'from_name'     => 'BatStateU Hostel - Nasugbu',
+    'smtp_username' => 'hostel.nasugbu@g.batstate-u.edu.ph',
+    'smtp_password' => 'lwlz xjfm wftr curf',
+
+    'from_email' => 'hostel.nasugbu@g.batstate-u.edu.ph',
+    'from_name' => 'BatStateU Hostel - Nasugbu',
     // Leave blank so ONLY the customer receives the email
-    'bcc_email'     => '',
+    'bcc_email' => '',
 ];
