@@ -1268,9 +1268,7 @@ body {
                         <?php endif; ?>
                     </div>
                     <p class="fr-desc"><?= htmlspecialchars($room['description'] ?? 'A versatile space perfect for your events.') ?></p>
-                    <a href="reservation.php?room=<?= $room['id'] ?>" class="fr-link">
-                        Reserve this room <i class="bi bi-arrow-right"></i>
-                    </a>
+
                 </div>
             </div>
             <?php endwhile; else: ?>
@@ -1407,10 +1405,6 @@ body {
                         <?php endif; ?>
                     </div>
                     
-                    <!-- Availability Badge — sits above carousel container -->
-                    <div class="gr-avail-badge" style="z-index:20;">
-                        <i class="bi bi-check-circle-fill"></i> Available
-                    </div>
                 </div>
                 
                 <div class="gr-body">
@@ -1449,7 +1443,7 @@ body {
                             ₱<?= !empty($room['price']) ? number_format($room['price'], 0) : '2,500' ?>
                             <sub>/ night</sub>
                         </div>
-                        <a href="guest_reservation.php?room=<?= $room['id'] ?>" class="btn-book">
+                        <a href="reservation.php?type=guest&room=<?= $room['id'] ?>" class="btn-book">
                             Book Now <i class="bi bi-arrow-right"></i>
                         </a>
                     </div>

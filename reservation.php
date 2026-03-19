@@ -4712,6 +4712,15 @@ document.addEventListener('DOMContentLoaded', function() {
     // If type=function or type=guest in URL (e.g. from rooms_showcase CTA), skip step 0 and open step 1
     var urlParams = new URLSearchParams(window.location.search);
     var typeParam = (urlParams.get('type') || '').toLowerCase();
+    
+    // Explicitly check for room parameter even if type isn't provided (fallback)
+    var roomParam = urlParams.get('room');
+    if (!typeParam && roomParam) {
+        // If room is provided but type isn't, assume guest (since function rooms didn't use room IDs as heavily in direct links before)
+        // Actually, let's be safe and only auto-guest if we know it's a guest room?
+        // But the guest ones now always pass type=guest.
+    }
+
     if (typeParam === 'function' || typeParam === 'guest') {
         reservationType = typeParam;
         document.querySelectorAll('.type-option').forEach(function(opt) { opt.classList.remove('selected'); });
@@ -4720,7 +4729,18 @@ document.addEventListener('DOMContentLoaded', function() {
         if (optEl) optEl.classList.add('selected');
         var radio = document.getElementById('type' + typeParam.charAt(0).toUpperCase() + typeParam.slice(1));
         if (radio) radio.checked = true;
+        
+        // Handle pre-selection of room
+        if (roomParam && typeParam === 'guest') {
+            var roomSel = document.getElementById('guest_room_id');
+            if (roomSel) {
+                roomSel.value = roomParam;
+                updateRoomCapacity(roomSel);
+            }
+        }
+        
         goToStep(1);
+        
         // Optional: clean URL without reload (keeps form state)
         if (window.history && window.history.replaceState) {
             var cleanUrl = window.location.pathname;
