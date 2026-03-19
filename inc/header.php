@@ -17,9 +17,7 @@ $nav_links = [
     ['href'=> 'rooms_showcase.php', 'text' => 'Rooms', 'is_anchor' => false],
     ['href' => '#faq', 'text' => 'FAQ', 'is_anchor' => true],
     ['href' => 'calendar.php', 'text' => 'Calendar', 'is_anchor' => false],
-    ['href' => 'reservation.php', 'text' => 'Reservation', 'is_anchor' => false],
-    ['href' => 'contact.php', 'text' => 'Contact', 'is_anchor' => false]
-
+    ['href' => 'reservation.php', 'text' => 'Reservation', 'is_anchor' => false]
 ];
 
 $logo_path_on_disk = __DIR__ . '/../assets/images/header_logo.png';

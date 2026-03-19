@@ -11,7 +11,7 @@ if (empty($carousel_slides)) {
     $carousel_slides = [
         ['title' => 'Welcome to BSU Hostel', 'subtitle' => 'The perfect venue for your events. Spacious function rooms and comfortable guest rooms for meetings, celebrations, and group stays. Reserve your space today.', 'button_text' => 'View Rooms', 'button_url' => 'rooms_showcase.php', 'image_path' => 'hostel/hostel2.png'],
         ['title' => 'Book Your Function or Guest Room', 'subtitle' => 'Check availability and reserve your stay in minutes.', 'button_text' => 'Check Availability', 'button_url' => 'calendar.php', 'image_path' => 'hostel/hostel2.png'],
-        ['title' => 'Stay With Us', 'subtitle' => 'Ideal for students, groups, and travelers visiting BSU.', 'button_text' => 'Get in Touch', 'button_url' => 'contact.php', 'image_path' => 'hostel/hostel2.png'],
+        ['title' => 'Stay With Us', 'subtitle' => 'Ideal for students, groups, and travelers visiting BSU.', 'button_text' => 'Check Rooms', 'button_url' => 'rooms_showcase.php', 'image_path' => 'hostel/hostel2.png'],
     ];
 }
 $assets_base = $base . '/assets/images/';
@@ -173,46 +173,14 @@ $assets_base = $base . '/assets/images/';
             <div class="contact-prompt-box scroll-animate scale-in delay-3 float-element">
                 <div class="icon-box"><i class="bi bi-chat-dots-fill"></i></div>
                 <h3 class="section-title">Still have questions?</h3>
-                <p class="lead" style="color: #666; font-size: 1.1rem;">If you cannot find an answer to your question in our FAQ, you can always contact us. We will answer you shortly!</p>
-                <a href="contact.php" class="btn-learn-more mt-3">Contact Us</a>
+                <p class="lead" style="color: #666; font-size: 1.1rem;">If you cannot find an answer to your question in our FAQ, please feel free to book your reservation now!</p>
+                <a href="reservation.php" class="btn-learn-more mt-3">Book Now</a>
             </div>
         </div>
     </section>
 
     <!-- Footer -->
-    <footer class="site-footer">
-        <div class="container">
-            <div class="footer-row">
-                <div class="footer-col footer-about">
-                    <h5 class="footer-title"><?= clean($footer_settings['site_name'] ?? $footer_settings['site_title'] ?? 'BSU Hostel') ?></h5>
-                    <p class="footer-tagline"><?= clean($footer_settings['site_tagline'] ?? 'The BSU Hostel Reservation System simplifies booking for function rooms and guest rooms.') ?></p>
-                    <div class="footer-social">
-                        <?php if (!empty($footer_contact['facebook_url'])): ?>
-                        <a href="<?= clean($footer_contact['facebook_url']) ?>" target="_blank" rel="noopener" class="social-link" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
-                        <?php endif; ?>
-                        <a href="#" class="social-link" aria-label="Twitter"><i class="bi bi-twitter-x"></i></a>
-                        <a href="#" class="social-link" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
-                    </div>
-                </div>
-                <div class="footer-col">
-                    <h5 class="footer-title">Quick Links</h5>
-                    <a href="<?= $base ?>/" class="footer-link">Home</a>
-                    <a href="<?= $base ?>/rooms_showcase.php" class="footer-link">Rooms</a>
-                    <a href="<?= $base ?>/facilities.php" class="footer-link">Amenities</a>
-                    <a href="<?= $base ?>/contact.php" class="footer-link">Contact</a>
-                </div>
-                <div class="footer-col">
-                    <h5 class="footer-title">Contact Info</h5>
-                    <?php if (!empty($footer_contact['address'])): ?><p class="footer-link"><i class="bi bi-geo-alt-fill me-2"></i><?= clean($footer_contact['address']) ?></p><?php endif; ?>
-                    <?php if (!empty($footer_contact['phone'])): ?><p class="footer-link"><i class="bi bi-telephone-fill me-2"></i><?= clean($footer_contact['phone']) ?></p><?php endif; ?>
-                    <?php if (!empty($footer_contact['email'])): ?><p class="footer-link"><i class="bi bi-envelope-fill me-2"></i><a href="mailto:<?= clean($footer_contact['email']) ?>"><?= clean($footer_contact['email']) ?></a></p><?php endif; ?>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p class="mb-0">© <?= date('Y') ?> <?= clean($footer_settings['site_name'] ?? 'BSU Hostel') ?>. All rights reserved.</p>
-            </div>
-        </div>
-    </footer>
+    <?php require_once __DIR__ . '/inc/footer.php'; ?>
 
     <!-- Scroll Fade Effect Script -->
     <script>
