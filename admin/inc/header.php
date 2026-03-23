@@ -427,28 +427,12 @@ if ($result) {
                     <i class="bi bi-building"></i>
                     Rooms
                 </a>
-                <a href="banquet.php" class="<?= $current_page == 'banquet.php' ? 'active' : '' ?>">
-                    <i class="bi bi-grid-3x3-gap"></i>
-                    Banquet Styles
-                </a>
-                <a href="faq.php" class="<?= $current_page == 'faq.php' ? 'active' : '' ?>">
-                    <i class="bi bi-question-circle"></i>
-                    FAQs
-                </a>
-                <a href="offices.php" class="<?= $current_page == 'offices.php' ? 'active' : '' ?>">
-                    <i class="bi bi-building"></i>
-                    Offices
-                </a>
-                <div class="nav-divider"></div>
-                <a href="carousel.php" class="<?= $current_page == 'carousel.php' ? 'active' : '' ?>">
-                    <i class="bi bi-images"></i>
-                    Carousel
-                </a>
-
                 <a href="reports.php" class="<?= $current_page == 'reports.php' ? 'active' : '' ?>">
                     <i class="bi bi-file-text"></i>
                     Reports
                 </a>
+
+
                 <div class="nav-divider"></div>
                 <a href="logout.php">
                     <i class="bi bi-box-arrow-right"></i>

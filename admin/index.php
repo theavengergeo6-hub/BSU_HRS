@@ -528,38 +528,7 @@ $guest_preview = $conn->query("
     flex-shrink: 0;
 }
 
-/* Quick Actions Grid */
-.quick-actions-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.75rem;
-}
 
-.quick-action-btn {
-    text-decoration: none;
-    padding: 0.75rem 0.5rem;
-    border-radius: 12px;
-    text-align: center;
-    transition: all 0.2s ease;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.25rem;
-}
-
-.quick-action-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-}
-
-.quick-action-btn i {
-    font-size: 1.2rem;
-}
-
-.quick-action-btn div {
-    font-size: 0.75rem;
-    font-weight: 600;
-}
 
 /* Empty States */
 .empty-state {
@@ -586,10 +555,6 @@ $guest_preview = $conn->query("
     .dashboard-two-col {
         grid-template-columns: 1fr;
     }
-    
-    .quick-actions-grid {
-        grid-template-columns: repeat(3, 1fr);
-    }
 }
 
 @media (max-width: 480px) {
@@ -597,9 +562,7 @@ $guest_preview = $conn->query("
         grid-template-columns: 1fr;
     }
     
-    .quick-actions-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
+
     
     .upcoming-item {
         flex-wrap: wrap;
@@ -773,7 +736,7 @@ $guest_preview = $conn->query("
         </div>
     </div>
 
-    <!-- Second Row - Upcoming Events and Quick Actions -->
+    <!-- Second Row - Upcoming Events and Guest Room Summary -->
     <div class="dashboard-two-col">
         <!-- Upcoming Events Preview -->
         <div class="dashboard-card">
@@ -818,48 +781,6 @@ $guest_preview = $conn->query("
             <?php endif; ?>
         </div>
 
-        <!-- Quick Actions -->
-        <div class="dashboard-card">
-            <div class="card-header">
-                <h3><i class="bi bi-lightning-charge" style="color: var(--bsu-red);"></i> Quick Actions</h3>
-            </div>
-            <div class="quick-actions-grid">
-                <a href="reservations_pending.php" class="quick-action-btn" style="background: #fff3cd; color: #856404;">
-                    <i class="bi bi-hourglass-split"></i>
-                    <div>Pending</div>
-                    <small><?= $pending_count ?></small>
-                </a>
-                <a href="reservations_pending.php" class="quick-action-btn" style="background: #e2d5f1; color: #5e3c8b;">
-                    <i class="bi bi-pencil"></i>
-                    <div>Pencil</div>
-                    <small><?= $pencil_count ?></small>
-                </a>
-                <a href="reservations.php?view=function&status=approved" class="quick-action-btn" style="background: #d4edda; color: #155724;">
-                    <i class="bi bi-check-circle"></i>
-                    <div>Approved</div>
-                </a>
-                <a href="reservations.php?view=guest" class="quick-action-btn" style="background: #e2f0fb; color: #004085;">
-                    <i class="bi bi-door-open"></i>
-                    <div>Guest Rooms</div>
-                    <small><?= $guest_pending ?></small>
-                </a>
-                <a href="reservations.php?view=function" class="quick-action-btn" style="background: #e9ecef; color: #495057;">
-                    <i class="bi bi-calendar3"></i>
-                    <div>Calendar</div>
-                </a>
-                <a href="guest_reservations.php" class="quick-action-btn" style="background: #cce5ff; color: #004085;">
-                    <i class="bi bi-list-ul"></i>
-                    <div>Guest List</div>
-                </a>
-            </div>
-            <div style="margin-top: 1rem; font-size: 0.7rem; color: #999; text-align: right; border-top: 1px solid #f0f0f0; padding-top: 0.75rem;">
-                <i class="bi bi-clock"></i> Last updated: <?= date('M d, Y h:i A') ?>
-            </div>
-        </div>
-    </div>
-
-    <!-- Guest Room Stats Row -->
-    <div class="dashboard-two-col" style="margin-bottom:1.5rem;">
         <!-- Guest Room Summary Card -->
         <div class="dashboard-card">
             <div class="card-header">
@@ -895,43 +816,53 @@ $guest_preview = $conn->query("
                 </a>
             </div>
         </div>
+    </div>
 
-        <!-- Recent Guest Reservations -->
-        <div class="dashboard-card">
-            <div class="card-header">
+    <!-- Third Row - Recent Guest Reservations -->
+    <div class="dashboard-two-col" style="margin-bottom:1.5rem;">
+        <!-- Recent Guest Bookings -->
+        <div class="dashboard-card" style="grid-column: span 2;">
+            <div class="card-header" style="border-bottom: 2px solid var(--bsu-red);">
                 <h3><i class="bi bi-person-badge" style="color: var(--bsu-red);"></i> Recent Guest Bookings</h3>
-                <a href="guest_reservations.php">View All <i class="bi bi-arrow-right"></i></a>
+                <a href="guest_reservations.php">View All Guest Reservations <i class="bi bi-arrow-right"></i></a>
             </div>
             <?php if ($guest_preview && $guest_preview->num_rows > 0): ?>
-                <ul class="pending-list">
-                    <?php while ($grow = $guest_preview->fetch_assoc()):
-                        $gStatusClass = $grow['status'] === 'confirmed' ? 'status-approved-small' : 'status-pending-small';
-                        $gStatusText  = strtoupper($grow['status']);
-                        $gNights = (strtotime($grow['departure_date']) - strtotime($grow['arrival_date'])) / 86400;
-                    ?>
-                    <li class="pending-item">
-                        <div class="pending-item-icon" style="background:#e2f0fb;color:#004085;">
-                            <i class="bi bi-door-open"></i>
-                        </div>
-                        <div class="pending-item-content">
-                            <div class="pending-item-title">
-                                <?= htmlspecialchars(substr($grow['guest_name'], 0, 22)) ?><?= strlen($grow['guest_name']) > 22 ? '…' : '' ?>
-                                <span class="status-badge-small <?= $gStatusClass ?>"><?= $gStatusText ?></span>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                    <ul class="pending-list">
+                        <?php 
+                        $count = 0;
+                        while ($grow = $guest_preview->fetch_assoc()):
+                            if ($count == 2) { echo '</ul><ul class="pending-list">'; }
+                            $gStatusClass = $grow['status'] === 'confirmed' ? 'status-approved-small' : 'status-pending-small';
+                            $gStatusText  = strtoupper($grow['status']);
+                            $gNights = (strtotime($grow['departure_date']) - strtotime($grow['arrival_date'])) / 86400;
+                        ?>
+                        <li class="pending-item">
+                            <div class="pending-item-icon" style="background:#e2f0fb;color:#004085;">
+                                <i class="bi bi-door-open"></i>
                             </div>
-                            <div class="pending-item-meta">
-                                <span><i class="bi bi-door-open"></i> <?= htmlspecialchars(substr($grow['room_name'], 0, 14)) ?></span>
-                                <span><i class="bi bi-calendar-check"></i> <?= date('M d', strtotime($grow['arrival_date'])) ?></span>
-                                <span><i class="bi bi-moon-stars"></i> <?= (int)$gNights ?> night<?= $gNights!=1?'s':'' ?></span>
+                            <div class="pending-item-content">
+                                <div class="pending-item-title">
+                                    <?= htmlspecialchars(substr($grow['guest_name'], 0, 22)) ?><?= strlen($grow['guest_name']) > 22 ? '…' : '' ?>
+                                    <span class="status-badge-small <?= $gStatusClass ?>"><?= $gStatusText ?></span>
+                                </div>
+                                <div class="pending-item-meta">
+                                    <span><i class="bi bi-door-open"></i> <?= htmlspecialchars(substr($grow['room_name'], 0, 14)) ?></span>
+                                    <span><i class="bi bi-calendar-check"></i> <?= date('M d', strtotime($grow['arrival_date'])) ?></span>
+                                    <span><i class="bi bi-moon-stars"></i> <?= (int)$gNights ?> night<?= $gNights!=1?'s':'' ?></span>
+                                </div>
                             </div>
-                        </div>
-                        <div class="pending-item-action">
-                            <a href="guest_reservation_details.php?id=<?= $grow['id'] ?>" title="View">
-                                <i class="bi bi-chevron-right"></i>
-                            </a>
-                        </div>
-                    </li>
-                    <?php endwhile; ?>
-                </ul>
+                            <div class="pending-item-action">
+                                <a href="guest_reservation_details.php?id=<?= $grow['id'] ?>" title="View">
+                                    <i class="bi bi-chevron-right"></i>
+                                </a>
+                            </div>
+                        </li>
+                        <?php 
+                        $count++;
+                        endwhile; ?>
+                    </ul>
+                </div>
             <?php else: ?>
                 <div class="empty-state">
                     <i class="bi bi-door-open"></i>

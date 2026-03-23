@@ -46,10 +46,6 @@ try {
     $office_id = isset($_POST['office_id']) && $_POST['office_id'] !== '' ? (int)$_POST['office_id'] : null;
     $external_office_name = clean($_POST['office_external_name'] ?? '');
     
-    $requested_by_last_name = clean($_POST['requested_by_last_name'] ?? '');
-    $requested_by_first_name = clean($_POST['requested_by_first_name'] ?? '');
-    $requested_by_middle_initial = clean($_POST['requested_by_middle_initial'] ?? '');
-    
     // Get activity_name
     $activity_name = $_POST['activity_name'] ?? '';
     write_log("BEFORE CLEAN - activity_name: '" . $activity_name . "'");
@@ -230,9 +226,8 @@ try {
         email, contact_number, office_type_id, office_id, external_office_name, 
         activity_name, event_type_id, venue_id, venue_setup_id, banquet_style_id,
         start_datetime, end_datetime, participants_count, miscellaneous_items, 
-        additional_instruction, requested_by_last_name, requested_by_first_name, 
-        requested_by_middle_initial
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        additional_instruction
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     
     write_log("SQL: $sql");
     
@@ -241,9 +236,9 @@ try {
         throw new Exception('Database prepare failed: ' . $conn->error);
     }
 
-    // Bind parameters - 23 variables
+    // Bind parameters - 20 variables
     $stmt->bind_param(
-        "sssssssisssiiisssisssss",
+        "sssssssisssiiisssis",
         $booking_no,
         $reservation_no,
         $last_name,
@@ -263,10 +258,7 @@ try {
         $end_datetime,
         $participants,
         $miscellaneous_items,
-        $additional_instruction,
-        $requested_by_last_name,
-        $requested_by_first_name,
-        $requested_by_middle_initial
+        $additional_instruction
     );
 
     if (!$stmt->execute()) {

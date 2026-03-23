@@ -371,6 +371,17 @@ class FunctionRoomPDF
             $pdf->SetXY(67.0, 187.0);
             $pdf->MultiCell(120.0, 4.5, $inst, 0, 'L', false, 1);
         }
+
+        // ── Signatures Overlay (Panel 0: Requestor) ──────────────────────────
+        // COORDINATES: X=14.0, Y=215.5 | FONT SIZE: 10
+        // Set border to 1 for debugging the box. Set to 0 when finished.
+        $reqName = $this->requestedByName();
+        if ($reqName !== '') {
+            $pdf->SetFont('times', '', 11.5);
+            $pdf->SetTextColor(0, 0, 0);
+            $pdf->SetXY(18.0, 215.5);
+            $pdf->Cell(45.0, 5, strtoupper($reqName), 0, 0, 'C');
+        }
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -583,9 +594,7 @@ class FunctionRoomPDF
             $y + 2,
             $panelW - 2,
             'Requested by:',
-            $this->requestedByName(),
-            $d['terms_position'] ?? '',
-            $d['terms_date'] ?? ''
+            $this->requestedByName()
         );
 
         // Panel 1 — Request received by
@@ -726,40 +735,28 @@ class FunctionRoomPDF
     /**
      * Signature panel where the requestor fills in their name and signs.
      */
-    private function sigPanel(\TCPDF $pdf, float $x, float $y, float $w, string $header, string $name, string $position, string $date): void
+    private function sigPanel(\TCPDF $pdf, float $x, float $y, float $w, string $header, string $name): void
     {
-        $pdf->SetFont('helvetica', 'B', 8);
+        $pdf->SetFont('times', 'B', 8);
         $pdf->SetTextColor(80, 80, 80);
         $pdf->SetXY($x, $y);
         $pdf->Cell($w, 5, $header, 0, 1, 'C');
 
-        // Name — use MultiCell so a long name wraps instead of overflowing
-        $pdf->SetFont('helvetica', 'B', 9);
+        $pdf->SetFont('times', 'B', 10);
         $pdf->SetTextColor(0, 0, 0);
         $pdf->SetXY($x, $y + 10);
         $pdf->MultiCell($w, 5, $name !== '' ? strtoupper($name) : '', 0, 'C', false, 1);
 
-        // Signature underline — placed below the (possibly wrapped) name
         $pdf->SetDrawColor(0, 0, 0);
         $pdf->SetLineWidth(0.3);
         $afterName = $pdf->GetY();
         $lineY = max($afterName + 2, $y + 21);
         $pdf->Line($x + 3, $lineY, $x + $w - 3, $lineY);
 
-        $pdf->SetFont('helvetica', '', 7.5);
+        $pdf->SetFont('times', '', 7.5);
         $pdf->SetTextColor(80, 80, 80);
         $pdf->SetXY($x, $lineY + 1);
         $pdf->Cell($w, 4, 'Signature over Printed Name', 0, 1, 'C');
-
-        if ($position !== '') {
-            $pdf->SetFont('helvetica', '', 8);
-            $pdf->SetXY($x, $lineY + 5);
-            $pdf->Cell($w - 2, 4, 'Position: ' . $position, 0, 0, 'L');
-        }
-
-        $pdf->SetFont('helvetica', '', 8);
-        $pdf->SetXY($x, $lineY + 9);
-        $pdf->Cell($w, 4, 'Date: ' . ($date ?: '____________________'), 0, 0, 'L');
     }
 
     /**
@@ -820,24 +817,23 @@ class FunctionRoomPDF
      */
     private function requestedByName(): string
     {
-        $l = trim($this->data['requested_by_last_name'] ?? '');
-        $f = trim($this->data['requested_by_first_name'] ?? '');
-        $m = trim($this->data['requested_by_middle_initial'] ?? '');
-        
-        // Fallback to contact person if requested_by is empty
-        if ($l === '' && $f === '') {
-            $l = trim($this->data['last_name'] ?? '');
-            $f = trim($this->data['first_name'] ?? '');
-            $m = trim($this->data['middle_initial'] ?? '');
+        $f = trim($this->data['first_name'] ?? '');
+        $m = trim($this->data['middle_initial'] ?? '');
+        $l = trim($this->data['last_name'] ?? '');
+
+        if ($f === '' && $l === '') {
+            return '';
         }
 
-        if ($l === '' && $f === '')
-            return '';
-        $parts = array_filter([$f, $l]);
-        $name = implode(' ', $parts);
-        if ($m !== '')
+        $name = $f;
+        if ($m !== '') {
             $name .= ' ' . rtrim($m, '.') . '.';
-        return strtoupper($name);
+        }
+        if ($l !== '') {
+            $name .= ' ' . $l;
+        }
+
+        return strtoupper(trim($name));
     }
 
     /**
@@ -865,7 +861,7 @@ class FunctionRoomPDF
         $dateE = $e ? date('F j, Y', strtotime($e)) : $dateS;
         $start = date('g:i A', strtotime($s));
         $end = $e ? date('g:i A', strtotime($e)) : '—';
-        
+
         if ($dateS === $dateE) {
             return $dateS . ', ' . $start . ' – ' . $end;
         } else {
@@ -887,7 +883,7 @@ class FunctionRoomPDF
         $dateE = $e ? date('F j, Y', strtotime($e)) : $dateS;
         $start = date('g:i A', strtotime($s));
         $end = $e ? date('g:i A', strtotime($e)) : '—';
-        
+
         if ($dateS === $dateE) {
             return [$dateS, $start . ' – ' . $end];
         } else {

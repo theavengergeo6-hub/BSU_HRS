@@ -1129,12 +1129,7 @@ input:checked + .slider:before { transform: translateX(20px); }
                         <div class="col-md-2"><div class="form-group"><label>M.I.</label><input type="text" class="form-control" name="middle_initial" id="middle_initial" maxlength="2"></div></div>
                     </div>
                     
-                    <h5 class="mt-4 mb-3 text-danger"><i class="bi bi-file-earmark-person-fill"></i> Requested By (for Report)</h5>
-                    <div class="row">
-                        <div class="col-md-4"><div class="form-group"><label>Last Name *</label><input type="text" class="form-control" name="requested_by_last_name" id="requested_by_last_name" required></div></div>
-                        <div class="col-md-4"><div class="form-group"><label>First Name *</label><input type="text" class="form-control" name="requested_by_first_name" id="requested_by_first_name" required></div></div>
-                        <div class="col-md-2"><div class="form-group"><label>M.I.</label><input type="text" class="form-control" name="requested_by_middle_initial" id="requested_by_middle_initial" maxlength="2"></div></div>
-                    </div>
+
 
                     <hr class="my-4">
                     <div class="row">

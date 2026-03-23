@@ -774,25 +774,7 @@ body {
                 </div>
             </div>
 
-            <!-- Card 1.2: Requested By -->
-            <?php if (!empty($reservation['requested_by_last_name']) || !empty($reservation['requested_by_first_name'])): ?>
-            <div class="rd-card">
-                <div class="rd-card-header" style="background:rgba(183,28,28,0.03);">
-                    <div class="ch-icon"><i class="bi bi-file-earmark-person"></i></div>
-                    <div class="ch-title">Requested By (for Report)</div>
-                </div>
-                <div class="rd-card-body">
-                    <div class="field-grid">
-                        <div class="field-item full">
-                            <div class="f-label"><i class="bi bi-person-vcard"></i> Full Name</div>
-                            <div class="f-value" style="font-weight:700; color:var(--red);">
-                                <?= htmlspecialchars(($reservation['requested_by_last_name'] ?? '') . ', ' . ($reservation['requested_by_first_name'] ?? '') . ' ' . ($reservation['requested_by_middle_initial'] ?? '')) ?>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <?php endif; ?>
+
 
             <!-- Card 2: Event Details -->
             <div class="rd-card">
