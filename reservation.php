@@ -892,10 +892,154 @@ if ($selected_customer_type) {
     gap: 0.3rem;
 }
 
-/* Enforced Reservation Card Size (Bypass Cache) */
-.reservation-card {
-    max-width: 900px !important;
-    margin: 0 auto !important;
+/* --- PROFESSIONAL MODAL & TOGGLE STYLING --- */
+.res-modal {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; 
+    width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(4px);
+    z-index: 1050;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    overflow-y: auto;
+}
+.res-modal.show { display: flex; }
+
+.modal-box {
+    background: #fff;
+    width: 100%;
+    max-width: 500px;
+    border-radius: 20px;
+    padding: 2.25rem;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+    position: relative;
+    max-height: 90vh;
+    overflow-y: auto;
+    animation: modalPulse 0.3s ease-out;
+}
+
+@keyframes modalPulse {
+    0% { transform: scale(0.95); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.modal-box h4 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #b71c1c;
+    margin-bottom: 1.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+/* Modern Switch Styling */
+.modern-switch-container {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+    transition: all 0.2s;
+}
+.modern-switch-container:hover { border-color: #b71c1c; background: #fff; }
+
+.switch-label-group { display: flex; flex-direction: column; gap: 0.1rem; }
+.switch-title { font-weight: 600; color: #2c3e50; font-size: 0.95rem; }
+.switch-desc { font-size: 0.75rem; color: #6c757d; }
+
+.modern-switch {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+    flex-shrink: 0;
+}
+.modern-switch input { opacity: 0; width: 0; height: 0; }
+.slider {
+    position: absolute; cursor: pointer;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: #dee2e6;
+    transition: .3s; border-radius: 24px;
+}
+.slider:before {
+    position: absolute; content: "";
+    height: 18px; width: 18px;
+    left: 3px; bottom: 3px;
+    background-color: white;
+    transition: .3s; border-radius: 50%;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+input:checked + .slider { background-color: #b71c1c; }
+input:checked + .slider:before { transform: translateX(20px); }
+
+/* Modal Inputs */
+.modal-box .form-group { margin-bottom: 1.25rem; }
+.modal-box .form-group label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 0.5rem;
+    display: block;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.modal-box .form-control, .modal-box .form-select {
+    border: 1.5px solid #e9ecef;
+    border-radius: 10px;
+    padding: 0.7rem 1rem;
+    font-size: 0.95rem;
+    transition: all 0.2s;
+}
+.modal-box .form-control:focus, .modal-box .form-select:focus {
+    border-color: #b71c1c;
+    box-shadow: 0 0 0 3px rgba(183,28,28,0.1);
+    outline: none;
+}
+
+.modal-btns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+.btn-res-modal {
+    padding: 0.8rem;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+.btn-m-cancel { background: #f8f9fa; color: #495057; border: 1.5px solid #e9ecef; }
+.btn-m-cancel:hover { background: #e9ecef; }
+.btn-m-add { background: #b71c1c; color: #fff; border: none; box-shadow: 0 4px 12px rgba(183,28,28,0.2); }
+.btn-m-add:hover { background: #8b0000; transform: translateY(-1px); box-shadow: 0 6px 15px rgba(183,28,28,0.3); }
+
+#availabilityStatus, #bookedSlotsInfo, #timeModalError { 
+    padding: 0.85rem 1rem; 
+    border-radius: 10px; 
+    font-size: 0.875rem; 
+    margin-bottom: 1.25rem; 
+}
+
+#availabilityStatus { border-left: 3px solid #28a745; background: #f4faf6; color: #155724; font-weight: 500; }
+#bookedSlotsInfo { border-left: 3px solid #dc3545; background: #fff5f5; color: #721c24; font-weight: 500; }
+#timeModalError { border-left: 3px solid #dc3545; background: #fff5f5; color: #721c24; font-weight: 500; }
+
+@media (max-width: 480px) {
+    .modal-box { padding: 1.5rem; }
+    .modal-btns { grid-template-columns: 1fr; }
 }
 </style>
 
@@ -977,14 +1121,24 @@ if ($selected_customer_type) {
                 <!-- Step 1: Personal and Event Info (for Function Rooms) -->
                 <div class="form-step" id="step1Form">
                     <div class="form-header"><h3>Reservation Information</h3><p>Enter your details and event information</p></div>
+                    
+                    <h5 class="mb-3 text-danger"><i class="bi bi-person-fill"></i> Contact Person</h5>
                     <div class="row">
                         <div class="col-md-4"><div class="form-group"><label>Last Name *</label><input type="text" class="form-control" name="last_name" id="last_name" required></div></div>
                         <div class="col-md-4"><div class="form-group"><label>First Name *</label><input type="text" class="form-control" name="first_name" id="first_name" required></div></div>
                         <div class="col-md-2"><div class="form-group"><label>M.I.</label><input type="text" class="form-control" name="middle_initial" id="middle_initial" maxlength="2"></div></div>
                     </div>
+                    
+                    <h5 class="mt-4 mb-3 text-danger"><i class="bi bi-file-earmark-person-fill"></i> Requested By (for Report)</h5>
                     <div class="row">
-                        <div class="col-md-6"><div class="form-group"><label>Email *</label><input type="email" class="form-control" name="email" id="email" required>
-                    </div></div>
+                        <div class="col-md-4"><div class="form-group"><label>Last Name *</label><input type="text" class="form-control" name="requested_by_last_name" id="requested_by_last_name" required></div></div>
+                        <div class="col-md-4"><div class="form-group"><label>First Name *</label><input type="text" class="form-control" name="requested_by_first_name" id="requested_by_first_name" required></div></div>
+                        <div class="col-md-2"><div class="form-group"><label>M.I.</label><input type="text" class="form-control" name="requested_by_middle_initial" id="requested_by_middle_initial" maxlength="2"></div></div>
+                    </div>
+
+                    <hr class="my-4">
+                    <div class="row">
+                        <div class="col-md-6"><div class="form-group"><label>Email *</label><input type="email" class="form-control" name="email" id="email" required></div></div>
                         <div class="col-md-6"><div class="form-group"><label>Contact Number *</label><input type="tel" class="form-control" name="contact" id="contact" maxlength="11" pattern="[0-9]{11}" required></div></div>
                     </div>
                     <hr>
@@ -1384,16 +1538,8 @@ if ($selected_customer_type) {
                 <div class="form-step" id="step3Form">
                     <p class="mb-3"><strong>Add date and time for each selected facility (7:00 AM - 11:00 PM only).</strong></p>
                     <div id="scheduleFacilitiesContainer"></div>
-                    <!-- Live pricing summary for external clients -->
-                    <div id="priceSummaryBox" style="display:none;margin-top:1rem;border:1.5px solid #f5c6cb;border-radius:12px;background:linear-gradient(135deg,#fff5f5,#ffe8e8);padding:1rem 1.2rem;">
-                        <div style="font-size:.82rem;font-weight:700;color:#8b0000;margin-bottom:.6rem;"><i class="bi bi-calculator me-1"></i>Estimated Cost Breakdown</div>
-                        <div id="priceSummaryLines" style="font-size:.8rem;color:#555;line-height:2;"></div>
-                        <div style="border-top:1px solid #f5c6cb;margin-top:.6rem;padding-top:.6rem;display:flex;justify-content:space-between;align-items:center;">
-                            <strong style="color:#8b0000;font-size:.85rem;">Estimated Total</strong>
-                            <strong style="color:#b71c1c;font-size:1.1rem;" id="priceSummaryTotal">₱0.00</strong>
-                        </div>
-                        <div style="font-size:.7rem;color:#888;margin-top:.4rem;"><i class="bi bi-info-circle me-1"></i>Sound system fee added at checkout if selected. Actual bill may vary.</div>
-                    </div>
+                    <!-- Live pricing summary deliberately removed per user request -->
+                    <div id="priceSummaryBox" style="display:none;"></div>
                     <p class="text-danger small mt-2" id="scheduleError" style="display:none">Please add at least one schedule for each selected facility.</p>
                     <div class="form-buttons">
                         <button type="button" class="btn-res btn-prev" onclick="goToStep(2)">Back</button>
@@ -1527,19 +1673,7 @@ if ($selected_customer_type) {
                             </div>
                         </div>
 
-                        <!-- Mono Block Chairs -->
-                        <div class="misc-item">
-                            <label class="misc-main-label">
-                                <input type="checkbox" class="misc-cb" data-key="mono_block_chairs"> 
-                                <span class="misc-title">Mono Block Chairs</span>
-                                <span class="misc-limits">(Max: 100)</span>
-                            </label>
-                            <div class="misc-single-item">
-                                <input type="number" class="form-control misc-qty-inline" data-key="mono_block_chairs" 
-                                       min="0" max="100" value="0" placeholder="Quantity" disabled>
-                                <span class="limit-hint">max 100</span>
-                            </div>
-                        </div>
+                        <!-- Mono Block Chairs removed per user request -->
                     </div>
                 
                     <input type="hidden" name="banquet_style_id" id="banquetStyleId" value="">
@@ -1571,31 +1705,66 @@ if ($selected_customer_type) {
 <!-- Time slot modal -->
 <div class="res-modal time-slot-modal" id="timeSlotModal">
     <div class="modal-box">
-        <h4>Add Schedule</h4>
-        <div class="form-group">
-            <label>Date *</label>
-            <input type="date" class="form-control" id="timeModalDateInput" min="<?= date('Y-m-d') ?>">
-        </div>
-        <div id="availabilityStatus" style="display:none; margin-bottom:0.75rem; padding:0.6rem 0.9rem; border-radius:8px; font-size:0.875rem;"></div>
-        <div class="time-grid">
-            <div class="form-group">
-                <label>Start Time * (7:00 AM - 10:30 PM)</label>
-                <select class="form-select" id="timeModalStart">
-                    <option value="">Select date first</option>
-                </select>
+        <h4><i class="bi bi-calendar-plus-fill"></i> Add Schedule</h4>
+        
+        <div class="modern-switch-container">
+            <div class="switch-label-group">
+                <span class="switch-title">Multiple day event?</span>
+                <span class="switch-desc">Toggle for events spanning more than one day</span>
             </div>
-            <div class="form-group">
-                <label>End Time * (7:30 AM - 11:00 PM)</label>
-                <select class="form-select" id="timeModalEnd">
-                    <option value="">Select start time first</option>
-                </select>
+            <label class="modern-switch">
+                <input type="checkbox" id="multiDayToggle">
+                <span class="slider"></span>
+            </label>
+        </div>
+
+        <div id="availabilityStatus" style="display:none;"></div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label id="dateLabel"><i class="bi bi-calendar-event"></i> Date</label>
+                    <input type="date" class="form-control" id="timeModalDateInput" min="<?= date('Y-m-d') ?>">
+                </div>
+            </div>
+            <div class="col-md-6" id="endDateWrap" style="display:none">
+                <div class="form-group">
+                    <label><i class="bi bi-calendar-range"></i> End Date</label>
+                    <input type="date" class="form-control" id="timeModalEndDate" min="<?= date('Y-m-d') ?>">
+                </div>
             </div>
         </div>
-        <div id="bookedSlotsInfo" style="display:none; margin-top:0.5rem; font-size:0.8rem; color:#721c24; background:#f8d7da; padding:0.5rem 0.75rem; border-radius:6px;"></div>
-        <div id="timeModalError" style="display:none; margin-top:0.75rem; padding:0.65rem 0.9rem; border-radius:8px; font-size:0.875rem; background:#f8d7da; color:#721c24; border-left:3px solid #dc3545;"></div>
-        <div class="d-flex gap-2 justify-content-end mt-3">
-            <button type="button" class="btn-res btn-prev" onclick="closeTimeModal()">Cancel</button>
-            <button type="button" class="btn-res btn-next" id="addScheduleBtn" onclick="confirmTimeSlot()">Add Schedule</button>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label><i class="bi bi-clock"></i> Start Time</label>
+                    <select class="form-select" id="timeModalStart">
+                        <option value="">Select date first</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label><i class="bi bi-clock-history"></i> End Time</label>
+                    <select class="form-select" id="timeModalEnd">
+                        <option value="">Select start time first</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div id="bookedSlotsInfo" style="display:none;"></div>
+        
+        <div id="timeModalError" style="display:none;"></div>
+
+        <div class="modal-btns">
+            <button type="button" class="btn-res-modal btn-m-cancel" onclick="closeTimeModal()">
+                <i class="bi bi-x-lg"></i> Cancel
+            </button>
+            <button type="button" class="btn-res-modal btn-m-add" id="addScheduleBtn" onclick="confirmTimeSlot()" disabled>
+                <i class="bi bi-plus-lg"></i> Add Schedule
+            </button>
         </div>
     </div>
 </div>
@@ -2817,58 +2986,8 @@ function updateVenuePricingDisplay() {
 
 /** Build / refresh the live cost summary in Step 3 (External only). */
 function updateSchedulePriceSummary() {
-    var box = document.getElementById('priceSummaryBox');
-    var linesEl = document.getElementById('priceSummaryLines');
-    var totalEl = document.getElementById('priceSummaryTotal');
-    if (!box || !linesEl || !totalEl) return;
-
-    if (!isExternalOffice()) {
-        box.style.display = 'none';
-        return;
-    }
-
-    var rates = getVenueRates();
-    var lines = '';
-    var grandTotal = 0;
-    var hasSchedules = false;
-
-    // Loop over selected venues and their schedules
-    Object.keys(facilitySchedules || {}).forEach(function(vid) {
-        var scheds = facilitySchedules[vid];
-        if (!scheds || scheds.length === 0) return;
-        // Find the venue name
-        var venueObj = (selectedVenues || []).find(function(v){ return String(v.id) === String(vid); });
-        var vname = venueObj ? venueObj.name : 'Venue #' + vid;
-
-        scheds.forEach(function(sched) {
-            if (!sched.start || !sched.end) return;
-            hasSchedules = true;
-            // Compute hours
-            var startParts = sched.start.split(':').map(Number);
-            var endParts   = sched.end.split(':').map(Number);
-            var startMins  = startParts[0] * 60 + (startParts[1] || 0);
-            var endMins    = endParts[0]   * 60 + (endParts[1]   || 0);
-            if (endMins <= startMins) endMins += 24 * 60; // overnight
-            var hours = (endMins - startMins) / 60;
-
-            var calc = calcVenueCost(hours, rates);
-            grandTotal += calc.cost;
-
-            lines += '<div style="display:flex;justify-content:space-between;">' +
-                     '<span>' + escapeHtml(vname) + ' — ' + escapeHtml(sched.date || '') + ' (' + hours.toFixed(1) + 'h, ' + calc.type + ')</span>' +
-                     '<strong style="color:#b71c1c;">' + formatPHP(calc.cost) + '</strong>' +
-                     '</div>';
-        });
-    });
-
-    if (!hasSchedules) {
-        box.style.display = 'none';
-        return;
-    }
-
-    linesEl.innerHTML = lines;
-    totalEl.textContent = formatPHP(grandTotal);
-    box.style.display = 'block';
+    // Disabled calculation per user request
+    return;
 }
 
 
@@ -3739,6 +3858,31 @@ function openTimeModal(venueId, venueName) {
     }
     dateInput.value = dateVal;
 
+    // ---- Multi-day toggle handling ----
+    var multiDayToggle = document.getElementById('multiDayToggle');
+    var endDateWrap = document.getElementById('endDateWrap');
+    var dateLabel = document.getElementById('dateLabel');
+    if (multiDayToggle) {
+        multiDayToggle.checked = false;
+        endDateWrap.style.display = 'none';
+        dateLabel.innerHTML = '<i class="bi bi-calendar-event"></i> Date';
+        
+        if (window._multiDayToggleHandler) {
+            multiDayToggle.removeEventListener('change', window._multiDayToggleHandler);
+        }
+        window._multiDayToggleHandler = function() {
+            if (this.checked) {
+                endDateWrap.style.display = 'block';
+                dateLabel.innerHTML = '<i class="bi bi-calendar-event"></i> Start Date';
+            } else {
+                endDateWrap.style.display = 'none';
+                dateLabel.innerHTML = '<i class="bi bi-calendar-event"></i> Date';
+                document.getElementById('timeModalEndDate').value = '';
+            }
+        };
+        multiDayToggle.addEventListener('change', window._multiDayToggleHandler);
+    }
+
     // ---- Clean removal of previous named listeners (no clone needed) ----
     if (_timeModalDateHandler) {
         dateInput.removeEventListener('change', _timeModalDateHandler);
@@ -3760,6 +3904,16 @@ function openTimeModal(venueId, venueName) {
     _timeModalDateHandler = function() {
         var newDate = this.value;
         if (!newDate) return;
+
+        // Ensure End Date cannot be before Start Date
+        var endInput = document.getElementById('timeModalEndDate');
+        if (endInput) {
+            endInput.min = newDate;
+            if (endInput.value && endInput.value < newDate) {
+                endInput.value = newDate;
+            }
+        }
+
         // Guard: only handle if this is still the current modal session
         if (myGeneration !== timeModalGeneration) return;
         console.log('Date changed to', newDate, 'for venue', venueId);
@@ -3892,6 +4046,10 @@ function confirmTimeSlot() {
     var venueId = timeModalContext.venueId;
     var venueName = timeModalContext.venueName;
     var dateVal = document.getElementById('timeModalDateInput').value;
+    
+    var isMulti = document.getElementById('multiDayToggle')?.checked;
+    var endDateVal = isMulti ? document.getElementById('timeModalEndDate').value : dateVal;
+    
     var start   = document.getElementById('timeModalStart').value;
     var end     = document.getElementById('timeModalEnd').value;
     
@@ -3925,7 +4083,17 @@ function confirmTimeSlot() {
     
     if (!dateVal) {
         console.log('Validation failed: No date selected');
-        showModalAlert('📅', 'Date Required', 'Please select a date before adding a schedule.');
+        showModalAlert('📅', 'Date Required', 'Please select a start date before adding a schedule.');
+        return;
+    }
+    if (!endDateVal) {
+        console.log('Validation failed: No end date selected');
+        showModalAlert('📅', 'End Date Required', 'Please select an end date before adding a schedule.');
+        return;
+    }
+    if (endDateVal < dateVal) {
+        console.log('Validation failed: End date < start date');
+        showModalAlert('📅', 'Invalid Date Range', 'End date must be the same as or after the start date.');
         return;
     }
     if (!start) {
@@ -3943,9 +4111,9 @@ function confirmTimeSlot() {
     var endM   = timeToMins(end);
     console.log('Time in minutes - Start:', startM, 'End:', endM);
     
-    if (endM <= startM) {
-        console.log('Validation failed: End time must be after start time');
-        showModalAlert('⚠️', 'Invalid Time Range', 'End time must be after start time. Please adjust your selection.');
+    if (endDateVal === dateVal && endM <= startM) {
+        console.log('Validation failed: End time must be after start time on same day');
+        showModalAlert('⚠️', 'Invalid Time Range', 'End time must be after start time on the same day. Please adjust your selection.');
         return;
     }
     
@@ -3954,17 +4122,12 @@ function confirmTimeSlot() {
     console.log('Checking against', bookedSlots.length, 'booked slots');
 
     var serverConflict = bookedSlots.some(function(b, index) {
-        console.log(`Checking against booked slot ${index + 1}:`, b);
-        console.log(`  - Proposed: ${start} to ${end}`);
-        console.log(`  - Booked: ${b.start} to ${b.end} (buffer until ${b.buffer_end})`);
+        var date1_start = new Date(dateVal + ' ' + start);
+        var date1_end = new Date(endDateVal + ' ' + end);
+        var date2_start = new Date(dateVal + ' ' + b.start);
+        var date2_end = new Date(dateVal + ' ' + b.buffer_end);
         
-        // Convert to comparable format
-        var conflict = start < b.end && end > b.start;
-        if (conflict) {
-            console.log(`  ❌ CONFLICT DETECTED! Proposed (${start}-${end}) overlaps with booked (${b.start}-${b.end})`);
-        } else {
-            console.log(`  ✅ No conflict with this booked slot`);
-        }
+        var conflict = (date1_start < date2_end && date1_end > date2_start);
         return conflict;
     });
 
@@ -3984,10 +4147,12 @@ function confirmTimeSlot() {
     console.log('Current facilitySchedules for venue', venueId, ':', facilitySchedules[venueId]);
     
     var hasOverlap = facilitySchedules[venueId].some(function(s, index) {
-        if (s.date !== dateVal) return false;
-        var sStartM = timeToMins(s.start);
-        var sEndM   = timeToMins(s.end);
-        var overlap = (startM < sEndM && endM > sStartM);
+        var date1_start = new Date(dateVal + ' ' + start);
+        var date1_end = new Date(endDateVal + ' ' + end);
+        var date2_start = new Date(s.date + ' ' + s.start);
+        var date2_end = new Date((s.endDate || s.date) + ' ' + s.end);
+        
+        var overlap = (date1_start < date2_end && date1_end > date2_start);
         if (overlap) {
             console.log(`❌ Overlaps with existing schedule ${index + 1}:`, s);
         }
@@ -4006,7 +4171,7 @@ function confirmTimeSlot() {
     
     // All good — add the schedule
     console.log('✅ No conflicts found! Adding schedule...');
-    var entry = { date: dateVal, start: start, end: end };
+    var entry = { date: dateVal, endDate: endDateVal, start: start, end: end };
     
     if (!facilitySchedules[venueId]) {
         facilitySchedules[venueId] = [];
@@ -4069,11 +4234,16 @@ function updateScheduleList(venueId) {
     var html = '';
     schedules.forEach(function(s, index) {
         var displayDate = formatDateDisplay(s.date);
+        var displayEndDate = formatDateDisplay(s.endDate || s.date);
         var displayStart = formatTime(s.start);
         var displayEnd = formatTime(s.end);
         
+        var dateText = (s.date === (s.endDate || s.date)) 
+            ? displayDate 
+            : displayDate + ' to ' + displayEndDate;
+            
         html += '<div class="schedule-item">';
-        html += '<span class="schedule-text">' + displayDate + ' • ' + displayStart + ' - ' + displayEnd + '</span>';
+        html += '<span class="schedule-text">' + dateText + ' • ' + displayStart + ' - ' + displayEnd + '</span>';
         html += '<button type="button" class="btn-remove" onclick="removeSchedule(\'' + venueId + '\', ' + index + ')" title="Remove">×</button>';
         html += '</div>';
     });
@@ -4241,9 +4411,16 @@ function buildFunctionSummary() {
         
         facilitySchedules[vid].forEach(function(s, i) {
             var startDt = s.date + ' ' + s.start;
-            var endDt = s.date + ' ' + s.end;
-            var durH = ((new Date(endDt) - new Date(startDt)) / (1000*60*60)).toFixed(1);
-            html += '<div class="summary-item"><strong>Date:</strong> ' + formatDateDisplay(s.date) + '</div>';
+            var endDt = (s.endDate || s.date) + ' ' + s.end;
+            var diffMs = new Date(endDt) - new Date(startDt);
+            if(diffMs < 0) diffMs = 0;
+            var durH = (diffMs / (1000*60*60)).toFixed(1);
+            
+            var dateText = (s.date === (s.endDate || s.date)) 
+                ? formatDateDisplay(s.date) 
+                : formatDateDisplay(s.date) + ' to ' + formatDateDisplay(s.endDate || s.date);
+                
+            html += '<div class="summary-item"><strong>Date:</strong> ' + dateText + '</div>';
             html += '<div class="summary-item"><strong>Time:</strong> ' + formatTime(s.start) + ' to ' + formatTime(s.end) + ' (' + durH + ' hrs) - ' + venueName + '</div>';
         });
     }
@@ -4273,54 +4450,7 @@ function buildFunctionSummary() {
         });
     }
     
-    // ── Cost Breakdown (External clients only) ──────────────────────────
-    if (isExternalOffice()) {
-        var rates = getVenueRates();
-        var summaryLines = '';
-        var sumTotal = 0;
-        var hasSched = false;
-
-        for (var cvid in facilitySchedules) {
-            var cVenue = selectedVenues.find(function(v){ return v.id == cvid; });
-            var cName = cVenue ? cVenue.name : 'Venue';
-            (facilitySchedules[cvid] || []).forEach(function(cs) {
-                if (!cs.start || !cs.end) return;
-                hasSched = true;
-                var sp = cs.start.split(':').map(Number);
-                var ep = cs.end.split(':').map(Number);
-                var sm = sp[0]*60 + (sp[1]||0);
-                var em = ep[0]*60 + (ep[1]||0);
-                if (em <= sm) em += 24*60;
-                var hrs = (em - sm) / 60;
-                var calc = calcVenueCost(hrs, rates);
-                sumTotal += calc.cost;
-                summaryLines += '<div style="display:flex;justify-content:space-between;font-size:.82rem;padding:.2rem 0;">' +
-                    '<span>' + escapeHtml(cName) + ' — ' + escapeHtml(cs.date||'') + ' (' + hrs.toFixed(1) + 'h, ' + calc.type + ')</span>' +
-                    '<strong style="color:#b71c1c;">' + formatPHP(calc.cost) + '</strong></div>';
-            });
-        }
-
-        if (hasSched) {
-            var soundFeeNote = '';
-            if (hasSoundSystem) {
-                sumTotal += rates.soundFee;
-                soundFeeNote = '<div style="display:flex;justify-content:space-between;font-size:.82rem;padding:.2rem 0;">' +
-                    '<span>🔊 Basic Sound System</span>' +
-                    '<strong style="color:#b71c1c;">' + formatPHP(rates.soundFee) + '</strong></div>';
-            }
-
-            html += '<h6 class="text-danger mt-3 mb-2">💰 Cost Breakdown</h6>';
-            html += '<div style="background:linear-gradient(135deg,#fff5f5,#ffe8e8);border:1.5px solid #f5c6cb;border-radius:10px;padding:.85rem 1rem;margin-top:.5rem;">';
-            html += summaryLines;
-            html += soundFeeNote;
-            html += '<div style="border-top:1px dashed #f5c6cb;margin:.5rem 0;"></div>';
-            html += '<div style="display:flex;justify-content:space-between;font-size:.9rem;">' +
-                    '<strong style="color:#8b0000;">Total Amount Due</strong>' +
-                    '<strong style="color:#b71c1c;font-size:1.1rem;">' + formatPHP(sumTotal) + '</strong></div>';
-            html += '<div style="font-size:.72rem;color:#b71c1c;margin-top:.5rem;"><i class="bi bi-exclamation-circle me-1"></i>Payment must be settled <strong>before the day of the event.</strong></div>';
-            html += '</div>';
-        }
-    }
+    // Cost Breakdown removed per user request
     
     var banquetId = document.getElementById('banquetStyleId')?.value;
     if (banquetId) {
@@ -4647,6 +4777,10 @@ function submitToServer(formData, url) {
     btn.disabled = true;
     btn.textContent = 'Submitting...';
     
+    if (typeof window.showGlobalLoader === 'function') {
+        window.showGlobalLoader('Submitting your reservation. Please wait...');
+    }
+    
     fetch(url, { 
         method: 'POST', 
         body: formData 
@@ -4688,6 +4822,9 @@ function submitToServer(formData, url) {
         document.getElementById('resultModal').classList.add('show');
     })
     .finally(function() {
+        if (typeof window.hideGlobalLoader === 'function') {
+            window.hideGlobalLoader();
+        }
         btn.disabled = false;
         btn.textContent = originalText;
     });

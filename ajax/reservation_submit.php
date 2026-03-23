@@ -36,8 +36,6 @@ try {
     $booking_no = 'FAC-' . date('Ymd') . '-' . str_pad(rand(1, 999), 3, '0', STR_PAD_LEFT);
     $reservation_no = 'RES-' . date('Ymd') . '-' . str_pad(rand(1, 999), 3, '0', STR_PAD_LEFT);
     
-    write_log("Generated numbers - booking_no: $booking_no, reservation_no: $reservation_no");
-
     // Get and sanitize POST data
     $last_name = clean($_POST['last_name'] ?? '');
     $first_name = clean($_POST['first_name'] ?? '');
@@ -47,6 +45,10 @@ try {
     $office_type_id = (int)($_POST['office_type_id'] ?? 0);
     $office_id = isset($_POST['office_id']) && $_POST['office_id'] !== '' ? (int)$_POST['office_id'] : null;
     $external_office_name = clean($_POST['office_external_name'] ?? '');
+    
+    $requested_by_last_name = clean($_POST['requested_by_last_name'] ?? '');
+    $requested_by_first_name = clean($_POST['requested_by_first_name'] ?? '');
+    $requested_by_middle_initial = clean($_POST['requested_by_middle_initial'] ?? '');
     
     // Get activity_name
     $activity_name = $_POST['activity_name'] ?? '';
@@ -119,7 +121,8 @@ try {
     }
 
     $start_datetime = $first_schedule['date'] . ' ' . $first_schedule['start'];
-    $end_datetime = $first_schedule['date'] . ' ' . $first_schedule['end'];
+    $end_date = $first_schedule['endDate'] ?? $first_schedule['date'];
+    $end_datetime = $end_date . ' ' . $first_schedule['end'];
     
     write_log("Times - start_datetime: $start_datetime, end_datetime: $end_datetime");
 
@@ -161,14 +164,18 @@ try {
         $venue_ids_to_check[] = $venue_id;
     }
 
+    // Server-side conflict check (using daily recurring logic)
     $conflict_check_sql = "
-        SELECT COUNT(*) as conflict
+        SELECT 1 as conflict
         FROM reservation_venues rv
         JOIN facility_reservations fr ON rv.reservation_id = fr.id
         WHERE rv.venue_id = ?
-          AND rv.start_datetime < ?
-          AND rv.end_datetime > DATE_ADD(?, INTERVAL -1 HOUR)
+          AND DATE(rv.start_datetime) <= ? 
+          AND DATE(rv.end_datetime) >= ?
+          AND TIME(rv.start_datetime) < ?
+          AND ADDTIME(TIME(rv.end_datetime), '01:00:00') > ?
           AND fr.status = 'approved'
+          LIMIT 1
     ";
     $conflict_stmt = $conn->prepare($conflict_check_sql);
     if (!$conflict_stmt) {
@@ -181,17 +188,19 @@ try {
 
         // Get this venue's schedule from the JSON
         $v_schedules = $schedules[$check_vid] ?? [];
-        $v_start = !empty($v_schedules) ? $v_schedules[0]['date'] . ' ' . $v_schedules[0]['start'] : $start_datetime;
-        $v_end   = !empty($v_schedules) ? $v_schedules[0]['date'] . ' ' . $v_schedules[0]['end']   : $end_datetime;
+        $v_start_date = !empty($v_schedules) ? $v_schedules[0]['date'] : date('Y-m-d', strtotime($start_datetime));
+        $v_end_date   = !empty($v_schedules) ? ($v_schedules[0]['endDate'] ?? $v_start_date) : date('Y-m-d', strtotime($end_datetime));
+        $v_start_time = !empty($v_schedules) ? $v_schedules[0]['start'] : date('H:i:s', strtotime($start_datetime));
+        $v_end_time   = !empty($v_schedules) ? $v_schedules[0]['end'] : date('H:i:s', strtotime($end_datetime));
 
-        $conflict_stmt->bind_param("iss", $check_vid, $v_end, $v_start);
+        $conflict_stmt->bind_param("issss", $check_vid, $v_end_date, $v_start_date, $v_end_time, $v_start_time);
         $conflict_stmt->execute();
         $conflict_result = $conflict_stmt->get_result()->fetch_assoc();
 
-        if ((int)$conflict_result['conflict'] > 0) {
+        if (isset($conflict_result['conflict']) && (int)$conflict_result['conflict'] > 0) {
             $venue_name_q = $conn->query("SELECT name FROM venues WHERE id = $check_vid");
             $venue_name   = $venue_name_q ? $venue_name_q->fetch_assoc()['name'] : "Venue #$check_vid";
-            throw new Exception("$venue_name is already booked for the selected time (or within the 1-hour cleaning buffer). Please choose a different time.");
+            throw new Exception("$venue_name is already booked for the selected time (or within the 1-hour cleaning buffer) on those dates. Please choose a different time.");
         }
     }
     $conflict_stmt->close();
@@ -202,63 +211,8 @@ try {
     $misc_data = json_decode($miscellaneous_items_raw, true) ?: [];
 
     // ── Price calculation for External clients ─────────────────────────────
-    $estimated_total    = 0;
-    $price_breakdown    = [];
-    $has_sound_system   = isset($misc_data['basic_sound_system']);
-
     if ($office_type_name === 'External') {
-        // Fetch rates from the first selected venue
-        $rates_row = null;
-        if ($venue_id) {
-            $rq = $conn->query("SELECT half_day_rate, whole_day_rate, extension_rate, sound_system_fee
-                                FROM venues WHERE id = $venue_id LIMIT 1");
-            if ($rq) $rates_row = $rq->fetch_assoc();
-        }
-        $rate_half  = (float)($rates_row['half_day_rate']    ?? 2000);
-        $rate_whole = (float)($rates_row['whole_day_rate']   ?? 3000);
-        $rate_ext   = (float)($rates_row['extension_rate']   ?? 400);
-        $rate_sound = (float)($rates_row['sound_system_fee'] ?? 1500);
-
-        foreach ($schedules as $vid => $vscheds) {
-            foreach ($vscheds as $sched) {
-                $startTs = strtotime($sched['date'] . ' ' . $sched['start']);
-                $endTs   = strtotime($sched['date'] . ' ' . $sched['end']);
-                if ($endTs <= $startTs) $endTs += 86400; // overnight
-                $hours = ($endTs - $startTs) / 3600;
-
-                if ($hours <= 4) {
-                    $type = 'Half Day';  $cost = $rate_half;
-                } elseif ($hours <= 8) {
-                    $type = 'Whole Day'; $cost = $rate_whole;
-                } else {
-                    $overH = ceil($hours - 8);
-                    $type  = 'Whole Day + ' . $overH . 'h Extension';
-                    $cost  = $rate_whole + ($overH * $rate_ext);
-                }
-
-                $price_breakdown[] = [
-                    'venue_id'  => (int)$vid,
-                    'date'      => $sched['date'],
-                    'start'     => $sched['start'],
-                    'end'       => $sched['end'],
-                    'hours'     => round($hours, 2),
-                    'rate_type' => $type,
-                    'cost'      => $cost,
-                ];
-                $estimated_total += $cost;
-            }
-        }
-
-        if ($has_sound_system) {
-            $estimated_total += $rate_sound;
-            $price_breakdown[] = ['rate_type' => 'Sound System', 'cost' => $rate_sound];
-        }
-
-        // Embed pricing data into miscellaneous items JSON for storage
-        $misc_data['_price_breakdown'] = $price_breakdown;
-        $misc_data['_estimated_total'] = $estimated_total;
         $misc_data['_client_type']     = 'External';
-        write_log("External pricing total: $estimated_total");
     }
 
     // Capture terms/signature info
@@ -276,8 +230,9 @@ try {
         email, contact_number, office_type_id, office_id, external_office_name, 
         activity_name, event_type_id, venue_id, venue_setup_id, banquet_style_id,
         start_datetime, end_datetime, participants_count, miscellaneous_items, 
-        additional_instruction
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        additional_instruction, requested_by_last_name, requested_by_first_name, 
+        requested_by_middle_initial
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     
     write_log("SQL: $sql");
     
@@ -286,13 +241,9 @@ try {
         throw new Exception('Database prepare failed: ' . $conn->error);
     }
 
-    // Bind parameters - 20 variables, 20 type characters
-    // s=booking_no, s=reservation_no, s=last_name, s=first_name, s=middle_initial,
-    // s=email, s=contact, i=office_type_id, s=office_id, s=external_office_name,
-    // s=activity_name, i=event_type_id, i=venue_id, i=venue_setup_id, s=banquet_style_id,
-    // s=start_datetime, s=end_datetime, i=participants, s=miscellaneous_items, s=additional_instruction
+    // Bind parameters - 23 variables
     $stmt->bind_param(
-        "sssssssisssiiisssiss",
+        "sssssssisssiiisssisssss",
         $booking_no,
         $reservation_no,
         $last_name,
@@ -312,7 +263,10 @@ try {
         $end_datetime,
         $participants,
         $miscellaneous_items,
-        $additional_instruction
+        $additional_instruction,
+        $requested_by_last_name,
+        $requested_by_first_name,
+        $requested_by_middle_initial
     );
 
     if (!$stmt->execute()) {
@@ -354,7 +308,8 @@ try {
         // Get this venue's specific schedule from the JSON, fall back to main schedule
         $v_schedules = $schedules[$vid] ?? [];
         $v_start = !empty($v_schedules) ? $v_schedules[0]['date'] . ' ' . $v_schedules[0]['start'] : $start_datetime;
-        $v_end   = !empty($v_schedules) ? $v_schedules[0]['date'] . ' ' . $v_schedules[0]['end']   : $end_datetime;
+        $v_end_date = !empty($v_schedules) ? ($v_schedules[0]['endDate'] ?? $v_schedules[0]['date']) : null;
+        $v_end   = !empty($v_schedules) ? $v_end_date . ' ' . $v_schedules[0]['end']   : $end_datetime;
 
         $venue_insert_stmt->bind_param("iiss", $insert_id, $vid, $v_start, $v_end);
         if (!$venue_insert_stmt->execute()) {

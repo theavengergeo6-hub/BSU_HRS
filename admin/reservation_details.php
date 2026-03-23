@@ -741,12 +741,12 @@ body {
             <div class="rd-card">
                 <div class="rd-card-header">
                     <div class="ch-icon"><i class="bi bi-person-circle"></i></div>
-                    <div class="ch-title">Requester Information</div>
+                    <div class="ch-title">Main Contact Person</div>
                 </div>
                 <div class="rd-card-body">
                     <div class="field-grid">
                         <div class="field-item">
-                            <div class="f-label"><i class="bi bi-person-badge"></i> Full Name</div>
+                            <div class="f-label"><i class="bi bi-person-badge"></i> Contact Name</div>
                             <div class="f-value"><?= htmlspecialchars($reservation['last_name'] . ', ' . $reservation['first_name'] . ' ' . $reservation['middle_initial']) ?></div>
                         </div>
                         <div class="field-item">
@@ -773,6 +773,26 @@ body {
                     </div>
                 </div>
             </div>
+
+            <!-- Card 1.2: Requested By -->
+            <?php if (!empty($reservation['requested_by_last_name']) || !empty($reservation['requested_by_first_name'])): ?>
+            <div class="rd-card">
+                <div class="rd-card-header" style="background:rgba(183,28,28,0.03);">
+                    <div class="ch-icon"><i class="bi bi-file-earmark-person"></i></div>
+                    <div class="ch-title">Requested By (for Report)</div>
+                </div>
+                <div class="rd-card-body">
+                    <div class="field-grid">
+                        <div class="field-item full">
+                            <div class="f-label"><i class="bi bi-person-vcard"></i> Full Name</div>
+                            <div class="f-value" style="font-weight:700; color:var(--red);">
+                                <?= htmlspecialchars(($reservation['requested_by_last_name'] ?? '') . ', ' . ($reservation['requested_by_first_name'] ?? '') . ' ' . ($reservation['requested_by_middle_initial'] ?? '')) ?>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <?php endif; ?>
 
             <!-- Card 2: Event Details -->
             <div class="rd-card">
@@ -835,9 +855,28 @@ body {
                 <div class="rd-card-body">
                     <?php if (!empty($all_venues)):
                         $venues_by_date = [];
+                        $unique_dates = [];
                         foreach ($all_venues as $venue) {
-                            $dk = date("M j, Y", strtotime($venue['start_datetime']));
-                            $venues_by_date[$dk][] = $venue;
+                            $s_timestamp = strtotime($venue['start_datetime']);
+                            $e_timestamp = strtotime($venue['end_datetime']);
+                            $sdate = date("Y-m-d", $s_timestamp);
+                            $edate = date("Y-m-d", $e_timestamp);
+                            
+                            if ($sdate === $edate) {
+                                $date_header = date("M j, Y", $s_timestamp);
+                            } else {
+                                $date_header = date("M j, Y", $s_timestamp) . ' — ' . date("M j, Y", $e_timestamp);
+                            }
+                            
+                            $venues_by_date[$date_header][] = $venue;
+
+                            // Calculate unique days spanned
+                            $current = strtotime($sdate);
+                            $last = strtotime($edate);
+                            while ($current <= $last) {
+                                $unique_dates[date("Y-m-d", $current)] = true;
+                                $current = strtotime("+1 day", $current);
+                            }
                         }
                     ?>
                         <?php foreach ($venues_by_date as $date_key => $dvs): ?>
@@ -852,7 +891,15 @@ body {
                                             <div class="vr-floor"><?= htmlspecialchars($v['floor']) ?></div>
                                         </div>
                                         <div class="vr-time">
-                                            <?= date("g:i A", strtotime($v['start_datetime'])) ?> — <?= date("g:i A", strtotime($v['end_datetime'])) ?>
+                                            <?php 
+                                            $vsdt = strtotime($v['start_datetime']);
+                                            $vedt = strtotime($v['end_datetime']);
+                                            if (date('Y-m-d', $vsdt) === date('Y-m-d', $vedt)) {
+                                                echo date("g:i A", $vsdt) . ' — ' . date("g:i A", $vedt);
+                                            } else {
+                                                echo date("M j, g:i A", $vsdt) . ' — ' . date("M j, g:i A", $vedt);
+                                            }
+                                            ?>
                                         </div>
                                     </div>
                                 <?php endforeach; ?>
@@ -865,7 +912,7 @@ body {
                                 <div class="vstat-label">Total Venues</div>
                             </div>
                             <div class="vstat">
-                                <div class="vstat-num"><?= count($venues_by_date) ?></div>
+                                <div class="vstat-num"><?= count($unique_dates) ?></div>
                                 <div class="vstat-label">Total Days</div>
                             </div>
                         </div>
@@ -1123,6 +1170,8 @@ document.addEventListener('DOMContentLoaded', function() {
         let statusDisplay = statusSelect.value.replace('_', ' ').toUpperCase();
         if (!confirm('Are you sure you want to change this reservation to ' + statusDisplay + '?')) {
             e.preventDefault();
+        } else if (typeof window.showGlobalLoader === 'function') {
+            window.showGlobalLoader('Updating status to ' + statusDisplay + '...');
         }
     });
 });

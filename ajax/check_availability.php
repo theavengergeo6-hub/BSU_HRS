@@ -16,34 +16,27 @@ $booked_slots = [];
 $seen_slots = []; // For deduplication
 
 // 1. Check primary venue in facility_reservations - ONLY APPROVED
+$requested_start = $date . ' 00:00:00';
+$requested_end   = $date . ' 23:59:59';
+$req_s = strtotime($requested_start);
+$req_e = strtotime($requested_end) + 1; // exactly midnight next day
+
 $query1 = "SELECT start_datetime, end_datetime, 
           DATE_ADD(end_datetime, INTERVAL 1 HOUR) as buffer_end,
           id as reservation_id
           FROM facility_reservations 
           WHERE venue_id = ? 
-          AND DATE(start_datetime) = ? 
-          AND status = 'approved'"; // Changed from IN to only 'approved'
+          AND start_datetime <= ? 
+          AND DATE_ADD(end_datetime, INTERVAL 1 HOUR) > ?
+          AND status = 'approved'"; 
 
 $stmt1 = $conn->prepare($query1);
-$stmt1->bind_param("is", $venue_id, $date);
+$stmt1->bind_param("iss", $venue_id, $requested_end, $requested_start);
 $stmt1->execute();
 $result1 = $stmt1->get_result();
 
 while ($row = $result1->fetch_assoc()) {
-    $start_time = date('H:i', strtotime($row['start_datetime']));
-    $end_time = date('H:i', strtotime($row['end_datetime']));
-    $buffer_end = date('H:i', strtotime($row['buffer_end']));
-    
-    $slot_key = $start_time . '-' . $end_time;
-    
-    if (!isset($seen_slots[$slot_key])) {
-        $booked_slots[] = [
-            'start' => $start_time,
-            'end' => $end_time,
-            'buffer_end' => $buffer_end
-        ];
-        $seen_slots[$slot_key] = true;
-    }
+    process_row($row, $req_s, $req_e, $booked_slots, $seen_slots);
 }
 $stmt1->close();
 
@@ -54,29 +47,17 @@ $query2 = "SELECT rv.start_datetime, rv.end_datetime,
           FROM reservation_venues rv
           JOIN facility_reservations r ON rv.reservation_id = r.id
           WHERE rv.venue_id = ? 
-          AND DATE(rv.start_datetime) = ? 
-          AND r.status = 'approved'"; // Changed from IN to only 'approved'
+          AND rv.start_datetime <= ? 
+          AND DATE_ADD(rv.end_datetime, INTERVAL 1 HOUR) > ?
+          AND r.status = 'approved'"; 
 
 $stmt2 = $conn->prepare($query2);
-$stmt2->bind_param("is", $venue_id, $date);
+$stmt2->bind_param("iss", $venue_id, $requested_end, $requested_start);
 $stmt2->execute();
 $result2 = $stmt2->get_result();
 
 while ($row = $result2->fetch_assoc()) {
-    $start_time = date('H:i', strtotime($row['start_datetime']));
-    $end_time = date('H:i', strtotime($row['end_datetime']));
-    $buffer_end = date('H:i', strtotime($row['buffer_end']));
-    
-    $slot_key = $start_time . '-' . $end_time;
-    
-    if (!isset($seen_slots[$slot_key])) {
-        $booked_slots[] = [
-            'start' => $start_time,
-            'end' => $end_time,
-            'buffer_end' => $buffer_end
-        ];
-        $seen_slots[$slot_key] = true;
-    }
+    process_row($row, $req_s, $req_e, $booked_slots, $seen_slots);
 }
 $stmt2->close();
 
@@ -115,6 +96,62 @@ echo json_encode([
     'booked_slots' => $booked_slots,
     'available_starts' => $available_starts
 ]);
+
+function process_row($row, $req_s, $req_e, &$booked_slots, &$seen_slots) {
+    // Treat the booking as a daily recurring event between start date and end date
+    $db_start = strtotime($row['start_datetime']);
+    $db_end = strtotime($row['end_datetime']);
+    
+    // Extract dates
+    $start_date = date('Y-m-d', $db_start);
+    $end_date   = date('Y-m-d', $db_end);
+    $req_date   = date('Y-m-d', $req_s); // The requested date being queried (starts at 00:00:00)
+    
+    // If the requested date falls within the booking's date range (inclusive)
+    if ($req_date >= $start_date && $req_date <= $end_date) {
+        
+        // Extract the TIME portions
+        $start_time_str = date('H:i:s', $db_start);
+        $end_time_str   = date('H:i:s', $db_end);
+        
+        // Base the times on today's requested date
+        $effective_start = strtotime($req_date . ' ' . $start_time_str);
+        
+        // The original end time plus a 1-hour buffer
+        $end_timestamp = strtotime($req_date . ' ' . $end_time_str);
+        $effective_end = strtotime('+1 hour', $end_timestamp);
+        
+        // Now calculate slot in minutes
+        $start_mins = ($effective_start - $req_s) / 60;
+        $end_mins   = ($effective_end - $req_s) / 60;
+        
+        // Format to H:i
+        $sh = floor($start_mins / 60);
+        $sm = $start_mins % 60;
+        $start_time = sprintf('%02d:%02d', $sh, $sm);
+        
+        $eh = floor($end_mins / 60);
+        $em = $end_mins % 60;
+        
+        if ($end_mins >= 1440) { // >= 24 hours
+            $buffer_end_time = '23:59';
+        } else {
+            $buffer_end_time = sprintf('%02d:%02d', $eh, $em);
+        }
+        
+        $display_end = date('H:i', $end_timestamp);
+        
+        $slot_key = $start_time . '-' . $buffer_end_time;
+        if (!isset($seen_slots[$slot_key])) {
+            $booked_slots[] = [
+                'start' => $start_time,
+                'end' => $display_end,
+                'buffer_end' => $buffer_end_time
+            ];
+            $seen_slots[$slot_key] = true;
+        }
+    }
+}
 
 function timeToMins($time) {
     $parts = explode(':', $time);

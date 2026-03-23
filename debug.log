@@ -2782,3 +2782,328 @@ Stack trace:
 [2026-03-19 11:59:58] Inserted activity_name: Birthday ni CEO Greg Tomco
 [2026-03-19 11:59:58] Inserted 3 venue(s) into reservation_venues for reservation ID 33
 [2026-03-19 12:00:31] Confirmation email sent to imgregtomco@gmail.com
+[2026-03-21 07:44:00] ========== START reservation_submit.php ==========
+[2026-03-21 14:44:00] RAW POST data: Array
+(
+    [reservation_type] => function
+    [last_name] => De Guzman
+    [first_name] => Jeremie
+    [middle_initial] => R
+    [email] => ravelajemjem@gmail.com
+    [contact] => 09626970801
+    [office_type_id] => 1
+    [office_id] => 6
+    [event_type_id] => 5
+    [activity_name] => BSED Prom
+    [participants] => 100
+    [banquet_style_id] => 11
+    [guest_last_name] => 
+    [guest_first_name] => 
+    [guest_middle_initial] => 
+    [guest_dob] => 
+    [guest_address] => 
+    [guest_email] => 
+    [guest_contact] => 
+    [arrival_date] => 
+    [checkin_time] => 
+    [checkout_time] => 
+    [departure_date] => 
+    [adults_count] => 1
+    [kids_count] => 0
+    [guest_room_id] => 
+    [guest_remarks] => 
+    [registered_by] => 
+    [venue_ids] => Array
+        (
+            [0] => 3
+            [1] => 4
+            [2] => 5
+        )
+
+    [view_board_qty] => 1
+    [additional_instruction] => Palagyan ng Design for prom
+    [action] => submit_function
+    [event_type] => Programs and Special Events
+    [venue_id] => 3
+    [facilities_schedules] => {"venues":[{"id":"3","name":"Function Room C","floor":"Ground Floor"},{"id":"4","name":"Function Room D","floor":"Ground Floor"},{"id":"5","name":"Function Room E","floor":"Ground Floor"}],"schedules":{"3":[{"date":"2026-03-23","start":"17:00","end":"23:00"}],"4":[{"date":"2026-03-23","start":"17:00","end":"23:00"}],"5":[{"date":"2026-03-23","start":"17:00","end":"23:00"}]}}
+    [miscellaneous_items] => {"basic_sound_system":{"speaker":2,"mic":2},"round_table":{"quantity":16},"banquet_chairs":{"quantity":100},"view_board":{"requested":true},"rectangular_table":{"quantity":2}}
+    [terms_agreed_by] => De Guzman, Jeremie R.
+    [terms_position] => Student
+    [terms_date] => March 21, 2026
+)
+
+[2026-03-21 14:44:00] SPECIFIC CHECK - activity_name: 'BSED Prom'
+[2026-03-21 14:44:00] SPECIFIC CHECK - event_type_id: '5'
+[2026-03-21 14:44:00] Generated numbers - booking_no: FAC-20260321-365, reservation_no: RES-20260321-800
+[2026-03-21 14:44:00] BEFORE CLEAN - activity_name: 'BSED Prom'
+[2026-03-21 14:44:00] AFTER CLEAN - activity_name: 'BSED Prom'
+[2026-03-21 14:44:00] event_type_id: 5
+[2026-03-21 14:44:00] FINAL activity_name: 'BSED Prom'
+[2026-03-21 14:44:00] facilities_schedules decoded: Array
+(
+    [venues] => Array
+        (
+            [0] => Array
+                (
+                    [id] => 3
+                    [name] => Function Room C
+                    [floor] => Ground Floor
+                )
+
+            [1] => Array
+                (
+                    [id] => 4
+                    [name] => Function Room D
+                    [floor] => Ground Floor
+                )
+
+            [2] => Array
+                (
+                    [id] => 5
+                    [name] => Function Room E
+                    [floor] => Ground Floor
+                )
+
+        )
+
+    [schedules] => Array
+        (
+            [3] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-03-23
+                            [start] => 17:00
+                            [end] => 23:00
+                        )
+
+                )
+
+            [4] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-03-23
+                            [start] => 17:00
+                            [end] => 23:00
+                        )
+
+                )
+
+            [5] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-03-23
+                            [start] => 17:00
+                            [end] => 23:00
+                        )
+
+                )
+
+        )
+
+)
+
+[2026-03-21 14:44:00] Times - start_datetime: 2026-03-23 17:00, end_datetime: 2026-03-23 23:00
+[2026-03-21 14:44:00] Conflict check passed for all venues
+[2026-03-21 14:44:00] Terms info captured: De Guzman, Jeremie R. | Student
+[2026-03-21 14:44:00] SQL: INSERT INTO facility_reservations (
+        booking_no, reservation_no, last_name, first_name, middle_initial, 
+        email, contact_number, office_type_id, office_id, external_office_name, 
+        activity_name, event_type_id, venue_id, venue_setup_id, banquet_style_id,
+        start_datetime, end_datetime, participants_count, miscellaneous_items, 
+        additional_instruction
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+[2026-03-21 14:44:00] Success! Inserted ID: 34
+[2026-03-21 14:44:00] Inserted activity_name: BSED Prom
+[2026-03-21 14:44:00] Inserted 3 venue(s) into reservation_venues for reservation ID 34
+[2026-03-21 14:44:24] Confirmation email sent to ravelajemjem@gmail.com
+[2026-03-23 01:20:01] ========== START reservation_submit.php ==========
+[2026-03-23 08:20:01] RAW POST data: Array
+(
+    [reservation_type] => function
+    [last_name] => Sulek
+    [first_name] => Sam
+    [middle_initial] => S
+    [email] => geomarc789@gmail.com
+    [contact] => 09626970801
+    [office_type_id] => 4
+    [office_external_name] => SSS
+    [event_type_id] => 1
+    [activity_name] => Meet and Greet
+    [participants] => 40
+    [banquet_style_id] => 3
+    [guest_last_name] => 
+    [guest_first_name] => 
+    [guest_middle_initial] => 
+    [guest_dob] => 
+    [guest_address] => 
+    [guest_email] => 
+    [guest_contact] => 
+    [arrival_date] => 
+    [checkin_time] => 
+    [checkout_time] => 
+    [departure_date] => 
+    [adults_count] => 1
+    [kids_count] => 0
+    [guest_room_id] => 
+    [guest_remarks] => 
+    [registered_by] => 
+    [venue_ids] => Array
+        (
+            [0] => 4
+        )
+
+    [view_board_qty] => 1
+    [additional_instruction] => 
+    [action] => submit_function
+    [event_type] => Meeting and Conference
+    [venue_id] => 4
+    [facilities_schedules] => {"venues":[{"id":"4","name":"Function Room D","floor":"Ground Floor"}],"schedules":{"4":[{"date":"2026-03-23","endDate":"2026-03-24","start":"07:00","end":"17:00"}]}}
+    [miscellaneous_items] => {"basic_sound_system":{"speaker":2,"mic":2},"banquet_chairs":{"quantity":50},"view_board":{"requested":true},"rectangular_table":{"quantity":1}}
+    [terms_agreed_by] => Sulek, Sam S.
+    [terms_position] => Event Coordinator
+    [terms_date] => March 23, 2026
+)
+
+[2026-03-23 08:20:01] SPECIFIC CHECK - activity_name: 'Meet and Greet'
+[2026-03-23 08:20:01] SPECIFIC CHECK - event_type_id: '1'
+[2026-03-23 08:20:01] Generated numbers - booking_no: FAC-20260323-384, reservation_no: RES-20260323-849
+[2026-03-23 08:20:01] BEFORE CLEAN - activity_name: 'Meet and Greet'
+[2026-03-23 08:20:01] AFTER CLEAN - activity_name: 'Meet and Greet'
+[2026-03-23 08:20:01] event_type_id: 1
+[2026-03-23 08:20:01] FINAL activity_name: 'Meet and Greet'
+[2026-03-23 08:20:01] facilities_schedules decoded: Array
+(
+    [venues] => Array
+        (
+            [0] => Array
+                (
+                    [id] => 4
+                    [name] => Function Room D
+                    [floor] => Ground Floor
+                )
+
+        )
+
+    [schedules] => Array
+        (
+            [4] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-03-23
+                            [endDate] => 2026-03-24
+                            [start] => 07:00
+                            [end] => 17:00
+                        )
+
+                )
+
+        )
+
+)
+
+[2026-03-23 08:20:01] Times - start_datetime: 2026-03-23 07:00, end_datetime: 2026-03-24 17:00
+[2026-03-23 08:20:01] ERROR: Function Room D is already booked for the selected time (or within the 1-hour cleaning buffer). Please choose a different time.
+[2026-03-23 01:21:49] ========== START reservation_submit.php ==========
+[2026-03-23 08:21:49] RAW POST data: Array
+(
+    [reservation_type] => function
+    [last_name] => Sulek
+    [first_name] => Sam
+    [middle_initial] => S
+    [email] => geomarc789@gmail.com
+    [contact] => 09626970801
+    [office_type_id] => 4
+    [office_external_name] => SSS
+    [event_type_id] => 1
+    [activity_name] => Meet and Greet
+    [participants] => 40
+    [banquet_style_id] => 3
+    [guest_last_name] => 
+    [guest_first_name] => 
+    [guest_middle_initial] => 
+    [guest_dob] => 
+    [guest_address] => 
+    [guest_email] => 
+    [guest_contact] => 
+    [arrival_date] => 
+    [checkin_time] => 
+    [checkout_time] => 
+    [departure_date] => 
+    [adults_count] => 1
+    [kids_count] => 0
+    [guest_room_id] => 
+    [guest_remarks] => 
+    [registered_by] => 
+    [venue_ids] => Array
+        (
+            [0] => 4
+        )
+
+    [view_board_qty] => 1
+    [additional_instruction] => 
+    [action] => submit_function
+    [event_type] => Meeting and Conference
+    [venue_id] => 4
+    [facilities_schedules] => {"venues":[{"id":"4","name":"Function Room D","floor":"Ground Floor"}],"schedules":{"4":[{"date":"2026-03-24","endDate":"2026-03-25","start":"07:00","end":"17:00"}]}}
+    [miscellaneous_items] => {"basic_sound_system":{"speaker":2,"mic":2},"banquet_chairs":{"quantity":50},"view_board":{"requested":true},"rectangular_table":{"quantity":1}}
+    [terms_agreed_by] => Sulek, Sam S.
+    [terms_position] => Event Coordinator
+    [terms_date] => March 23, 2026
+)
+
+[2026-03-23 08:21:49] SPECIFIC CHECK - activity_name: 'Meet and Greet'
+[2026-03-23 08:21:49] SPECIFIC CHECK - event_type_id: '1'
+[2026-03-23 08:21:49] Generated numbers - booking_no: FAC-20260323-923, reservation_no: RES-20260323-100
+[2026-03-23 08:21:49] BEFORE CLEAN - activity_name: 'Meet and Greet'
+[2026-03-23 08:21:49] AFTER CLEAN - activity_name: 'Meet and Greet'
+[2026-03-23 08:21:49] event_type_id: 1
+[2026-03-23 08:21:49] FINAL activity_name: 'Meet and Greet'
+[2026-03-23 08:21:49] facilities_schedules decoded: Array
+(
+    [venues] => Array
+        (
+            [0] => Array
+                (
+                    [id] => 4
+                    [name] => Function Room D
+                    [floor] => Ground Floor
+                )
+
+        )
+
+    [schedules] => Array
+        (
+            [4] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-03-24
+                            [endDate] => 2026-03-25
+                            [start] => 07:00
+                            [end] => 17:00
+                        )
+
+                )
+
+        )
+
+)
+
+[2026-03-23 08:21:49] Times - start_datetime: 2026-03-24 07:00, end_datetime: 2026-03-25 17:00
+[2026-03-23 08:21:49] Conflict check passed for all venues
+[2026-03-23 08:21:49] Terms info captured: Sulek, Sam S. | Event Coordinator
+[2026-03-23 08:21:49] SQL: INSERT INTO facility_reservations (
+        booking_no, reservation_no, last_name, first_name, middle_initial, 
+        email, contact_number, office_type_id, office_id, external_office_name, 
+        activity_name, event_type_id, venue_id, venue_setup_id, banquet_style_id,
+        start_datetime, end_datetime, participants_count, miscellaneous_items, 
+        additional_instruction
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+[2026-03-23 08:21:49] Success! Inserted ID: 35
+[2026-03-23 08:21:49] Inserted activity_name: Meet and Greet
+[2026-03-23 08:21:49] Inserted 1 venue(s) into reservation_venues for reservation ID 35
+[2026-03-23 08:22:18] Confirmation email sent to geomarc789@gmail.com

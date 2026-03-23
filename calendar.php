@@ -44,101 +44,93 @@ while ($row = $venue_query->fetch_assoc()) {
     $color_index++;
 }
 
-// Get all approved reservations for the month with their venues
-$query = "
-    SELECT r.*, 
-           v.name as venue_name, 
-           v.floor,
-           et.name as event_type_name,
-           CONCAT(r.first_name, ' ', r.last_name) as requester_name,
-           ot.name as office_type_name,
+// Group reservations by date - handle multi-day accurately
+$events_by_date = [];
+
+// Calculate range shown on calendar
+$cur_tmp = strtotime('last Sunday of previous month', $month_start);
+if (date('w', $cur_tmp) != 0) $cur_tmp = strtotime('last Sunday', $month_start);
+$range_start_dt = date('Y-m-d', $cur_tmp);
+$range_end_dt   = date('Y-m-d', strtotime('+41 days', $cur_tmp));
+
+// Fetch all venue schedules that intersect the visible range
+$v_query = $conn->prepare("
+    SELECT rv.reservation_id, rv.start_datetime, rv.end_datetime,
+           v.name as venue_name, v.id as venue_id, v.floor,
+           r.activity_name, r.event_type_id, et.name as event_type_name,
+           r.first_name, r.last_name, ot.name as office_type_name,
            CASE WHEN r.office_type_id = 4 THEN r.external_office_name ELSE o.name END as office_name
-    FROM facility_reservations r
-    JOIN venues v ON r.venue_id = v.id
+    FROM reservation_venues rv
+    JOIN facility_reservations r ON rv.reservation_id = r.id
+    JOIN venues v ON rv.venue_id = v.id
     LEFT JOIN event_types et ON r.event_type_id = et.id
     LEFT JOIN office_types ot ON r.office_type_id = ot.id
     LEFT JOIN offices o ON r.office_id = o.id
     WHERE r.status = 'approved'
-    AND MONTH(r.start_datetime) = ? 
-    AND YEAR(r.start_datetime) = ?
-";
+      AND rv.start_datetime <= ?
+      AND rv.end_datetime >= ?
+" . ($filter_venue > 0 ? " AND rv.venue_id = $filter_venue" : "") . "
+    ORDER BY rv.start_datetime ASC
+");
 
-$params = [$month, $year];
-$types = "ii";
+$range_end_bound = $range_end_dt . ' 23:59:59';
+$range_start_bound = $range_start_dt . ' 00:00:00';
+$v_query->bind_param("ss", $range_end_bound, $range_start_bound);
+$v_query->execute();
+$v_res = $v_query->get_result();
 
-if ($filter_venue > 0) {
-    $query .= " AND r.venue_id = ?";
-    $params[] = $filter_venue;
-    $types .= "i";
-}
+$res_cache = [];
 
-$query .= " ORDER BY r.start_datetime ASC";
-
-$stmt = $conn->prepare($query);
-$stmt->bind_param($types, ...$params);
-$stmt->execute();
-$reservations = $stmt->get_result();
-
-// Get all reservation venues from the pivot table for multi-venue bookings
-$reservation_ids = [];
-$reservations_data = [];
-
-// First pass: store main reservation data
-while ($row = $reservations->fetch_assoc()) {
-    $reservation_ids[] = $row['id'];
-    $reservations_data[$row['id']] = $row;
-    // Initialize venues array with main venue
-    $reservations_data[$row['id']]['venues'] = [
-        [
-            'id' => $row['venue_id'],
-            'name' => $row['venue_name'],
-            'floor' => $row['floor'],
-            'color' => $venues_colors[$row['venue_id']] ?? '#b71c1c'
-        ]
-    ];
-}
-
-// If there are reservations, fetch all venues from reservation_venues
-if (!empty($reservation_ids)) {
-    $ids_string = implode(',', $reservation_ids);
-    $venues_query = $conn->query("
-        SELECT rv.reservation_id, v.id as venue_id, v.name as venue_name, v.floor
-        FROM reservation_venues rv
-        JOIN venues v ON rv.venue_id = v.id
-        WHERE rv.reservation_id IN ($ids_string)
-        ORDER BY rv.start_datetime ASC
-    ");
+while($row = $v_res->fetch_assoc()){
+    $rid = $row['reservation_id'];
     
-    if ($venues_query && $venues_query->num_rows > 0) {
-        while ($venue_row = $venues_query->fetch_assoc()) {
-            $res_id = $venue_row['reservation_id'];
-            // Check if this venue is not already the main venue
-            if (isset($reservations_data[$res_id])) {
-                $is_main = ($reservations_data[$res_id]['venue_id'] == $venue_row['venue_id']);
-                
-                if (!$is_main) {
-                    // Add to venues array
-                    $reservations_data[$res_id]['venues'][] = [
-                        'id' => $venue_row['venue_id'],
-                        'name' => $venue_row['venue_name'],
-                        'floor' => $venue_row['floor'],
-                        'color' => $venues_colors[$venue_row['venue_id']] ?? '#b71c1c'
-                    ];
-                }
-            }
-        }
+    // Add venue info to cache
+    if(!isset($res_cache[$rid])){
+        $res_cache[$rid] = $row;
+        $res_cache[$rid]['venues'] = [];
+    }
+    
+    $v_info = [
+        'id' => $row['venue_id'],
+        'name' => $row['venue_name'],
+        'floor' => $row['floor'],
+        'color' => $venues_colors[$row['venue_id']] ?? '#b71c1c'
+    ];
+    $res_cache[$rid]['venues'][] = $v_info;
+
+    // Place it on every day it spans within the visible range
+    $start_date = date('Y-m-d', strtotime($row['start_datetime']));
+    $end_date   = date('Y-m-d', strtotime($row['end_datetime']));
+    
+    $current = max(strtotime($start_date), strtotime($range_start_dt));
+    $last    = min(strtotime($end_date), strtotime($range_end_dt));
+    
+    while($current <= $last){
+        $d = date('Y-m-d', $current);
+        // We'll store the core event info, but we need to ensure unique entries etc if multiple venues?
+        // Let's store by reservation ID per date for now to avoid duplicates if same reservation has multi venues shown on same day
+        $events_by_date[$d][$rid] = $row; // Overwrites are fine, same basic info
+        // But we need to keep the venues array updated
+        $events_by_date[$d][$rid]['venues'][] = $v_info;
+        
+        $current = strtotime("+1 day", $current);
     }
 }
 
-// Group reservations by date
-$events_by_date = [];
-foreach ($reservations_data as $res_id => $reservation) {
-    if (isset($reservation['start_datetime'])) {
-        $date = date('Y-m-d', strtotime($reservation['start_datetime']));
-        if (!isset($events_by_date[$date])) {
-            $events_by_date[$date] = [];
+// Flatten the associative reservation IDs back to simple lists for display logic
+foreach($events_by_date as $d => $events_map){
+    $events_by_date[$d] = array_values($events_map);
+    // Deduplicate venues in each event (since same reservations might have multiple venues)
+    foreach($events_by_date[$d] as &$ev){
+        $temp_venues = [];
+        $vids = [];
+        foreach($ev['venues'] as $v){
+            if(!in_array($v['id'], $vids)){
+                $temp_venues[] = $v;
+                $vids[] = $v['id'];
+            }
         }
-        $events_by_date[$date][] = $reservation;
+        $ev['venues'] = $temp_venues;
     }
 }
 

@@ -761,6 +761,10 @@ document.addEventListener('DOMContentLoaded', function() {
             
             if (!confirm('Are you sure you want to mark this reservation as ' + status.toUpperCase() + '?')) {
                 e.preventDefault();
+            } else if (typeof window.showGlobalLoader === 'function') {
+                window.showGlobalLoader('Updating status to ' + status.toUpperCase() + '...');
+                // The form will now submit and the browser will navigate away,
+                // so the loader will stay visible until the page reloads.
             }
         });
     }
