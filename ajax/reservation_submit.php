@@ -238,7 +238,7 @@ try {
 
     // Bind parameters - 20 variables
     $stmt->bind_param(
-        "sssssssisssiiisssis",
+        "sssssssiissiiiississ",
         $booking_no,
         $reservation_no,
         $last_name,

@@ -36,25 +36,37 @@ if ($view === 'function') {
         $events = [];
         $seen   = [];
 
-        // Primary start_datetime
         $s1 = $conn->prepare("
             SELECT r.id, r.activity_name, r.status,
                    r.start_datetime, r.end_datetime,
                    v.name AS venue_name, v.floor,
-                   CONCAT(r.last_name,', ',r.first_name) AS requester,
-                   DATE(r.start_datetime) AS event_date
+                   CONCAT(r.last_name,', ',r.first_name) AS requester
             FROM facility_reservations r
             JOIN venues v ON r.venue_id = v.id
             WHERE r.status = ?
-              AND DATE(r.start_datetime) BETWEEN ? AND ?
+              AND r.start_datetime <= ?
+              AND r.end_datetime >= ?
             ORDER BY r.start_datetime ASC
         ");
-        $s1->bind_param('sss', $status, $start, $end);
+        $bound_end = $end . ' 23:59:59';
+        $bound_start = $start . ' 00:00:00';
+        $s1->bind_param('sss', $status, $bound_end, $bound_start);
         $s1->execute();
         foreach ($s1->get_result()->fetch_all(MYSQLI_ASSOC) as $row) {
-            $d = $row['event_date'];
-            $events[$d][] = $row;
-            $seen[$d][$row['id']] = true;
+            $sdate = date('Y-m-d', strtotime($row['start_datetime']));
+            $edate = date('Y-m-d', strtotime($row['end_datetime']));
+            
+            $curr = max(strtotime($sdate), strtotime($start));
+            $last = min(strtotime($edate), strtotime($end));
+            
+            while($curr <= $last){
+                $d = date('Y-m-d', $curr);
+                if (empty($seen[$d][$row['id']])) {
+                    $events[$d][] = $row;
+                    $seen[$d][$row['id']] = true;
+                }
+                $curr = strtotime("+1 day", $curr);
+            }
         }
         $s1->close();
 
@@ -64,21 +76,31 @@ if ($view === 'function') {
                    r.start_datetime, r.end_datetime,
                    v.name AS venue_name, v.floor,
                    CONCAT(r.last_name,', ',r.first_name) AS requester,
-                   DATE(rv.start_datetime) AS event_date
+                   rv.start_datetime as rv_start, rv.end_datetime as rv_end
             FROM reservation_venues rv
             JOIN facility_reservations r ON rv.reservation_id = r.id
             JOIN venues v ON rv.venue_id = v.id
             WHERE r.status = ?
-              AND DATE(rv.start_datetime) BETWEEN ? AND ?
+              AND rv.start_datetime <= ?
+              AND rv.end_datetime >= ?
             ORDER BY rv.start_datetime ASC
         ");
-        $s2->bind_param('sss', $status, $start, $end);
+        $s2->bind_param('sss', $status, $bound_end, $bound_start);
         $s2->execute();
         foreach ($s2->get_result()->fetch_all(MYSQLI_ASSOC) as $row) {
-            $d = $row['event_date'];
-            if (empty($seen[$d][$row['id']])) {
-                $events[$d][] = $row;
-                $seen[$d][$row['id']] = true;
+            $sdate = date('Y-m-d', strtotime($row['rv_start']));
+            $edate = date('Y-m-d', strtotime($row['rv_end']));
+            
+            $curr = max(strtotime($sdate), strtotime($start));
+            $last = min(strtotime($edate), strtotime($end));
+            
+            while($curr <= $last){
+                $d = date('Y-m-d', $curr);
+                if (empty($seen[$d][$row['id']])) {
+                    $events[$d][] = $row;
+                    $seen[$d][$row['id']] = true;
+                }
+                $curr = strtotime("+1 day", $curr);
             }
         }
         $s2->close();
@@ -181,7 +203,7 @@ $sql = "
     JOIN venues v ON r.venue_id = v.id
     LEFT JOIN office_types ot ON r.office_type_id = ot.id
     LEFT JOIN offices o ON r.office_id = o.id
-    WHERE DATE(r.start_datetime) = ? AND r.status IN ($ph)
+    WHERE r.start_datetime <= ? AND r.end_datetime >= ? AND r.status IN ($ph)
     UNION
     SELECT r.id, r.booking_no, r.activity_name, r.status,
            r.start_datetime, r.end_datetime,
@@ -196,11 +218,13 @@ $sql = "
     JOIN venues v ON rv.venue_id = v.id
     LEFT JOIN office_types ot ON r.office_type_id = ot.id
     LEFT JOIN offices o ON r.office_id = o.id
-    WHERE DATE(rv.start_datetime) = ? AND r.status IN ($ph)
+    WHERE rv.start_datetime <= ? AND rv.end_datetime >= ? AND r.status IN ($ph)
     ORDER BY status DESC, start_datetime ASC
 ";
 $stmt = $conn->prepare($sql);
-$vals = array_merge([$date], $statuses, [$date], $statuses);
+$date_end = $date . \' 23:59:59\';
+$date_start = $date . \' 00:00:00\';
+$vals = array_merge([$date_end, $date_start], $statuses, [$date_end, $date_start], $statuses);
 $types = str_repeat(\'s\', count($vals));
 $refs  = []; foreach ($vals as $k => $v) $refs[$k] = &$vals[$k];
 array_unshift($refs, $types);

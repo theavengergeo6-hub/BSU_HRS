@@ -30,7 +30,7 @@ $sql = "
     JOIN venues v ON r.venue_id = v.id
     LEFT JOIN office_types ot ON r.office_type_id = ot.id
     LEFT JOIN offices o ON r.office_id = o.id
-    WHERE DATE(r.start_datetime) = ? AND r.status IN ($ph)
+    WHERE r.start_datetime <= ? AND r.end_datetime >= ? AND r.status IN ($ph)
     UNION
     SELECT r.id, r.booking_no, r.activity_name, r.status,
            r.start_datetime, r.end_datetime,
@@ -45,11 +45,13 @@ $sql = "
     JOIN venues v ON rv.venue_id = v.id
     LEFT JOIN office_types ot ON r.office_type_id = ot.id
     LEFT JOIN offices o ON r.office_id = o.id
-    WHERE DATE(rv.start_datetime) = ? AND r.status IN ($ph)
+    WHERE rv.start_datetime <= ? AND rv.end_datetime >= ? AND r.status IN ($ph)
     ORDER BY status DESC, start_datetime ASC
 ";
 $stmt = $conn->prepare($sql);
-$vals = array_merge([$date], $statuses, [$date], $statuses);
+$date_end = $date . ' 23:59:59';
+$date_start = $date . ' 00:00:00';
+$vals = array_merge([$date_end, $date_start], $statuses, [$date_end, $date_start], $statuses);
 $types = str_repeat('s', count($vals));
 $refs  = []; foreach ($vals as $k => $v) $refs[$k] = &$vals[$k];
 array_unshift($refs, $types);

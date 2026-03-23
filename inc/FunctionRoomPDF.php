@@ -213,8 +213,7 @@ class FunctionRoomPDF
         $y3 = 125.0;   // Row 3 — Date & Time / Venue set-up
         $y4 = 137.5;   // Row 4 — Participants / Contact
 
-        // Event No.
-        $put(30.0, $yEvent, (string) ($d['booking_no'] ?? ''), 9.5);
+        // Event No. removed per request
 
         // Row 1 — Name | Office/College
         $putMulti($xLeft, $y1, $this->requestorName(), $leftColW, 9.2, 4.2);
@@ -373,14 +372,23 @@ class FunctionRoomPDF
         }
 
         // ── Signatures Overlay (Panel 0: Requestor) ──────────────────────────
-        // COORDINATES: X=14.0, Y=215.5 | FONT SIZE: 10
-        // Set border to 1 for debugging the box. Set to 0 when finished.
+        // COORDINATES: X=18.0, Y=215.5 | Cell Width=45mm | Auto-scaled font
         $reqName = $this->requestedByName();
         if ($reqName !== '') {
-            $pdf->SetFont('times', '', 11.5);
+            // Auto-scale font size based on name length for clean centering
+            $cellWidth = 45.0;
+            $baseFontSize = 11.5;
+            $pdf->SetFont('times', '', $baseFontSize);
+            // Scale down font if name is too wide for the cell
+            foreach ([11.5, 10.5, 9.5, 8.5, 7.5] as $fs) {
+                $pdf->SetFont('times', '', $fs);
+                if ($pdf->GetStringWidth(strtoupper($reqName)) <= $cellWidth - 1) {
+                    break;
+                }
+            }
             $pdf->SetTextColor(0, 0, 0);
             $pdf->SetXY(18.0, 215.5);
-            $pdf->Cell(45.0, 5, strtoupper($reqName), 0, 0, 'C');
+            $pdf->Cell($cellWidth, 5, strtoupper($reqName), 0, 0, 'C');
         }
     }
 
@@ -436,8 +444,7 @@ class FunctionRoomPDF
 
         $pdf->SetFont('helvetica', '', 8);
         $pdf->SetTextColor(0, 0, 0);
-        $pdf->SetXY($W - $lm - 48, 8);
-        $pdf->Cell(48, 5, 'Event No.: ' . ($d['booking_no'] ?? ''), 0, 0, 'R');
+        // Event No. removed per request
 
         // ── 3. FORM TITLE ─────────────────────────────────────────────────────
         $y = 38;

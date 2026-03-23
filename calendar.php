@@ -48,6 +48,7 @@ while ($row = $venue_query->fetch_assoc()) {
 $events_by_date = [];
 
 // Calculate range shown on calendar
+$month_start = strtotime("$year-$month-01");
 $cur_tmp = strtotime('last Sunday of previous month', $month_start);
 if (date('w', $cur_tmp) != 0) $cur_tmp = strtotime('last Sunday', $month_start);
 $range_start_dt = date('Y-m-d', $cur_tmp);
@@ -107,11 +108,66 @@ while($row = $v_res->fetch_assoc()){
     
     while($current <= $last){
         $d = date('Y-m-d', $current);
-        // We'll store the core event info, but we need to ensure unique entries etc if multiple venues?
-        // Let's store by reservation ID per date for now to avoid duplicates if same reservation has multi venues shown on same day
-        $events_by_date[$d][$rid] = $row; // Overwrites are fine, same basic info
-        // But we need to keep the venues array updated
+        if(!isset($events_by_date[$d])) $events_by_date[$d] = [];
+        
+        if(!isset($events_by_date[$d][$rid])){
+            $events_by_date[$d][$rid] = $row;
+            $events_by_date[$d][$rid]['venues'] = [];
+        }
         $events_by_date[$d][$rid]['venues'][] = $v_info;
+        
+        $current = strtotime("+1 day", $current);
+    }
+}
+
+// 2. Fetch all guest room reservations that intersect the visible range
+$g_query = $conn->prepare("
+    SELECT gr.id as reservation_id, gr.check_in_date as start_datetime, gr.check_out_date as end_datetime,
+           g.room_name as venue_name, g.id as venue_id, g.floor,
+           gr.guest_name as activity_name, 'Guest Stay' as event_type_name,
+           gr.guest_name, 'Guest' as office_type_name,
+           gr.status
+    FROM guest_room_reservations gr
+    JOIN guest_rooms g ON gr.guest_room_id = g.id
+    WHERE gr.deleted = 0
+      AND gr.status IN ('approved', 'confirmed', 'checked_in')
+      AND gr.check_in_date <= ?
+      AND gr.check_out_date >= ?
+    ORDER BY gr.check_in_date ASC
+");
+
+$g_query->bind_param("ss", $range_end_bound, $range_start_bound);
+$g_query->execute();
+$g_res = $g_query->get_result();
+
+$guest_color = '#6a1b9a'; // Purple for guest rooms
+
+while($row = $g_res->fetch_assoc()){
+    $rid = 'G' . $row['reservation_id']; // Prefix to avoid collision
+    
+    $v_info = [
+        'id' => $row['venue_id'],
+        'name' => $row['venue_name'],
+        'floor' => $row['floor'],
+        'color' => $guest_color,
+        'is_guest' => true
+    ];
+
+    // Place it on every day it spans within the visible range
+    $start_date = date('Y-m-d', strtotime($row['start_datetime']));
+    $end_date   = date('Y-m-d', strtotime($row['end_datetime']));
+    
+    $current = max(strtotime($start_date), strtotime($range_start_dt));
+    $last    = min(strtotime($end_date), strtotime($range_end_dt));
+    
+    while($current <= $last){
+        $d = date('Y-m-d', $current);
+        if(!isset($events_by_date[$d])) $events_by_date[$d] = [];
+        
+        $row['venues'] = [$v_info];
+        $row['is_guest'] = true;
+        // For guest rooms, we don't need to deduplicate venues as it's usually 1:1, but let's be consistent
+        $events_by_date[$d][$rid] = $row;
         
         $current = strtotime("+1 day", $current);
     }
@@ -134,8 +190,7 @@ foreach($events_by_date as $d => $events_map){
     }
 }
 
-// Calendar calculations
-$month_start = strtotime("$year-$month-01");
+// Calendar calculations (month_start already defined above)
 $first_dow = (int)date('w', $month_start);
 $days_in_month = (int)date('t', $month_start);
 
@@ -807,6 +862,11 @@ $today = date('Y-m-d');
                                 <span><?= htmlspecialchars($r['name']) ?></span>
                             </label>
                             <?php endforeach; ?>
+                            <label>
+                                <input type="radio" disabled>
+                                <span class="dot" style="background:#6a1b9a"></span>
+                                <span class="text-muted">Guest Rooms (All)</span>
+                            </label>
                         </div>
                         
                         <button type="submit" class="btn-filter">
@@ -978,6 +1038,12 @@ function showDayEvents(date, formattedDate) {
                             <i class="bi bi-briefcase"></i>
                             <span>${escapeHtml(officeInfo)}</span>
                         </div>
+                        ${event.is_guest ? `
+                        <div class="day-event-detail text-primary fw-bold">
+                            <i class="bi bi-person-check"></i>
+                            <span>Guest: ${escapeHtml(event.guest_name || '')}</span>
+                        </div>
+                        ` : ''}
                     </div>
                     <div class="day-event-venues">
             `;

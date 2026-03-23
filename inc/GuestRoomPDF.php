@@ -144,14 +144,6 @@ class GuestRoomPDF
             $pdf->MultiCell(182.0, 4.5, $remarks, 0, 'L', false, 1);
         }
 
-        // Registered by
-        $regBy = trim((string)($d['terms_accepted_by'] ?? $d['registered_by'] ?? ''));
-        $this->put($pdf, 70.0, 250.0, $regBy);
-
-        // Digital signature (page 1)
-        $sig = trim((string)($d['digital_signature'] ?? ''));
-        $this->drawDigitalSignature($pdf, $sig);
-
         // Principal guest printed name (ALL CAPS) for the signature block (page 1)
         $principalLine = $this->principalGuestPrintedNameLineAllCaps();
         if ($principalLine !== '') {

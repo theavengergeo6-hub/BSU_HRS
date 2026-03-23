@@ -1363,35 +1363,6 @@ input:checked + .slider:before { transform: translateX(20px); }
                         </div>
                         
                         
-                        <!-- Registered By -->
-                        <div class="guest-form-section">
-                            <h4><i class="bi bi-pencil-square"></i> Registered By</h4>
-                            <div class="row mb-3">
-                                <div class="col-md-12">
-                                    <div class="form-group">
-                                        <label>Name of Person Registering *</label>
-                                        <input type="text" class="form-control" name="registered_by" id="registered_by" placeholder="Full name of the person filling out this form" required style="text-transform: uppercase;">
-
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- Digital Signature (draw) -->
-                            <div class="signature-section">
-                                <label class="form-label">Digital Signature *</label>
-                                <div class="signature-pad" id="guestSignatureWrap">
-                                    <canvas id="guestSignaturePad" aria-label="Draw your signature"></canvas>
-                                </div>
-                                <div class="signature-actions">
-                                    <button type="button" class="btn btn-sm btn-outline-secondary" id="guestSigClear">
-                                        <i class="bi bi-eraser"></i> Clear
-                                    </button>
-                                    <small class="text-muted">Use your finger (mobile) or mouse (PC) to sign.</small>
-                                </div>
-                            </div>
-                            <input type="hidden" id="guest_signature" value="">
-                            <input type="hidden" id="guest_form_date" value="<?= date('Y-m-d') ?>">
-                        </div>
-                        
                         <!-- Data Privacy -->
                         <div class="data-privacy-box">
                             <p><strong>Data Privacy and Protection</strong></p>
@@ -1554,7 +1525,7 @@ input:checked + .slider:before { transform: translateX(20px); }
                         <!-- Content will be loaded here -->
                     </div>
                     
-                    <div class="row mt-3">
+                    <div class="row mt-3" id="functionRoomTermsFields">
                         <div class="col-md-5">
                             <div class="form-group">
                                 <label class="small text-muted fw-bold">REQUESTOR NAME (Last, First, MI)</label>
@@ -2426,8 +2397,6 @@ function saveFormData() {
             adults_count: document.getElementById('adults_count')?.value || '',
             kids_count: document.getElementById('kids_count')?.value || '',
             guest_room_id: document.getElementById('guest_room_id')?.value || '',
-            registered_by: document.getElementById('registered_by')?.value || '',
-            guest_signature: document.getElementById('guest_signature')?.value || '',
             consent: document.getElementById('guestConsent')?.checked || false,
             other_guests: []
         },
@@ -2512,7 +2481,6 @@ function saveFormData() {
                 nonEmptyStr(g.last_name) || nonEmptyStr(g.first_name) || nonEmptyStr(g.dob) || nonEmptyStr(g.address) ||
                 nonEmptyStr(g.email) || nonEmptyStr(g.contact) || nonEmptyStr(g.arrival_date) || nonEmptyStr(g.departure_date) ||
                 nonEmptyStr(g.checkin_time) || nonEmptyStr(g.checkout_time) || nonEmptyStr(g.guest_room_id) ||
-                nonEmptyStr(g.registered_by) || nonEmptyStr(g.guest_signature) ||
                 (Array.isArray(g.other_guests) && g.other_guests.length > 0);
 
             return hasGuestCore || nonEmptyStr(d.additional);
@@ -2552,8 +2520,7 @@ function validateGuestForm() {
         { id: 'departure_date',   label: 'Departure Date' },
         { id: 'checkout_time',    label: 'Check-out Time' },
         { id: 'adults_count',     label: 'Number of Adults' },
-        { id: 'guest_room_id',    label: 'Room Selection' },
-        { id: 'registered_by',    label: 'Name of Person Registering' }
+        { id: 'guest_room_id',    label: 'Room Selection' }
     ];
 
     for (var i = 0; i < requiredFields.length; i++) {
@@ -2673,8 +2640,6 @@ function loadFormData() {
             setValue('adults_count', data.guest.adults_count);
             setValue('kids_count', data.guest.kids_count);
             setValue('guest_room_id', data.guest.guest_room_id);
-            setValue('registered_by', data.guest.registered_by);
-            setValue('guest_signature', data.guest.guest_signature);
             var consentBox = document.getElementById('guestConsent');
             if (consentBox && data.guest.consent) consentBox.checked = true;
             
@@ -2769,7 +2734,7 @@ function checkForSavedData() {
                         ok = !!(
                             g.last_name || g.first_name || g.dob || g.address || g.email || g.contact ||
                             g.arrival_date || g.departure_date || g.checkin_time || g.checkout_time ||
-                            g.guest_room_id || g.registered_by || g.guest_signature ||
+                            g.guest_room_id ||
                             (Array.isArray(g.other_guests) && g.other_guests.length) ||
                             (parsed.additional && String(parsed.additional).trim() !== '')
                         );
@@ -2997,7 +2962,9 @@ function loadGuestTerms() {
     document.getElementById('termsAgree').disabled = true;
     document.getElementById('termsAgree').checked = false;
     
-    // Try to fetch from database first
+    // Hide function room specific fields
+    var frFields = document.getElementById('functionRoomTermsFields');
+    if (frFields) frFields.style.display = 'none';
     fetch(baseUrl + '/ajax/get_terms.php?customer_type=guest')
         .then(response => response.json())
         .then(data => {
@@ -3107,6 +3074,10 @@ function loadTermsForStep4() {
     document.getElementById('termsAgree').disabled = true;
     document.getElementById('termsAgree').checked = false;
     
+    // Show function room specific fields
+    var frFields = document.getElementById('functionRoomTermsFields');
+    if (frFields) frFields.style.display = 'block';
+
     fetch(baseUrl + '/ajax/get_terms.php?office_type_id=' + officeTypeId)
         .then(response => response.json())
         .then(data => {
@@ -4001,12 +3972,27 @@ function autoCapitalizeMiddleInitial() {
             this.value = this.value.toUpperCase().replace(/[^A-Z]/g, '').substring(0, 1);
         });
     }
+}
 
-    // Ensure "registered_by" value is stored in uppercase (CSS text-transform only affects display).
-    var registeredByInput = document.getElementById('registered_by');
-    if (registeredByInput) {
-        registeredByInput.addEventListener('input', function() {
-            this.value = this.value.toUpperCase();
+function handleParticipantsLimit() {
+    var pInput = document.getElementById('participants');
+    if (pInput) {
+        pInput.addEventListener('input', function() {
+            var val = this.value;
+            // Cap at 3 digits
+            if (val.length > 3) {
+                this.value = val.substring(0, 3);
+                val = this.value;
+            }
+            // Strict 200 limit: if it starts with 20, the 3rd char MUST be 0
+            if (val.length === 3 && val.startsWith('20')) {
+                if (val[2] !== '0') {
+                    this.value = '200';
+                }
+            } else if (parseInt(val) > 200) {
+                // Any other > 200 case
+                this.value = '200';
+            }
         });
     }
 }
@@ -4014,6 +4000,7 @@ function autoCapitalizeMiddleInitial() {
 // Call it in DOMContentLoaded
 document.addEventListener('DOMContentLoaded', function() {
     autoCapitalizeMiddleInitial();
+    handleParticipantsLimit();
 });
 
 function showModalAlert(icon, title, message) {
@@ -4361,7 +4348,7 @@ function buildGuestSummary() {
     
     // Registered By
     html += '<h6 class="text-danger mt-3 mb-2">Registration Details</h6>';
-    html += '<div class="summary-item"><strong>Registered By:</strong> ' + (document.getElementById('registered_by')?.value || '') + '</div>';
+
     html += '<div class="summary-item"><strong>Date Registered:</strong> ' + (document.getElementById('guest_form_date')?.value || '') + '</div>';
     
     document.getElementById('summaryBox').innerHTML = html;
@@ -4581,10 +4568,10 @@ function submitGuestReservation() {
     if (!validateGuestForm()) return;
 
     // Require a drawn signature
-    var sigVal = document.getElementById('guest_signature')?.value || '';
+    var sigVal = ''; // document.getElementById('guest_signature').value; // REMOVED
     if (!sigVal) {
-        showModalAlert('✍️', 'Signature Required', 'Please draw your digital signature before submitting.');
-        return;
+        // showModalAlert('✍️', 'Signature Required', 'Please draw your digital signature before submitting.'); // REMOVED
+        // return; // REMOVED
     }
     
     var fd = new FormData();
@@ -4628,11 +4615,11 @@ function submitGuestReservation() {
     fd.append('room_id', document.getElementById('guest_room_id').value);
     fd.append('room_type', 'Guest Room');
     fd.append('remarks', document.getElementById('guest_remarks').value || '');
-    fd.append('registered_by', document.getElementById('registered_by').value);
+            // fd.append('registered_by', ''); // No longer used but kept empty for API compatibility if needed // REMOVED
     
     // Consent & Signature
     fd.append('data_privacy_consent', document.getElementById('guestConsent').checked ? '1' : '0');
-    fd.append('digital_signature', sigVal);
+    // fd.append('digital_signature', sigVal); // REMOVED
     fd.append('guest_form_date', document.getElementById('guest_form_date')?.value || '<?= date("Y-m-d") ?>');
     
     // Terms acceptance (from step 4)
