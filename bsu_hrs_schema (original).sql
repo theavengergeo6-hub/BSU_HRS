@@ -461,6 +461,215 @@ INSERT INTO `faq` (`id`, `question`, `answer`, `sort_order`, `created_at`) VALUE
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `features`
+--
+
+CREATE TABLE `features` (
+  `id` int(11) NOT NULL,
+  `name` varchar(50) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `function_calendar_config`
+--
+
+CREATE TABLE `function_calendar_config` (
+  `id` int(11) NOT NULL,
+  `config_key` varchar(100) NOT NULL,
+  `config_value` text DEFAULT NULL,
+  `description` varchar(255) DEFAULT NULL,
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `function_calendar_config`
+--
+
+INSERT INTO `function_calendar_config` (`id`, `config_key`, `config_value`, `description`, `updated_at`) VALUES
+(1, 'min_advance_days', '1', 'Minimum days in advance for booking', '2026-03-06 07:07:06'),
+(2, 'max_advance_days', '180', 'Maximum days in advance for booking', '2026-03-06 07:07:06'),
+(3, 'min_duration_hours', '1', 'Minimum event duration in hours', '2026-03-06 07:07:06'),
+(4, 'max_duration_hours', '12', 'Maximum event duration in hours', '2026-03-06 07:07:06'),
+(5, 'operating_hours_start', '07:00:00', 'Start of operating hours', '2026-03-06 07:07:06'),
+(6, 'operating_hours_end', '23:00:00', 'End of operating hours', '2026-03-06 07:07:06'),
+(7, 'buffer_before_minutes', '30', 'Buffer time before events in minutes', '2026-03-06 07:07:06'),
+(8, 'buffer_after_minutes', '60', 'Buffer time after events in minutes', '2026-03-06 07:07:06'),
+(9, 'weekly_holidays', '[]', 'Days of week when bookings are not allowed', '2026-03-06 07:07:06'),
+(10, 'special_dates', '[]', 'Special dates with custom rules', '2026-03-06 07:07:06');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `function_rooms`
+--
+
+CREATE TABLE `function_rooms` (
+  `id` int(11) NOT NULL,
+  `room_name` varchar(100) NOT NULL,
+  `floor` varchar(20) DEFAULT NULL,
+  `capacity_min` int(11) DEFAULT 0,
+  `capacity_max` int(11) NOT NULL,
+  `rate_per_hour` decimal(10,2) DEFAULT NULL,
+  `rate_per_day` decimal(10,2) NOT NULL,
+  `has_sound_system` tinyint(1) NOT NULL DEFAULT 0,
+  `has_projector` tinyint(1) NOT NULL DEFAULT 0,
+  `has_wifi` tinyint(1) NOT NULL DEFAULT 1,
+  `description` text DEFAULT NULL,
+  `amenities` text DEFAULT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `sort_order` int(11) DEFAULT 0,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `function_rooms`
+--
+
+INSERT INTO `function_rooms` (`id`, `room_name`, `floor`, `capacity_min`, `capacity_max`, `rate_per_hour`, `rate_per_day`, `has_sound_system`, `has_projector`, `has_wifi`, `description`, `amenities`, `is_active`, `sort_order`, `created_at`, `updated_at`) VALUES
+(1, 'Function Room A', 'Ground Floor', 20, 40, 500.00, 4000.00, 1, 1, 1, 'Spacious function room perfect for meetings, seminars, and small events.', NULL, 1, 0, '2026-03-06 07:07:05', '2026-03-06 07:07:05'),
+(2, 'Function Room B', 'Ground Floor', 25, 50, 600.00, 4500.00, 1, 1, 1, 'Ideal for workshops, training sessions, and medium-sized gatherings.', NULL, 1, 0, '2026-03-06 07:07:05', '2026-03-06 07:07:05'),
+(3, 'Function Room C', 'Ground Floor', 30, 60, 700.00, 5000.00, 1, 1, 1, 'Largest function room with complete AV equipment, suitable for conferences and events.', NULL, 1, 0, '2026-03-06 07:07:05', '2026-03-06 07:07:05'),
+(4, 'Function Room D', 'Ground Floor', 15, 30, 400.00, 3000.00, 1, 0, 1, 'Intimate space for small meetings, interviews, and private discussions.', NULL, 1, 0, '2026-03-06 07:07:05', '2026-03-06 07:07:05'),
+(5, 'Function Room E', 'Ground Floor', 20, 45, 550.00, 4200.00, 1, 1, 1, 'Versatile space for training, seminars, and corporate events.', NULL, 1, 0, '2026-03-06 07:07:05', '2026-03-06 07:07:05');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `function_room_availability`
+--
+
+CREATE TABLE `function_room_availability` (
+  `id` int(11) NOT NULL,
+  `function_room_id` int(11) NOT NULL,
+  `date` date NOT NULL,
+  `time_slot` varchar(20) NOT NULL COMMENT 'e.g., 08:00-10:00',
+  `start_time` time NOT NULL,
+  `end_time` time NOT NULL,
+  `is_available` tinyint(1) NOT NULL DEFAULT 1,
+  `reservation_id` int(11) DEFAULT NULL,
+  `status` enum('available','booked','blocked','maintenance') NOT NULL DEFAULT 'available',
+  `notes` varchar(255) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `function_room_blocked_dates`
+--
+
+CREATE TABLE `function_room_blocked_dates` (
+  `id` int(11) NOT NULL,
+  `function_room_id` int(11) NOT NULL,
+  `start_date` date NOT NULL,
+  `end_date` date NOT NULL,
+  `start_time` time DEFAULT NULL,
+  `end_time` time DEFAULT NULL,
+  `reason` varchar(255) NOT NULL,
+  `is_full_day` tinyint(1) NOT NULL DEFAULT 1,
+  `created_by` int(11) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `function_room_images`
+--
+
+CREATE TABLE `function_room_images` (
+  `id` int(11) NOT NULL,
+  `function_room_id` int(11) NOT NULL,
+  `image_path` varchar(255) NOT NULL,
+  `is_primary` tinyint(1) DEFAULT 0,
+  `sort_order` int(11) DEFAULT 0,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `function_room_reservations`
+--
+
+CREATE TABLE `function_room_reservations` (
+  `id` int(11) NOT NULL,
+  `booking_no` varchar(50) NOT NULL,
+  `reservation_no` varchar(50) NOT NULL,
+  `user_id` int(11) DEFAULT NULL,
+  `last_name` varchar(100) NOT NULL,
+  `first_name` varchar(100) NOT NULL,
+  `middle_initial` varchar(10) DEFAULT NULL,
+  `email` varchar(255) NOT NULL,
+  `contact_number` varchar(50) NOT NULL,
+  `office_type_id` int(11) NOT NULL,
+  `office_id` int(11) DEFAULT NULL,
+  `external_office_name` varchar(255) DEFAULT NULL,
+  `activity_name` varchar(255) NOT NULL,
+  `event_type_id` int(11) DEFAULT NULL,
+  `participants_count` int(11) NOT NULL,
+  `banquet_style_id` int(11) DEFAULT NULL,
+  `function_room_id` int(11) NOT NULL,
+  `venue_setup_id` int(11) NOT NULL,
+  `event_date` date NOT NULL,
+  `start_time` time NOT NULL,
+  `end_time` time NOT NULL,
+  `setup_time` time DEFAULT NULL,
+  `cleanup_time` time DEFAULT NULL,
+  `total_hours` decimal(5,2) GENERATED ALWAYS AS (timestampdiff(HOUR,concat(`event_date`,' ',`start_time`),concat(`event_date`,' ',`end_time`))) STORED,
+  `rate_per_hour` decimal(10,2) NOT NULL,
+  `total_rental_cost` decimal(10,2) NOT NULL,
+  `discount_amount` decimal(10,2) DEFAULT 0.00,
+  `total_amount` decimal(10,2) NOT NULL,
+  `miscellaneous_items` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`miscellaneous_items`)),
+  `additional_instruction` text DEFAULT NULL,
+  `status` enum('pending','pencil_booked','approved','denied','cancelled','completed') NOT NULL DEFAULT 'pending',
+  `payment_status` enum('unpaid','partial','paid','refunded') NOT NULL DEFAULT 'unpaid',
+  `payment_method` varchar(50) DEFAULT NULL,
+  `payment_date` datetime DEFAULT NULL,
+  `amount_paid` decimal(10,2) DEFAULT 0.00,
+  `admin_remarks` text DEFAULT NULL,
+  `terms_accepted` tinyint(1) NOT NULL DEFAULT 0,
+  `terms_accepted_by` varchar(255) DEFAULT NULL,
+  `terms_accepted_at` datetime DEFAULT NULL,
+  `terms_position` varchar(100) DEFAULT NULL,
+  `digital_signature` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `deleted` tinyint(1) NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Triggers `function_room_reservations`
+--
+DELIMITER $$
+CREATE TRIGGER `trg_function_reservation_after_insert` AFTER INSERT ON `function_room_reservations` FOR EACH ROW BEGIN
+  INSERT INTO function_room_availability 
+    (function_room_id, date, time_slot, start_time, end_time, is_available, reservation_id, status)
+  VALUES 
+    (NEW.function_room_id, NEW.event_date, 
+     CONCAT(NEW.start_time, '-', NEW.end_time),
+     NEW.start_time, NEW.end_time, 0, NEW.id, 'booked');
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trg_function_reservation_after_update` AFTER UPDATE ON `function_room_reservations` FOR EACH ROW BEGIN
+  IF NEW.status = 'cancelled' AND OLD.status != 'cancelled' THEN
+    DELETE FROM function_room_availability 
+    WHERE reservation_id = OLD.id;
+  END IF;
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `guest_calendar_config`
 --
 
@@ -487,6 +696,23 @@ INSERT INTO `guest_calendar_config` (`id`, `config_key`, `config_value`, `descri
 (8, 'weekly_holidays', '[]', 'Days of week when bookings are not allowed', '2026-03-06 07:07:06'),
 (9, 'special_dates', '[]', 'Special dates with custom rules', '2026-03-06 07:07:06');
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `guest_details`
+--
+
+CREATE TABLE `guest_details` (
+  `id` int(11) NOT NULL,
+  `reservation_id` int(11) NOT NULL,
+  `full_name` varchar(255) NOT NULL,
+  `date_of_birth` date DEFAULT NULL,
+  `age` int(11) DEFAULT NULL,
+  `relationship` varchar(50) DEFAULT NULL,
+  `id_type` varchar(50) DEFAULT NULL,
+  `id_number` varchar(100) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -1000,6 +1226,20 @@ INSERT INTO `guest_room_availability` (`id`, `guest_room_id`, `date`, `is_availa
 (449, 3, '2026-06-03', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
 (450, 5, '2026-06-03', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05');
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `guest_room_images`
+--
+
+CREATE TABLE `guest_room_images` (
+  `id` int(11) NOT NULL,
+  `guest_room_id` int(11) NOT NULL,
+  `image_path` varchar(255) NOT NULL,
+  `is_primary` tinyint(1) DEFAULT 0,
+  `sort_order` int(11) DEFAULT 0,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -1086,13 +1326,236 @@ END
 $$
 DELIMITER ;
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `hidden_users`
+--
+
+CREATE TABLE `hidden_users` (
+  `user_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `hidden_users`
+--
+
+INSERT INTO `hidden_users` (`user_id`) VALUES
+(25),
+(29);
 
 -- --------------------------------------------------------
 
+--
+-- Table structure for table `messages`
+--
+
+CREATE TABLE `messages` (
+  `msg_id` int(11) NOT NULL,
+  `incoming_msg_id` int(255) NOT NULL,
+  `outgoing_msg_id` int(255) NOT NULL,
+  `msg` varchar(1000) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `messages`
+--
+
+INSERT INTO `messages` (`msg_id`, `incoming_msg_id`, `outgoing_msg_id`, `msg`) VALUES
+(2, 22, 22, 'test'),
+(3, 23, 22, 'test'),
+(4, 23, 22, 'asdfg'),
+(5, 0, 24, 'fff');
 
 -- --------------------------------------------------------
 
+--
+-- Table structure for table `miscellaneous_items`
+--
 
+CREATE TABLE `miscellaneous_items` (
+  `id` int(11) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `category` enum('equipment','furniture','supplies') DEFAULT 'equipment',
+  `has_quantity` tinyint(1) DEFAULT 1,
+  `has_specs` tinyint(1) DEFAULT 0,
+  `specs_label` varchar(100) DEFAULT NULL,
+  `is_active` tinyint(1) DEFAULT 1,
+  `sort_order` int(11) DEFAULT 0,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `miscellaneous_items`
+--
+
+INSERT INTO `miscellaneous_items` (`id`, `name`, `category`, `has_quantity`, `has_specs`, `specs_label`, `is_active`, `sort_order`, `created_at`) VALUES
+(1, 'Basic Sound System', 'equipment', 1, 1, 'Speaker and Mic', 1, 1, '2026-02-23 01:25:18'),
+(2, 'Round Table', 'furniture', 1, 0, NULL, 1, 2, '2026-02-23 01:25:18'),
+(3, 'Banquet Chairs', 'furniture', 1, 0, NULL, 1, 3, '2026-02-23 01:25:18'),
+(4, 'View Board', 'equipment', 1, 0, NULL, 1, 4, '2026-02-23 01:25:18'),
+(5, 'Projector', 'equipment', 1, 0, NULL, 1, 5, '2026-02-23 01:25:18'),
+(6, 'Projector Screen', 'equipment', 1, 0, NULL, 1, 6, '2026-02-23 01:25:18'),
+(7, 'Student Chairs', 'furniture', 1, 0, NULL, 1, 7, '2026-02-23 01:25:18'),
+(8, 'Student Tables', 'furniture', 1, 0, NULL, 1, 8, '2026-02-23 01:25:18'),
+(9, 'Water Dispenser', 'equipment', 1, 0, NULL, 1, 9, '2026-02-23 01:25:18'),
+(10, 'Cup and Saucer', 'supplies', 1, 0, NULL, 1, 10, '2026-02-23 01:25:18'),
+(11, 'Percolator', 'equipment', 1, 0, NULL, 1, 11, '2026-02-23 01:25:18'),
+(12, 'Basic Sound System', 'equipment', 1, 1, 'Speaker and Mic', 1, 1, '2026-02-23 01:39:40'),
+(13, 'Round Table', 'furniture', 1, 0, NULL, 1, 2, '2026-02-23 01:39:40'),
+(14, 'Banquet Chairs', 'furniture', 1, 0, NULL, 1, 3, '2026-02-23 01:39:40'),
+(15, 'View Board', 'equipment', 1, 0, NULL, 1, 4, '2026-02-23 01:39:40'),
+(16, 'Projector', 'equipment', 1, 0, NULL, 1, 5, '2026-02-23 01:39:40'),
+(17, 'Projector Screen', 'equipment', 1, 0, NULL, 1, 6, '2026-02-23 01:39:40'),
+(18, 'Student Chairs', 'furniture', 1, 0, NULL, 1, 7, '2026-02-23 01:39:40'),
+(19, 'Student Tables', 'furniture', 1, 0, NULL, 1, 8, '2026-02-23 01:39:40'),
+(20, 'Water Dispenser', 'equipment', 1, 0, NULL, 1, 9, '2026-02-23 01:39:40'),
+(21, 'Cup and Saucer', 'supplies', 1, 0, NULL, 1, 10, '2026-02-23 01:39:40'),
+(22, 'Percolator', 'equipment', 1, 0, NULL, 1, 11, '2026-02-23 01:39:40');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `notifications`
+--
+
+CREATE TABLE `notifications` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `message` text NOT NULL,
+  `is_read` tinyint(1) NOT NULL DEFAULT 0,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `notifications`
+--
+
+INSERT INTO `notifications` (`id`, `user_id`, `message`, `is_read`, `created_at`) VALUES
+(230, 29, 'Your reservation with Booking No. GM RES-20250125-140 has been submitted successfully.', 1, '2025-01-25 01:33:54'),
+(231, 29, 'Your reservation with Booking No. GM RES-20250125-140 has been updated. Status changed to: <span style=\'color: green;\'>Approved</span>', 1, '2025-01-25 01:34:19'),
+(232, 29, 'Your reservation with Booking No. GM RES-20250125-141 has been submitted successfully.', 1, '2025-01-25 02:43:14'),
+(233, 29, 'Your reservation with Booking No. GM RES-20250125-142 has been submitted successfully.', 1, '2025-01-25 12:19:14'),
+(234, 29, 'Your reservation with Booking No. GM RES-20250125-142 has been updated. Status changed to: <span style=\'color: green;\'>Approved</span>', 1, '2025-01-25 12:19:36'),
+(235, 29, 'Your reservation with Booking No. GM RES-20250125-143 has been submitted successfully.', 1, '2025-01-25 12:48:07'),
+(236, 29, 'Your reservation with Booking No. GM RES-20250125-143 has been updated. Status changed to: <span style=\'color: green;\'>Approved</span>', 1, '2025-01-25 12:48:23'),
+(237, 29, 'Your reservation with Booking No. GM RES-20250125-140 has been updated. Status changed to: <span style=\'color: red;\'>Denied</span>', 1, '2025-01-25 17:23:51'),
+(238, 29, 'Your reservation with Booking No. GM RES-20250125-140 has been updated. Status changed to: <span style=\'color: green;\'>Approved</span>', 1, '2025-01-25 17:32:28'),
+(239, 29, 'You have a new liability. Click here to view details.', 1, '2025-01-26 12:15:00'),
+(240, 29, 'Your reservation with Booking No. GM RES-20250126-144 has been submitted successfully.', 1, '2025-01-26 12:27:47'),
+(241, 29, 'You have a new liability. Click here to view details.', 1, '2025-01-26 22:45:15'),
+(242, 29, 'Your reservation with Booking No. GM RES-20250127-145 has been submitted successfully.', 1, '2025-01-27 08:05:00'),
+(243, 29, 'Your reservation with Booking No. EV RES-20250127-1 has been submitted successfully.', 1, '2025-01-27 12:34:23'),
+(244, 29, 'Your reservation with Booking No. EV RES-20250127-1 has been updated. Status changed to: <span style=\'color: green;\'>Approved</span>', 1, '2025-01-27 12:35:27'),
+(245, 29, 'Your reservation with Booking No. EV RES-20250127-1 has been updated. Payment status updated to: <span style=\'color: green;\'>PAID</span>', 1, '2025-01-27 12:35:27'),
+(246, 29, 'Your reservation with Booking No. GM RES-20250128-146 has been submitted successfully.', 1, '2025-01-28 04:57:04'),
+(247, 34, 'Your reservation with Booking No. EV RES-20250128-81 has been submitted successfully.', 1, '2025-01-28 04:58:34'),
+(248, 29, 'Your reservation with Booking No. EV RES-20250128-82 has been submitted successfully.', 1, '2025-01-28 04:59:10'),
+(249, 34, 'Your reservation with Booking No. GM RES-20250128-147 has been submitted successfully.', 1, '2025-01-28 05:05:02'),
+(250, 34, 'Your reservation with Booking No. GM RES-20250128-147 has been updated. Status changed to: <span style=\'color: green;\'>Approved</span>', 1, '2025-01-28 05:06:11'),
+(251, 34, 'Your reservation with Booking No. GM RES-20250128-147 has been updated. Payment status updated to: <span style=\'color: green;\'>PAID</span>', 1, '2025-01-28 05:06:11'),
+(252, 32, 'Your reservation with Booking No. EV RES-20250128-83 has been submitted successfully.', 0, '2025-01-28 09:42:18'),
+(253, 30, 'Your reservation with Booking No. EV RES-20250128-84 has been submitted successfully.', 1, '2025-01-28 11:23:25'),
+(254, 30, 'Your reservation with Booking No. GM RES-20250128-148 has been submitted successfully.', 1, '2025-01-28 11:32:33'),
+(255, 29, 'Your reservation with Booking No. EV RES-20250128-85 has been submitted successfully.', 1, '2025-01-28 11:35:15'),
+(256, 29, 'Your reservation with Booking No. GM RES-20250128-149 has been submitted successfully.', 1, '2025-01-28 11:36:47'),
+(257, 32, 'Your reservation with Booking No. EV RES-20250128-83 has been updated. Status changed to: <span style=\'color: green;\'>Approved</span>', 0, '2025-01-28 11:39:40'),
+(258, 34, 'Your reservation with Booking No. EV RES-20250128-81 has been updated. Status changed to: <span style=\'color: green;\'>Approved</span>', 1, '2025-01-28 11:44:29'),
+(259, 32, 'Your reservation with Booking No. GM RES-20250128-150 has been submitted successfully.', 0, '2025-01-28 11:46:36'),
+(260, 32, 'Your reservation with Booking No. GM RES-20250128-150 has been updated. Status changed to: <span style=\'color: green;\'>Approved</span>', 0, '2025-01-28 11:47:21'),
+(261, 30, 'Your reservation with Booking No. GM RES-20250128-151 has been submitted successfully.', 1, '2025-01-28 12:17:00'),
+(262, 35, 'Your reservation with Booking No. EV RES-20250128-84 has been submitted successfully.', 0, '2025-01-28 12:17:03'),
+(263, 35, 'Your reservation with Booking No. EV RES-20250128-84 has been updated. Status changed to: <span style=\'color: green;\'>Approved</span>', 0, '2025-01-28 12:18:47'),
+(264, 35, 'Your reservation with Booking No. EV RES-20250128-84 has been updated. Payment status updated to: <span style=\'color: green;\'>PAID</span>', 0, '2025-01-28 12:18:47'),
+(265, 30, 'Your reservation with Booking No. EV RES-20250128-87 has been submitted successfully.', 1, '2025-01-28 12:28:42'),
+(266, 30, 'Your reservation with Booking No. EV RES-20250128-88 has been submitted successfully.', 1, '2025-01-28 13:18:59'),
+(267, 34, 'Your reservation with Booking No. EV RES-20250129-89 has been submitted successfully.', 1, '2025-01-29 00:55:16'),
+(268, 34, 'Your reservation with Booking No. EV RES-20250129-89 has been updated. Status changed to: <span style=\'color: green;\'>Approved</span>', 0, '2025-01-29 03:00:44'),
+(269, 34, 'You have a new liability. Click here to view details.', 0, '2025-01-29 16:17:29'),
+(270, 29, 'Your reservation with Booking No. EV RES-20250130-90 has been submitted successfully.', 1, '2025-01-29 19:05:20'),
+(271, 29, 'Your reservation with Booking No. GM RES-20250125-141 has been updated. Status changed to: <span style=\'color: green;\'>Approved</span>', 1, '2025-01-29 19:23:59'),
+(273, 30, 'Your reservation with Booking No. GM RES-20250128-151 has been updated. Status changed to: <span style=\'color: green;\'>Approved</span>', 1, '2025-01-29 20:29:53'),
+(274, 30, 'Your reservation with Booking No. GM RES-20250128-151 has been updated. Payment status updated to: <span style=\'color: green;\'>PAID</span>', 1, '2025-01-29 20:29:53'),
+(275, 29, 'Your reservation with Booking No. GM RES-20250130-152 has been submitted successfully.', 1, '2025-01-29 23:47:52'),
+(276, 29, 'You have a new liability. Click here to view details.', 1, '2025-01-29 23:49:39'),
+(277, 30, 'Your reservation with Booking No. EV RES-20250128-87 has been updated. Status changed to: <span style=\'color: green;\'>Approved</span>', 1, '2025-01-30 12:02:44'),
+(278, 30, 'Your reservation with Booking No. EV RES-20250130-90 has been submitted successfully.', 1, '2025-01-30 14:25:29'),
+(279, 30, 'Your reservation with Booking No. GM RES-20250130-153 has been submitted successfully.', 1, '2025-01-30 14:27:58'),
+(280, 30, 'Your reservation with Booking No. GM RES-20250131-154 has been submitted successfully.', 1, '2025-01-31 04:08:54'),
+(281, 34, 'Your reservation with Booking No. EV RES-20250131-92 has been submitted successfully.', 0, '2025-01-31 06:31:14'),
+(282, 34, 'Your reservation with Booking No. EV RES-20250131-92 has been updated. Status changed to: <span style=\'color: green;\'>Approved</span>', 0, '2025-01-31 06:32:09'),
+(283, 34, 'Your reservation with Booking No. EV RES-20250131-92 has been updated. Payment status updated to: <span style=\'color: green;\'>PAID</span>', 0, '2025-01-31 06:32:09'),
+(284, 34, 'Your reservation with Booking No. GM RES-20250131-155 has been submitted successfully.', 0, '2025-01-31 06:33:22'),
+(285, 34, 'Your reservation with Booking No. GM RES-20250131-155 has been updated. Status changed to: <span style=\'color: green;\'>Approved</span>', 0, '2025-01-31 06:33:45'),
+(286, 34, 'Your reservation with Booking No. GM RES-20250131-155 has been updated. Payment status updated to: <span style=\'color: green;\'>PAID</span>', 0, '2025-01-31 06:33:45'),
+(287, 30, 'Your reservation with Booking No. EV RES-20250131-93 has been submitted successfully.', 1, '2025-01-31 08:39:01'),
+(288, 30, 'Your reservation with Booking No. GM RES-20250131-156 has been submitted successfully.', 1, '2025-01-31 09:00:29'),
+(289, 30, 'Your reservation with Booking No. EV RES-20250131-93 has been updated. Status changed to: <span style=\'color: gray;\'>Canceled</span>', 1, '2025-01-31 09:14:24'),
+(290, 29, 'Your reservation with Booking No. EV RES-20250203-94 has been submitted successfully.', 1, '2025-02-03 11:39:52'),
+(291, 30, 'Your reservation with Booking No. EV RES-20250203-95 has been submitted successfully.', 1, '2025-02-03 11:41:57'),
+(292, 30, 'Your reservation with Booking No. EV RES-20250130-90 has been updated. Status changed to: <span style=\'color: green;\'>Approved</span>', 1, '2025-02-03 15:49:08'),
+(293, 29, 'You have a new liability. Click here to view details.', 1, '2025-02-08 00:01:15'),
+(294, 34, 'Your reservation with Booking No. GM RES-20250212-157 has been submitted successfully.', 1, '2025-02-12 00:20:55'),
+(295, 29, 'Your reservation with Booking No. GM RES-20250220-158 has been submitted successfully.', 1, '2025-02-19 23:36:23'),
+(296, 29, 'Your reservation with Booking No. GM RES-20250220-159 has been submitted successfully.', 0, '2025-02-19 23:56:04'),
+(297, 30, 'Your reservation with Booking No. EV RES-20250224-0001 has been submitted successfully.', 1, '2025-02-24 07:25:26'),
+(298, 30, 'Your reservation with Booking No. GM RES-20250224-160 has been submitted successfully.', 1, '2025-02-24 07:27:29'),
+(299, 34, 'Your reservation with Booking No. GM RES-20250224-161 has been submitted successfully.', 0, '2025-02-24 07:41:11'),
+(300, 34, 'Your reservation with Booking No. EV RES-20250224-0002 has been submitted successfully.', 0, '2025-02-24 07:43:06'),
+(301, 34, 'Your reservation with Booking No. GM RES-20250224-162 has been submitted successfully.', 0, '2025-02-24 07:50:47'),
+(302, 30, 'Your reservation with Booking No. GM RES-20250224-163 has been submitted successfully.', 1, '2025-02-24 08:33:41'),
+(303, 30, 'Your reservation with Booking No. EV RES-20250224-0003 has been submitted successfully.', 1, '2025-02-24 08:36:28'),
+(304, 30, 'Your reservation with Booking No. GM RES-20250224-164 has been submitted successfully.', 1, '2025-02-24 09:18:42'),
+(305, 34, 'Your reservation with Booking No. GM RES-20250224-165 has been submitted successfully.', 0, '2025-02-24 09:31:30'),
+(306, 34, 'Your reservation with Booking No. GM RES-20250224-166 has been submitted successfully.', 0, '2025-02-24 09:32:52'),
+(307, 34, 'Your reservation with Booking No. GM RES-20250224-167 has been submitted successfully.', 0, '2025-02-24 09:34:11'),
+(308, 34, 'Your reservation with Booking No. GM RES-20250224-168 has been submitted successfully.', 0, '2025-02-24 09:35:56'),
+(309, 34, 'Your reservation with Booking No. GM RES-20250224-169 has been submitted successfully.', 0, '2025-02-24 09:36:37'),
+(310, 34, 'Your reservation with Booking No. GM RES-20250224-170 has been submitted successfully.', 0, '2025-02-24 09:37:38'),
+(311, 34, 'Your reservation with Booking No. EV RES-20250224-0004 has been submitted successfully.', 0, '2025-02-24 09:38:49'),
+(312, 34, 'Your reservation with Booking No. EV RES-20250224-0005 has been submitted successfully.', 0, '2025-02-24 09:39:55'),
+(313, 34, 'Your reservation with Booking No. EV RES-20250224-0006 has been submitted successfully.', 0, '2025-02-24 09:40:58'),
+(314, 34, 'Your reservation with Booking No. EV RES-20250224-0007 has been submitted successfully.', 1, '2025-02-24 10:17:16'),
+(315, 34, 'Your reservation with Booking No. EV RES-20250224-0008 has been submitted successfully.', 1, '2025-02-24 10:18:03'),
+(316, 34, 'Your reservation with Booking No. EV RES-20250224-0009 has been submitted successfully.', 1, '2025-02-24 10:18:47'),
+(317, 29, 'Your reservation with Booking No. EV RES-20250225-0010 has been submitted successfully.', 0, '2025-02-25 00:10:16'),
+(318, 29, 'Your reservation with Booking No. EV RES-20250225-0010 has been submitted successfully.', 0, '2025-02-25 00:10:17'),
+(319, 29, 'Your reservation with Booking No. EV RES-20250225-0011 has been submitted successfully.', 0, '2025-02-25 01:13:15'),
+(320, 30, 'Your reservation with Booking No. EV RES-20250227-0012 has been submitted successfully.', 1, '2025-02-27 03:50:03'),
+(321, 34, 'Your reservation with Booking No. EV RES-20250227-0013 has been submitted successfully.', 1, '2025-02-27 03:51:24'),
+(322, 30, 'Your reservation with Booking No. GM RES-20250227-171 has been submitted successfully.', 1, '2025-02-27 03:55:58'),
+(323, 34, 'Your reservation with Booking No. GM RES-20250227-172 has been submitted successfully.', 1, '2025-02-27 04:22:15'),
+(324, 43, 'Your reservation with Booking No. EV RES-20250227-0014 has been submitted successfully.', 1, '2025-02-27 05:08:52'),
+(325, 43, 'Your reservation with Booking No. GM RES-20250227-173 has been submitted successfully.', 1, '2025-02-27 05:10:08'),
+(326, 43, 'Your reservation with Booking No. EV RES-20250227-0015 has been submitted successfully.', 0, '2025-02-27 05:29:14'),
+(327, 44, 'Your reservation with Booking No. GM RES-20250227-174 has been submitted successfully.', 0, '2025-02-27 05:32:09'),
+(328, 44, 'Your reservation with Booking No. GM RES-20250227-175 has been submitted successfully.', 0, '2025-02-27 05:32:59'),
+(329, 44, 'Your reservation with Booking No. EV RES-20250227-0016 has been submitted successfully.', 0, '2025-02-27 05:36:06'),
+(330, 44, 'Your reservation with Booking No. EV RES-20250227-0017 has been submitted successfully.', 0, '2025-02-27 06:07:04'),
+(331, 44, 'Your reservation with Booking No. EV RES-20250227-0018 has been submitted successfully.', 0, '2025-02-27 06:26:40'),
+(332, 30, 'Your reservation with Booking No. EV RES-20250227-0019 has been submitted successfully.', 1, '2025-02-27 08:08:57'),
+(333, 30, 'Your reservation with Booking No. GM RES-20250227-176 has been submitted successfully.', 1, '2025-02-27 08:09:36'),
+(334, 44, 'Your reservation with Booking No. GM RES-20250303-177 has been submitted successfully.', 0, '2025-03-03 06:54:26'),
+(335, 44, 'Your reservation with Booking No. EV RES-20250303-0020 has been submitted successfully.', 0, '2025-03-03 06:58:33'),
+(336, 30, 'Your reservation with Booking No. EV RES-20250303-0021 has been submitted successfully.', 1, '2025-03-03 07:00:42'),
+(337, 44, 'Your reservation with Booking No. EV RES-20250303-0022 has been submitted successfully.', 1, '2025-03-03 07:19:45'),
+(338, 30, 'Your reservation with Booking No. EV RES-20250304-0023 has been submitted successfully.', 1, '2025-03-04 03:34:07'),
+(339, 29, 'Your reservation with Booking No. GM RES-20250309-178 has been submitted successfully.', 0, '2025-03-09 10:12:59'),
+(340, 29, 'Your reservation with Booking No. GM RES-20250309-179 has been submitted successfully.', 0, '2025-03-09 10:19:40'),
+(341, 29, 'Your reservation with Booking No. EV RES-20250309-0024 has been submitted successfully.', 0, '2025-03-09 11:58:21'),
+(342, 30, 'Your reservation with Booking No. EV RES-20250309-0024 has been submitted successfully.', 1, '2025-03-09 11:58:48'),
+(343, 29, 'Your reservation with Booking No. GM RES-20250309-180 has been submitted successfully.', 0, '2025-03-09 12:20:11'),
+(344, 30, 'Your reservation with Booking No. EV RES-20250314-0025 has been submitted successfully.', 1, '2025-03-14 08:12:06'),
+(345, 30, 'Your reservation with Booking No. GM RES-20250314-181 has been submitted successfully.', 1, '2025-03-14 08:13:51'),
+(346, 43, 'Your reservation with Booking No. EV RES-20250315-0026 has been submitted successfully.', 0, '2025-03-15 08:01:43'),
+(347, 43, 'Your reservation with Booking No. GM RES-20250315-182 has been submitted successfully.', 1, '2025-03-15 08:03:29'),
+(348, 34, 'Your reservation with Booking No. GM RES-20250315-183 has been submitted successfully.', 0, '2025-03-15 08:05:16'),
+(349, 34, 'Your reservation with Booking No. GM RES-20250315-184 has been submitted successfully.', 0, '2025-03-15 08:08:19'),
+(350, 29, 'Your reservation with Booking No. EV RES-20250315-0027 has been submitted successfully.', 0, '2025-03-15 08:10:45'),
+(351, 30, 'You have a new liability. Click here to view details.', 1, '2025-03-15 08:56:13'),
+(352, 44, 'You have a new liability. Click here to view details.', 0, '2025-03-15 08:57:18'),
+(353, 30, 'You have a new liability. Click here to view details.', 1, '2025-03-15 08:57:46'),
+(354, 44, 'Your reservation with Booking No. EV RES-20250316-0028 has been submitted successfully.', 0, '2025-03-16 08:34:20');
 
 -- --------------------------------------------------------
 
@@ -1219,6 +1682,27 @@ INSERT INTO `office_types` (`id`, `name`, `description`, `created_at`) VALUES
 (3, 'Student Organization', 'Accredited student organizations', '2026-02-23 01:17:54'),
 (4, 'External', 'External organizations, companies, or individuals', '2026-02-23 01:17:54');
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `request`
+--
+
+CREATE TABLE `request` (
+  `id` int(11) NOT NULL,
+  `name` varchar(150) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `request`
+--
+
+INSERT INTO `request` (`id`, `name`) VALUES
+(1, 'Rectangular Table'),
+(2, 'Round Table'),
+(3, 'Basic Sound System'),
+(4, 'Mono Block Chair'),
+(5, 'Projector Screen');
 
 -- --------------------------------------------------------
 
@@ -1649,6 +2133,73 @@ ALTER TABLE `facility_reservations`
 ALTER TABLE `faq`
   ADD PRIMARY KEY (`id`);
 
+--
+-- Indexes for table `features`
+--
+ALTER TABLE `features`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `function_calendar_config`
+--
+ALTER TABLE `function_calendar_config`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `config_key` (`config_key`);
+
+--
+-- Indexes for table `function_rooms`
+--
+ALTER TABLE `function_rooms`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `room_name` (`room_name`),
+  ADD KEY `idx_is_active` (`is_active`);
+
+--
+-- Indexes for table `function_room_availability`
+--
+ALTER TABLE `function_room_availability`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `room_date_time` (`function_room_id`,`date`,`start_time`,`end_time`),
+  ADD KEY `idx_date` (`date`),
+  ADD KEY `idx_status` (`status`),
+  ADD KEY `idx_reservation` (`reservation_id`);
+
+--
+-- Indexes for table `function_room_blocked_dates`
+--
+ALTER TABLE `function_room_blocked_dates`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `function_room_id` (`function_room_id`),
+  ADD KEY `idx_dates` (`start_date`,`end_date`);
+
+--
+-- Indexes for table `function_room_images`
+--
+ALTER TABLE `function_room_images`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `function_room_id` (`function_room_id`),
+  ADD KEY `is_primary` (`is_primary`);
+
+--
+-- Indexes for table `function_room_reservations`
+--
+ALTER TABLE `function_room_reservations`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `booking_no` (`booking_no`),
+  ADD UNIQUE KEY `reservation_no` (`reservation_no`),
+  ADD KEY `idx_user_id` (`user_id`),
+  ADD KEY `idx_function_room_id` (`function_room_id`),
+  ADD KEY `idx_event_type` (`event_type_id`),
+  ADD KEY `idx_status` (`status`),
+  ADD KEY `idx_event_date` (`event_date`),
+  ADD KEY `idx_payment_status` (`payment_status`),
+  ADD KEY `idx_created_at` (`created_at`),
+  ADD KEY `function_room_reservations_ibfk_3` (`banquet_style_id`),
+  ADD KEY `function_room_reservations_ibfk_4` (`office_type_id`),
+  ADD KEY `function_room_reservations_ibfk_5` (`office_id`),
+  ADD KEY `function_room_reservations_ibfk_6` (`venue_setup_id`),
+  ADD KEY `idx_function_reservation_dates` (`event_date`,`start_time`,`end_time`,`status`),
+  ADD KEY `idx_function_reservation_user` (`user_id`,`created_at`);
 
 --
 -- Indexes for table `guest_calendar_config`
@@ -1657,6 +2208,12 @@ ALTER TABLE `guest_calendar_config`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `config_key` (`config_key`);
 
+--
+-- Indexes for table `guest_details`
+--
+ALTER TABLE `guest_details`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `reservation_id` (`reservation_id`);
 
 --
 -- Indexes for table `guest_rooms`
@@ -1676,6 +2233,13 @@ ALTER TABLE `guest_room_availability`
   ADD KEY `idx_date` (`date`),
   ADD KEY `idx_availability` (`is_available`);
 
+--
+-- Indexes for table `guest_room_images`
+--
+ALTER TABLE `guest_room_images`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `guest_room_id` (`guest_room_id`),
+  ADD KEY `is_primary` (`is_primary`);
 
 --
 -- Indexes for table `guest_room_reservations`
@@ -1692,9 +2256,30 @@ ALTER TABLE `guest_room_reservations`
   ADD KEY `idx_guest_reservation_dates` (`check_in_date`,`check_out_date`,`status`),
   ADD KEY `idx_guest_reservation_user` (`user_id`,`created_at`);
 
+--
+-- Indexes for table `hidden_users`
+--
+ALTER TABLE `hidden_users`
+  ADD PRIMARY KEY (`user_id`);
 
+--
+-- Indexes for table `messages`
+--
+ALTER TABLE `messages`
+  ADD PRIMARY KEY (`msg_id`);
 
+--
+-- Indexes for table `miscellaneous_items`
+--
+ALTER TABLE `miscellaneous_items`
+  ADD PRIMARY KEY (`id`);
 
+--
+-- Indexes for table `notifications`
+--
+ALTER TABLE `notifications`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_user_id` (`user_id`);
 
 --
 -- Indexes for table `offices`
@@ -1711,6 +2296,12 @@ ALTER TABLE `offices`
 ALTER TABLE `office_types`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `name` (`name`);
+
+--
+-- Indexes for table `request`
+--
+ALTER TABLE `request`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `reservation_venues`
@@ -1857,10 +2448,58 @@ ALTER TABLE `faq`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
+-- AUTO_INCREMENT for table `features`
+--
+ALTER TABLE `features`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+
+--
+-- AUTO_INCREMENT for table `function_calendar_config`
+--
+ALTER TABLE `function_calendar_config`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+
+--
+-- AUTO_INCREMENT for table `function_rooms`
+--
+ALTER TABLE `function_rooms`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+
+--
+-- AUTO_INCREMENT for table `function_room_availability`
+--
+ALTER TABLE `function_room_availability`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `function_room_blocked_dates`
+--
+ALTER TABLE `function_room_blocked_dates`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `function_room_images`
+--
+ALTER TABLE `function_room_images`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `function_room_reservations`
+--
+ALTER TABLE `function_room_reservations`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `guest_calendar_config`
 --
 ALTER TABLE `guest_calendar_config`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+
+--
+-- AUTO_INCREMENT for table `guest_details`
+--
+ALTER TABLE `guest_details`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `guest_rooms`
@@ -1875,10 +2514,34 @@ ALTER TABLE `guest_room_availability`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=773;
 
 --
+-- AUTO_INCREMENT for table `guest_room_images`
+--
+ALTER TABLE `guest_room_images`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `guest_room_reservations`
 --
 ALTER TABLE `guest_room_reservations`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+
+--
+-- AUTO_INCREMENT for table `messages`
+--
+ALTER TABLE `messages`
+  MODIFY `msg_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT for table `miscellaneous_items`
+--
+ALTER TABLE `miscellaneous_items`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+
+--
+-- AUTO_INCREMENT for table `notifications`
+--
+ALTER TABLE `notifications`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=355;
 
 --
 -- AUTO_INCREMENT for table `offices`
@@ -1891,6 +2554,12 @@ ALTER TABLE `offices`
 --
 ALTER TABLE `office_types`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+
+--
+-- AUTO_INCREMENT for table `request`
+--
+ALTER TABLE `request`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `reservation_venues`
@@ -1972,12 +2641,54 @@ ALTER TABLE `chat_messages`
 -- Constraints for table `facility_reservations`
 --
 ALTER TABLE `facility_reservations`
-  ADD CONSTRAINT `fk_banquet_style_style` FOREIGN KEY (`banquet_style_id`) REFERENCES `banquet` (`id`) ON UPDATE CASCADE,
-  ADD CONSTRAINT `fk_event_type_type` FOREIGN KEY (`event_type_id`) REFERENCES `event_types` (`id`) ON UPDATE CASCADE,
-  ADD CONSTRAINT `fk_office_office` FOREIGN KEY (`office_id`) REFERENCES `offices` (`id`) ON UPDATE CASCADE,
-  ADD CONSTRAINT `fk_office_type_type` FOREIGN KEY (`office_type_id`) REFERENCES `office_types` (`id`) ON UPDATE CASCADE,
-  ADD CONSTRAINT `fk_venue_venue` FOREIGN KEY (`venue_id`) REFERENCES `venues` (`id`) ON UPDATE CASCADE,
-  ADD CONSTRAINT `fk_venue_setup_setup` FOREIGN KEY (`venue_setup_id`) REFERENCES `venue_setups` (`id`) ON UPDATE CASCADE;
+  ADD CONSTRAINT `fk_banquet_style` FOREIGN KEY (`banquet_style_id`) REFERENCES `banquet` (`id`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_event_type` FOREIGN KEY (`event_type_id`) REFERENCES `event_types` (`id`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_fr_banquet_style` FOREIGN KEY (`banquet_style_id`) REFERENCES `banquet` (`id`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_fr_event_type` FOREIGN KEY (`event_type_id`) REFERENCES `event_types` (`id`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_fr_office` FOREIGN KEY (`office_id`) REFERENCES `offices` (`id`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_fr_office_type` FOREIGN KEY (`office_type_id`) REFERENCES `office_types` (`id`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_fr_venue_setup` FOREIGN KEY (`venue_setup_id`) REFERENCES `venue_setups` (`id`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_office` FOREIGN KEY (`office_id`) REFERENCES `offices` (`id`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_office_type` FOREIGN KEY (`office_type_id`) REFERENCES `office_types` (`id`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_venue` FOREIGN KEY (`venue_id`) REFERENCES `venues` (`id`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_venue_setup` FOREIGN KEY (`venue_setup_id`) REFERENCES `venue_setups` (`id`) ON UPDATE CASCADE;
+
+--
+-- Constraints for table `function_room_availability`
+--
+ALTER TABLE `function_room_availability`
+  ADD CONSTRAINT `function_room_availability_ibfk_1` FOREIGN KEY (`function_room_id`) REFERENCES `function_rooms` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `function_room_availability_ibfk_2` FOREIGN KEY (`reservation_id`) REFERENCES `function_room_reservations` (`id`) ON DELETE SET NULL;
+
+--
+-- Constraints for table `function_room_blocked_dates`
+--
+ALTER TABLE `function_room_blocked_dates`
+  ADD CONSTRAINT `function_room_blocked_dates_ibfk_1` FOREIGN KEY (`function_room_id`) REFERENCES `function_rooms` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `function_room_images`
+--
+ALTER TABLE `function_room_images`
+  ADD CONSTRAINT `function_room_images_ibfk_1` FOREIGN KEY (`function_room_id`) REFERENCES `function_rooms` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `function_room_reservations`
+--
+ALTER TABLE `function_room_reservations`
+  ADD CONSTRAINT `function_room_reservations_ibfk_1` FOREIGN KEY (`function_room_id`) REFERENCES `function_rooms` (`id`),
+  ADD CONSTRAINT `function_room_reservations_ibfk_2` FOREIGN KEY (`event_type_id`) REFERENCES `event_types` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `function_room_reservations_ibfk_3` FOREIGN KEY (`banquet_style_id`) REFERENCES `banquet` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `function_room_reservations_ibfk_4` FOREIGN KEY (`office_type_id`) REFERENCES `office_types` (`id`),
+  ADD CONSTRAINT `function_room_reservations_ibfk_5` FOREIGN KEY (`office_id`) REFERENCES `offices` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `function_room_reservations_ibfk_6` FOREIGN KEY (`venue_setup_id`) REFERENCES `venue_setups` (`id`),
+  ADD CONSTRAINT `function_room_reservations_ibfk_7` FOREIGN KEY (`user_id`) REFERENCES `user_reg` (`id`) ON DELETE SET NULL;
+
+--
+-- Constraints for table `guest_details`
+--
+ALTER TABLE `guest_details`
+  ADD CONSTRAINT `guest_details_ibfk_1` FOREIGN KEY (`reservation_id`) REFERENCES `guest_room_reservations` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `guest_room_availability`
@@ -1986,11 +2697,23 @@ ALTER TABLE `guest_room_availability`
   ADD CONSTRAINT `guest_room_availability_ibfk_1` FOREIGN KEY (`guest_room_id`) REFERENCES `guest_rooms` (`id`) ON DELETE CASCADE;
 
 --
+-- Constraints for table `guest_room_images`
+--
+ALTER TABLE `guest_room_images`
+  ADD CONSTRAINT `guest_room_images_ibfk_1` FOREIGN KEY (`guest_room_id`) REFERENCES `guest_rooms` (`id`) ON DELETE CASCADE;
+
+--
 -- Constraints for table `guest_room_reservations`
 --
 ALTER TABLE `guest_room_reservations`
   ADD CONSTRAINT `guest_room_reservations_ibfk_1` FOREIGN KEY (`guest_room_id`) REFERENCES `guest_rooms` (`id`),
   ADD CONSTRAINT `guest_room_reservations_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `user_reg` (`id`) ON DELETE SET NULL;
+
+--
+-- Constraints for table `notifications`
+--
+ALTER TABLE `notifications`
+  ADD CONSTRAINT `notifications_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user_reg` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `offices`
