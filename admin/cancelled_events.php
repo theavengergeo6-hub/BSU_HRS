@@ -44,14 +44,48 @@ if ($res_guest) {
         </h1>
     </div>
 
+    <style>
+        .cancelled-table-container {
+            max-height: 450px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #ffcdd2 transparent;
+        }
+
+        .cancelled-table-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .cancelled-table-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .cancelled-table-container::-webkit-scrollbar-thumb {
+            background-color: #ffcdd2;
+            border-radius: 10px;
+        }
+
+        .cancelled-table-container::-webkit-scrollbar-thumb:hover {
+            background-color: #e57373;
+        }
+
+        .sticky-header th {
+            position: sticky;
+            top: 0;
+            background-color: #f8f9fa !important;
+            z-index: 10;
+            box-shadow: inset 0 -1px 0 #dee2e6;
+        }
+    </style>
+
     <div class="card border-0 shadow-sm mb-4" style="border-radius: 12px; overflow: hidden;">
         <div class="card-header bg-white py-3 border-bottom">
             <h5 class="mb-0 text-danger" style="font-weight: 600;"><i class="bi bi-building me-2"></i>Function Room Cancellations</h5>
         </div>
         <div class="card-body p-0">
-            <div class="table-responsive">
+            <div class="table-responsive cancelled-table-container">
                 <table class="table table-hover align-middle mb-0" style="min-width: 800px;">
-                    <thead class="bg-light text-muted" style="font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;">
+                    <thead class="bg-light text-muted sticky-header" style="font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;">
                         <tr>
                             <th class="py-3 px-4 fw-semibold border-0">Booking No.</th>
                             <th class="py-3 px-4 fw-semibold border-0">Requester</th>
@@ -99,9 +133,9 @@ if ($res_guest) {
             <h5 class="mb-0 text-danger" style="font-weight: 600;"><i class="bi bi-door-open me-2"></i>Guest Room Cancellations</h5>
         </div>
         <div class="card-body p-0">
-            <div class="table-responsive">
+            <div class="table-responsive cancelled-table-container">
                 <table class="table table-hover align-middle mb-0" style="min-width: 800px;">
-                    <thead class="bg-light text-muted" style="font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;">
+                    <thead class="bg-light text-muted sticky-header" style="font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;">
                         <tr>
                             <th class="py-3 px-4 fw-semibold border-0">Booking No.</th>
                             <th class="py-3 px-4 fw-semibold border-0">Guest Name</th>

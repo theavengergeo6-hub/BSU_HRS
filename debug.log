@@ -5474,3 +5474,142 @@ water dispenser
 [2026-03-24 11:49:27] Inserted activity_name: Global Bump
 [2026-03-24 11:49:27] Inserted 5 venue(s) into reservation_venues for reservation ID 44
 [2026-03-24 11:49:51] Confirmation email sent to joshuacullo360@gmail.com
+[2026-03-24 08:38:14] ========== START reservation_submit.php ==========
+[2026-03-24 15:38:14] RAW POST data: Array
+(
+    [reservation_type] => function
+    [last_name] => Tesfaye
+    [first_name] => Abel
+    [middle_initial] => W
+    [email] => 22-70720@g.batstate-u.edu.ph
+    [contact] => 09087547440
+    [position] => Student
+    [office_type_id] => 1
+    [office_id] => 5
+    [event_type_id] => 2
+    [activity_name] => 4th year OJT Orientation
+    [participants] => 70
+    [banquet_style_id] => 3
+    [guest_last_name] => 
+    [guest_first_name] => 
+    [guest_middle_initial] => 
+    [guest_dob] => 
+    [guest_address] => 
+    [guest_email] => 
+    [guest_contact] => 
+    [arrival_date] => 
+    [checkin_time] => 
+    [checkout_time] => 
+    [departure_date] => 
+    [adults_count] => 1
+    [kids_count] => 0
+    [guest_room_id] => 
+    [guest_remarks] => 
+    [venue_ids] => Array
+        (
+            [0] => 1
+            [1] => 2
+            [2] => 3
+        )
+
+    [view_board_qty] => 1
+    [additional_instruction] => 
+    [action] => submit_function
+    [event_type] => Seminar and Lecture
+    [venue_id] => 1
+    [facilities_schedules] => {"venues":[{"id":"1","name":"Function Room A","floor":"Ground Floor"},{"id":"2","name":"Function Room B","floor":"Ground Floor"},{"id":"3","name":"Function Room C","floor":"Ground Floor"}],"schedules":{"1":[{"date":"2026-03-31","endDate":"2026-03-31","start":"07:00","end":"12:00"}],"2":[{"date":"2026-03-31","endDate":"2026-03-31","start":"07:00","end":"12:00"}],"3":[{"date":"2026-03-31","endDate":"2026-03-31","start":"07:00","end":"12:00"}]}}
+    [miscellaneous_items] => {"basic_sound_system":{"speaker":2,"mic":2},"banquet_chairs":{"quantity":70},"view_board":{"requested":true},"rectangular_table":{"quantity":2}}
+    [terms_agreed_by] => Tesfaye, Abel W.
+    [terms_position] => Student
+    [terms_date] => March 24, 2026
+)
+
+[2026-03-24 15:38:14] SPECIFIC CHECK - activity_name: '4th year OJT Orientation'
+[2026-03-24 15:38:14] SPECIFIC CHECK - event_type_id: '2'
+[2026-03-24 15:38:14] BEFORE CLEAN - activity_name: '4th year OJT Orientation'
+[2026-03-24 15:38:14] AFTER CLEAN - activity_name: '4th year OJT Orientation'
+[2026-03-24 15:38:14] event_type_id: 2
+[2026-03-24 15:38:14] FINAL activity_name: '4th year OJT Orientation'
+[2026-03-24 15:38:14] facilities_schedules decoded: Array
+(
+    [venues] => Array
+        (
+            [0] => Array
+                (
+                    [id] => 1
+                    [name] => Function Room A
+                    [floor] => Ground Floor
+                )
+
+            [1] => Array
+                (
+                    [id] => 2
+                    [name] => Function Room B
+                    [floor] => Ground Floor
+                )
+
+            [2] => Array
+                (
+                    [id] => 3
+                    [name] => Function Room C
+                    [floor] => Ground Floor
+                )
+
+        )
+
+    [schedules] => Array
+        (
+            [1] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-03-31
+                            [endDate] => 2026-03-31
+                            [start] => 07:00
+                            [end] => 12:00
+                        )
+
+                )
+
+            [2] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-03-31
+                            [endDate] => 2026-03-31
+                            [start] => 07:00
+                            [end] => 12:00
+                        )
+
+                )
+
+            [3] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-03-31
+                            [endDate] => 2026-03-31
+                            [start] => 07:00
+                            [end] => 12:00
+                        )
+
+                )
+
+        )
+
+)
+
+[2026-03-24 15:38:14] Times - start_datetime: 2026-03-31 07:00, end_datetime: 2026-03-31 12:00
+[2026-03-24 15:38:14] Conflict check passed for all venues
+[2026-03-24 15:38:14] Terms info captured: Tesfaye, Abel W. | Student
+[2026-03-24 15:38:14] SQL: INSERT INTO facility_reservations (
+        booking_no, reservation_no, last_name, first_name, middle_initial, 
+        email, contact_number, office_type_id, office_id, external_office_name, 
+        activity_name, event_type_id, venue_id, venue_setup_id, banquet_style_id,
+        start_datetime, end_datetime, participants_count, miscellaneous_items, 
+        additional_instruction
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+[2026-03-24 15:38:14] Success! Inserted ID: 45
+[2026-03-24 15:38:14] Inserted activity_name: 4th year OJT Orientation
+[2026-03-24 15:38:14] Inserted 3 venue(s) into reservation_venues for reservation ID 45
+[2026-03-24 15:38:38] Confirmation email sent to 22-70720@g.batstate-u.edu.ph

@@ -1475,14 +1475,18 @@ if ($selected_customer_type) {
                                             <div class="form-group">
                                                 <label>No. of Adults *</label>
                                                 <input type="number" class="form-control" name="adults_count"
-                                                    id="adults_count" min="1" max="50" value="1" required>
+                                                    id="adults_count" min="1" max="50" value="1" required
+                                                    onchange="validateGuestCountAgainstCapacity();"
+                                                    oninput="validateGuestCountAgainstCapacity();">
                                             </div>
                                         </div>
                                         <div class="col-6">
                                             <div class="form-group">
                                                 <label>No. of Kids *</label>
                                                 <input type="number" class="form-control" name="kids_count"
-                                                    id="kids_count" min="0" max="10" value="0">
+                                                    id="kids_count" min="0" max="10" value="0"
+                                                    onchange="validateGuestCountAgainstCapacity();"
+                                                    oninput="validateGuestCountAgainstCapacity();">
                                             </div>
                                         </div>
                                     </div>
@@ -1499,7 +1503,7 @@ if ($selected_customer_type) {
                                 <div class="form-group">
                                     <label>Room *</label>
                                     <select class="form-select" name="guest_room_id" id="guest_room_id" required
-                                        onchange="updateRoomCapacity(this)">
+                                        onchange="updateRoomCapacity(this); scheduleAvailabilityCheck();">
                                         <option value="">Select Room</option>
                                         <?php foreach ($guest_venues as $room): ?>
                                             <option value="<?= $room['id'] ?>" data-capacity="<?= $room['capacity'] ?>"
@@ -2431,17 +2435,43 @@ Thank you. We look forward in welcoming your group here at the Hostel!`;
 
     function validateGuestCountAgainstCapacity() {
         var roomSelect = document.getElementById('guest_room_id');
-        if (!roomSelect.value) return true;
+        if (!roomSelect || !roomSelect.value) return true;
+
         var selectedOption = roomSelect.options[roomSelect.selectedIndex];
         var roomName = selectedOption.getAttribute('data-name') || '';
         var capacity = parseInt(selectedOption.getAttribute('data-capacity') || '0');
-        var maxAdditional = Math.max(0, capacity - 1);
-        var currentGuests = document.querySelectorAll('.guest-card').length;
-        if (currentGuests > maxAdditional) {
+
+        var adultsInput = document.getElementById('adults_count');
+        var kidsInput = document.getElementById('kids_count');
+
+        var adults = parseInt(adultsInput.value) || 0;
+        var kids = parseInt(kidsInput.value) || 0;
+        var totalInputGuests = adults + kids;
+
+        // 1. Check if adults + kids > capacity
+        if (totalInputGuests > capacity) {
             showModalAlert('⚠️', 'Exceeds Capacity',
-                `${roomName} allows ${capacity} total (1 principal + ${maxAdditional} additional). Please remove ${currentGuests - maxAdditional} guest(s).`);
+                `${roomName} has a maximum capacity of ${capacity} guests total. Your current selection (${adults} Adults + ${kids} Kids = ${totalInputGuests}) exceeds this limit.`);
+
+            // Try to adjust back - if it was kids change, reduce kids, else reduce adults
+            if (event && event.target && event.target.id === 'kids_count') {
+                kidsInput.value = Math.max(0, capacity - adults);
+            } else {
+                adultsInput.value = Math.max(1, capacity - kids);
+            }
             return false;
         }
+
+        // 2. Also check against existing guest cards if present
+        var maxAdditionalAllowed = Math.max(0, capacity - 1);
+        var currentCards = document.querySelectorAll('.guest-card').length;
+
+        if (currentCards > maxAdditionalAllowed) {
+            showModalAlert('⚠️', 'Too Many Guest Cards',
+                `${roomName} only allows ${maxAdditionalAllowed} additional guests besides the principal. Please remove ${currentCards - maxAdditionalAllowed} guest card(s).`);
+            return false;
+        }
+
         return true;
     }
 
@@ -2784,11 +2814,11 @@ Thank you. We look forward in welcoming your group here at the Hostel!`;
             return false;
         }
 
-        // Email validation - MUST be gmail.com
+        // Email validation - MUST be gmail.com or university email
         var email = document.getElementById('guest_email').value.trim();
-        var emailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+        var emailRegex = /^[a-zA-Z0-9._%+-]+@(gmail\.com|g\.batstate-u\.edu\.ph)$/;
         if (!emailRegex.test(email)) {
-            showModalAlert('📧', 'Invalid Email', 'Please use a valid Gmail address (@gmail.com).');
+            showModalAlert('📧', 'Invalid Email', 'Please use a valid Gmail address (@gmail.com) or University GSuite email (@g.batstate-u.edu.ph).');
             document.getElementById('guest_email').focus();
             return false;
         }
@@ -3550,9 +3580,9 @@ Thank you. We look forward in welcoming your group here at the Hostel!`;
 
             // ADD THIS EMAIL VALIDATION FOR FUNCTION ROOMS
             var email = document.getElementById('email').value.trim();
-            var emailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+            var emailRegex = /^[a-zA-Z0-9._%+-]+@(gmail\.com|g\.batstate-u\.edu\.ph)$/;
             if (!emailRegex.test(email)) {
-                showModalAlert('📧', 'Invalid Email', 'Please use a valid Gmail address (@gmail.com).');
+                showModalAlert('📧', 'Invalid Email', 'Please use a valid Gmail address (@gmail.com) or University GSuite email (@g.batstate-u.edu.ph).');
                 document.getElementById('email').focus();
                 return false;
             }
