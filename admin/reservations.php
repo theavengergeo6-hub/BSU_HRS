@@ -116,8 +116,16 @@ if ($view === 'function') {
     $pencil_month   = (int)$conn->query("SELECT COUNT(*) AS c FROM facility_reservations WHERE status='pencil_booked' AND MONTH(start_datetime)=$month AND YEAR(start_datetime)=$year")->fetch_assoc()['c'];
     $pending_month  = (int)$conn->query("SELECT COUNT(*) AS c FROM facility_reservations WHERE status='pending' AND MONTH(start_datetime)=$month AND YEAR(start_datetime)=$year")->fetch_assoc()['c'];
 
-    $pending_total = (int)$conn->query("SELECT COUNT(*) AS c FROM facility_reservations WHERE status='pending'")->fetch_assoc()['c'];
-    $pencil_total  = (int)$conn->query("SELECT COUNT(*) AS c FROM facility_reservations WHERE status='pencil_booked'")->fetch_assoc()['c'];
+    // Total counts (function only) for tab badges
+    $pending_total_fac = (int)$conn->query("SELECT COUNT(*) AS c FROM facility_reservations WHERE status='pending'")->fetch_assoc()['c'];
+    $pencil_total_fac  = (int)$conn->query("SELECT COUNT(*) AS c FROM facility_reservations WHERE status='pencil_booked'")->fetch_assoc()['c'];
+
+    // Global totals (function + guest) for banners
+    $pending_total_guest = (int)$conn->query("SELECT COUNT(*) AS c FROM guest_room_reservations WHERE status='pending' AND deleted=0")->fetch_assoc()['c'];
+    $pencil_total_guest  = (int)$conn->query("SELECT COUNT(*) AS c FROM guest_room_reservations WHERE status='pencil_booked' AND deleted=0")->fetch_assoc()['c'];
+
+    $global_pending_total = $pending_total_fac + $pending_total_guest;
+    $global_pencil_total  = $pencil_total_fac + $pencil_total_guest;
 }
 
 // ── Guest room data ──────────────────────────────────────────────────────────
@@ -128,6 +136,16 @@ if ($view === 'guest') {
     // Treat invalid/blank enum values as pending so reservations never "disappear"
     $gPending   = (int)$conn->query("SELECT COUNT(*) AS c FROM guest_room_reservations WHERE deleted=0 AND (status='pending' OR status='' OR status IS NULL) AND MONTH(check_in_date)=$month AND YEAR(check_in_date)=$year")->fetch_assoc()['c'];
     $gCancelled = (int)$conn->query("SELECT COUNT(*) AS c FROM guest_room_reservations WHERE deleted=0 AND status='cancelled'     AND MONTH(check_in_date)=$month AND YEAR(check_in_date)=$year")->fetch_assoc()['c'];
+
+    // Global totals for banner (same as above but for when view is guest)
+    $pending_total_fac = (int)$conn->query("SELECT COUNT(*) AS c FROM facility_reservations WHERE status='pending'")->fetch_assoc()['c'];
+    $pencil_total_fac  = (int)$conn->query("SELECT COUNT(*) AS c FROM facility_reservations WHERE status='pencil_booked'")->fetch_assoc()['c'];
+    
+    $pending_total_guest = (int)$conn->query("SELECT COUNT(*) AS c FROM guest_room_reservations WHERE status='pending' AND deleted=0")->fetch_assoc()['c'];
+    $pencil_total_guest  = (int)$conn->query("SELECT COUNT(*) AS c FROM guest_room_reservations WHERE status='pencil_booked' AND deleted=0")->fetch_assoc()['c'];
+
+    $global_pending_total = $pending_total_fac + $pending_total_guest;
+    $global_pencil_total  = $pencil_total_fac + $pencil_total_guest;
 
     // Load all active guest reservations that overlap this month
     $gr_result = $conn->query("
@@ -547,14 +565,17 @@ foreach ($rows as $row):
            class="view-tab <?= $view==='function'?'active':'' ?>">
             <i class="bi bi-building"></i>
             Function Rooms
-            <?php if ($view==='function' && !empty($pending_total)): ?>
-            <span class="tab-badge"><?= $pending_total ?></span>
+            <?php if ($pending_total_fac > 0): ?>
+            <span class="tab-badge"><?= $pending_total_fac ?></span>
             <?php endif; ?>
         </a>
         <a href="?view=guest&month=<?= $month ?>&year=<?= $year ?>"
            class="view-tab <?= $view==='guest'?'active':'' ?>">
             <i class="bi bi-door-open"></i>
             Guest Rooms
+            <?php if ($pending_total_guest > 0): ?>
+            <span class="tab-badge"><?= $pending_total_guest ?></span>
+            <?php endif; ?>
         </a>
     </div>
 
@@ -563,12 +584,12 @@ foreach ($rows as $row):
          FUNCTION ROOM CALENDAR
          ════════════════════════════════════════════════════════════════════ -->
 
-    <?php if ($pending_total > 0 || $pencil_total > 0): ?>
+    <?php if ($global_pending_total > 0 || $global_pencil_total > 0): ?>
     <div class="pending-banner">
         <div class="banner-content">
             <div class="banner-icon"><i class="bi bi-bell-fill"></i></div>
             <div class="banner-text">
-                <h3><?= $pending_total ?> pending &amp; <?= $pencil_total ?> pencil-booked reservation<?= ($pending_total+$pencil_total)!=1?'s':'' ?> awaiting action</h3>
+                <h3><?= $global_pending_total ?> pending &amp; <?= $global_pencil_total ?> pencil-booked reservation<?= ($global_pending_total+$global_pencil_total)!=1?'s':'' ?> awaiting action</h3>
                 <p>Click to review and approve</p>
             </div>
         </div>

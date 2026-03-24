@@ -6,17 +6,16 @@ requireAdminLogin();
 $current_page = basename($_SERVER['PHP_SELF']);
 $admin = getAdminInfo($conn);
 
-// Get pending reservations count for badge
-$pending_count = 0;
-$result = $conn->query("SELECT COUNT(*) as count FROM facility_reservations WHERE status = 'pending'");
-if ($result) {
-    $pending_count = $result->fetch_assoc()['count'];
-}
+// Get pending reservations count for badge (function + guest)
+$pending_fac = $conn->query("SELECT COUNT(*) as count FROM facility_reservations WHERE status = 'pending'")->fetch_assoc()['count'] ?? 0;
+$pending_guest = $conn->query("SELECT COUNT(*) as count FROM guest_room_reservations WHERE status = 'pending' AND deleted = 0")->fetch_assoc()['count'] ?? 0;
+$pending_count = (int)$pending_fac + (int)$pending_guest;
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" type="image/x-icon" href="<?= BASE_URL ?>BSU_Logo.ico">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= isset($pageTitle) ? $pageTitle . ' - ' : '' ?>Admin | BSU Hostel</title>
     <!-- Bootstrap CSS -->
@@ -426,6 +425,10 @@ if ($result) {
                 <a href="rooms.php" class="<?= $current_page == 'rooms.php' ? 'active' : '' ?>">
                     <i class="bi bi-building"></i>
                     Rooms
+                </a>
+                <a href="cancelled_events.php" class="<?= $current_page == 'cancelled_events.php' ? 'active' : '' ?>">
+                    <i class="bi bi-x-circle"></i>
+                    Cancelled Events
                 </a>
                 <a href="reports.php" class="<?= $current_page == 'reports.php' ? 'active' : '' ?>">
                     <i class="bi bi-file-text"></i>

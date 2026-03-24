@@ -27,6 +27,7 @@ $logo_url = BASE_URL . '/assets/images/header_logo.png';
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" type="image/x-icon" href="<?= BASE_URL ?>/BSU_Logo.ico">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= isset($pageTitle) ? htmlspecialchars($pageTitle) . ' | ' : '' ?>BSU Hostel</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">

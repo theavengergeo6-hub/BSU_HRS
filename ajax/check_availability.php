@@ -5,9 +5,10 @@ require_once __DIR__ . '/../inc/essentials.php';
 header('Content-Type: application/json');
 
 $venue_id = (int)($_GET['venue_id'] ?? 0);
-$date = $_GET['date'] ?? '';
+$start_date = $_GET['date'] ?? '';
+$end_date   = $_GET['end_date'] ?? $start_date; // Handle multi-day range
 
-if (!$venue_id || !$date) {
+if (!$venue_id || !$start_date) {
     echo json_encode(['success' => false, 'message' => 'Missing parameters']);
     exit;
 }
@@ -16,10 +17,10 @@ $booked_slots = [];
 $seen_slots = []; // For deduplication
 
 // 1. Check primary venue in facility_reservations - ONLY APPROVED
-$requested_start = $date . ' 00:00:00';
-$requested_end   = $date . ' 23:59:59';
+$requested_start = $start_date . ' 00:00:00';
+$requested_end   = $end_date . ' 23:59:59';
 $req_s = strtotime($requested_start);
-$req_e = strtotime($requested_end) + 1; // exactly midnight next day
+$req_e = strtotime($requested_end) + 1;
 
 $query1 = "SELECT start_datetime, end_datetime, 
           DATE_ADD(end_datetime, INTERVAL 1 HOUR) as buffer_end,
@@ -36,7 +37,12 @@ $stmt1->execute();
 $result1 = $stmt1->get_result();
 
 while ($row = $result1->fetch_assoc()) {
-    process_row($row, $req_s, $req_e, $booked_slots, $seen_slots);
+    // For range check, we need to loop through each day in the requested range
+    $curr_ts = $req_s;
+    while ($curr_ts < $req_e) {
+        process_row($row, $curr_ts, $curr_ts + 86400, $booked_slots, $seen_slots);
+        $curr_ts += 86400; // Next day
+    }
 }
 $stmt1->close();
 
@@ -57,7 +63,11 @@ $stmt2->execute();
 $result2 = $stmt2->get_result();
 
 while ($row = $result2->fetch_assoc()) {
-    process_row($row, $req_s, $req_e, $booked_slots, $seen_slots);
+    $curr_ts = $req_s;
+    while ($curr_ts < $req_e) {
+        process_row($row, $curr_ts, $curr_ts + 86400, $booked_slots, $seen_slots);
+        $curr_ts += 86400; // Next day
+    }
 }
 $stmt2->close();
 
@@ -141,9 +151,10 @@ function process_row($row, $req_s, $req_e, &$booked_slots, &$seen_slots) {
         
         $display_end = date('H:i', $end_timestamp);
         
-        $slot_key = $start_time . '-' . $buffer_end_time;
+        $slot_key = $req_date . '-' . $start_time . '-' . $buffer_end_time;
         if (!isset($seen_slots[$slot_key])) {
             $booked_slots[] = [
+                'date' => $req_date,
                 'start' => $start_time,
                 'end' => $display_end,
                 'buffer_end' => $buffer_end_time

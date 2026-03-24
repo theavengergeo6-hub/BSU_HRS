@@ -3909,7 +3909,8 @@ Thank you. We look forward in welcoming your group here at the Hostel!`;
         // Show booked slots info if any
         if (bookedSlots && bookedSlots.length > 0) {
             var lines = bookedSlots.map(function (b) {
-                return formatTimeDisplay(b.start) + ' – ' + formatTimeDisplay(b.end) +
+                var dateText = b.date ? formatDateDisplay(b.date) + ': ' : '';
+                return dateText + formatTimeDisplay(b.start) + ' – ' + formatTimeDisplay(b.end) +
                     ' (unavailable until ' + formatTimeDisplay(b.buffer_end) + ')';
             });
             bookedInfo.innerHTML = '<strong>⚠ Already booked for this venue:</strong><br>' + lines.join('<br>');
@@ -3940,7 +3941,9 @@ Thank you. We look forward in welcoming your group here at the Hostel!`;
 
     function fetchAvailability(venueId, date, callback, generation) {
         console.log('fetchAvailability called for venue ID:', venueId, 'date:', date, 'generation:', generation);
-        var cacheKey = 'venue_' + venueId + '_' + date;
+        var endDateInput = document.getElementById('timeModalEndDate');
+        var endDateVal = (endDateInput && endDateInput.value) ? endDateInput.value : date;
+        var cacheKey = 'venue_' + venueId + '_' + date + '_' + endDateVal;
 
         // Guard: if this fetch is already stale (user opened a different venue), do nothing
         if (generation !== undefined && generation !== timeModalGeneration) {
@@ -3967,8 +3970,10 @@ Thank you. We look forward in welcoming your group here at the Hostel!`;
         document.getElementById('timeModalEnd').innerHTML = '<option value="">Loading...</option>';
         document.getElementById('addScheduleBtn').disabled = true;
 
-        var url = baseUrl + '/ajax/check_availability.php?venue_id=' + venueId + '&date=' + date;
-        console.log('Fetching availability for venue', venueId, 'date', date, 'URL:', url);
+        var endDateInput = document.getElementById('timeModalEndDate');
+        var endDate = (endDateInput && endDateInput.value) ? endDateInput.value : date;
+        var url = baseUrl + '/ajax/check_availability.php?venue_id=' + venueId + '&date=' + date + '&end_date=' + endDate;
+        console.log('Fetching availability for venue', venueId, 'range', date, 'to', endDate, 'URL:', url);
 
         fetch(url)
             .then(function (r) {
@@ -4092,6 +4097,10 @@ Thank you. We look forward in welcoming your group here at the Hostel!`;
                     endDateWrap.style.display = 'none';
                     dateLabel.innerHTML = '<i class="bi bi-calendar-event"></i> Date';
                     document.getElementById('timeModalEndDate').value = '';
+                    // Re-fetch when toggled OFF
+                    fetchAvailability(venueId, document.getElementById('timeModalDateInput').value, function (data) {
+                        populateTimeDropdowns(data.available_starts, data.booked_slots, venueId);
+                    }, myGeneration);
                 }
             };
             multiDayToggle.addEventListener('change', window._multiDayToggleHandler);
@@ -4137,6 +4146,20 @@ Thank you. We look forward in welcoming your group here at the Hostel!`;
             }, myGeneration);
         };
         document.getElementById('timeModalDateInput').addEventListener('change', _timeModalDateHandler);
+
+        // Re-fetch when END DATE changes
+        _timeModalEndDateHandler = function () {
+            var startDate = document.getElementById('timeModalDateInput').value;
+            var endDate = this.value;
+            if (!startDate || !endDate) return;
+            if (myGeneration !== timeModalGeneration) return;
+            document.getElementById('timeModalEnd').innerHTML = '<option value="">Select start time first</option>';
+            fetchAvailability(venueId, startDate, function (data) {
+                populateTimeDropdowns(data.available_starts, data.booked_slots, venueId);
+            }, myGeneration);
+        };
+        var endInputEl = document.getElementById('timeModalEndDate');
+        if (endInputEl) endInputEl.addEventListener('change', _timeModalEndDateHandler);
 
         // Populate end times when start time is selected (named function so it can be removed)
         _timeModalStartHandler = function () {
