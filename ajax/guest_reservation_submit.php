@@ -49,7 +49,6 @@ $adults_count   = max(1, (int)($_POST['adults_count'] ?? 1));
 $children_count = max(0, (int)($_POST['kids_count']   ?? 0));
 $guest_room_id  = (int)($_POST['room_id'] ?? 0);
 $special_requests = clean($_POST['remarks']       ?? '');
-$registered_by  = clean($_POST['registered_by']  ?? '');
 $data_privacy   = (int)($_POST['data_privacy_consent'] ?? 0);
 $digital_sig    = clean($_POST['digital_signature']    ?? '');
 // "Registered By" on the PDF must match the principal guest's name format:
@@ -100,8 +99,6 @@ if (!$check_out_date)  $missing[] = 'Departure Date';
 if (!$check_in_time)   $missing[] = 'Check-in Time';
 if (!$check_out_time)  $missing[] = 'Check-out Time';
 if (!$guest_room_id)   $missing[] = 'Room';
-if (!$registered_by)   $missing[] = 'Name of Person Registering';
-
 if ($missing) {
     jsonOut(['success' => false, 'message' => 'Please fill in: ' . implode(', ', $missing)]);
 }

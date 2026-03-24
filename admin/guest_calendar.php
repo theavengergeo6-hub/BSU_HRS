@@ -74,15 +74,17 @@ $guest_reservations = $conn->query("
 // Group reservations by date
 $events_by_date = [];
 while ($row = $guest_reservations->fetch_assoc()) {
+    // Force arrival/departure to Y-m-d format for key consistency
+    $arrival_date = $row['start_date'];
+    $departure_date = $row['end_date'];
+    
     // Add to arrival date
-    $arrival_date = $row['arrival_date'];
     if (!isset($events_by_date[$arrival_date])) {
         $events_by_date[$arrival_date] = [];
     }
     $events_by_date[$arrival_date][] = array_merge($row, ['event_type' => 'arrival']);
     
     // Add to departure date
-    $departure_date = $row['departure_date'];
     if ($departure_date !== $arrival_date) {
         if (!isset($events_by_date[$departure_date])) {
             $events_by_date[$departure_date] = [];

@@ -100,14 +100,17 @@ while($row = $v_res->fetch_assoc()){
     $res_cache[$rid]['venues'][] = $v_info;
 
     // Place it on every day it spans within the visible range
-    $start_date = date('Y-m-d', strtotime($row['start_datetime']));
-    $end_date   = date('Y-m-d', strtotime($row['end_datetime']));
-    
-    $current = max(strtotime($start_date), strtotime($range_start_dt));
-    $last    = min(strtotime($end_date), strtotime($range_end_dt));
-    
-    while($current <= $last){
-        $d = date('Y-m-d', $current);
+    $start_dt = new DateTime($row['start_datetime']);
+    $end_dt   = new DateTime($row['end_datetime']);
+    $range_end = new DateTime($range_end_dt);
+
+    $iter = clone $start_dt;
+    $iter->setTime(0,0,0);
+    $limit = clone $end_dt;
+    $limit->setTime(0,0,0);
+
+    while ($iter <= $limit && $iter <= $range_end) {
+        $d = $iter->format('Y-m-d');
         if(!isset($events_by_date[$d])) $events_by_date[$d] = [];
         
         if(!isset($events_by_date[$d][$rid])){
@@ -116,7 +119,7 @@ while($row = $v_res->fetch_assoc()){
         }
         $events_by_date[$d][$rid]['venues'][] = $v_info;
         
-        $current = strtotime("+1 day", $current);
+        $iter->modify('+1 day');
     }
 }
 
@@ -154,22 +157,27 @@ while($row = $g_res->fetch_assoc()){
     ];
 
     // Place it on every day it spans within the visible range
-    $start_date = date('Y-m-d', strtotime($row['start_datetime']));
-    $end_date   = date('Y-m-d', strtotime($row['end_datetime']));
+    $start_dt = new DateTime($row['start_datetime']);
+    $end_dt   = new DateTime($row['end_datetime']);
+    $range_end = new DateTime($range_end_dt);
     
-    $current = max(strtotime($start_date), strtotime($range_start_dt));
-    $last    = min(strtotime($end_date), strtotime($range_end_dt));
+    // Iterate from start date to end date inclusive
+    // Using a loop that adds 1 day at a time
+    $iter = clone $start_dt;
+    $iter->setTime(0,0,0);
+    $limit = clone $end_dt;
+    $limit->setTime(0,0,0);
     
-    while($current <= $last){
-        $d = date('Y-m-d', $current);
+    while ($iter <= $limit && $iter <= $range_end) {
+        $d = $iter->format('Y-m-d');
         if(!isset($events_by_date[$d])) $events_by_date[$d] = [];
         
-        $row['venues'] = [$v_info];
-        $row['is_guest'] = true;
-        // For guest rooms, we don't need to deduplicate venues as it's usually 1:1, but let's be consistent
-        $events_by_date[$d][$rid] = $row;
+        $curr_row = $row;
+        $curr_row['venues'] = [$v_info];
+        $curr_row['is_guest'] = true;
+        $events_by_date[$d][$rid] = $curr_row;
         
-        $current = strtotime("+1 day", $current);
+        $iter->modify('+1 day');
     }
 }
 

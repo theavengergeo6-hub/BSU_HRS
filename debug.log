@@ -4472,3 +4472,1005 @@ Stack trace:
 [2026-03-23 13:58:22] Inserted activity_name: CCF Elevate Youth Gathering
 [2026-03-23 13:58:23] Inserted 2 venue(s) into reservation_venues for reservation ID 37
 [2026-03-23 13:58:57] Confirmation email sent to delavega.emerishjem15@gmail.com
+[2026-03-24 01:23:41] ========== START reservation_submit.php ==========
+[2026-03-24 08:23:41] RAW POST data: Array
+(
+    [reservation_type] => function
+    [last_name] => Noche
+    [first_name] => John Kevin
+    [middle_initial] => R
+    [email] => joshuacullo360@gmail.com
+    [contact] => 09971448358
+    [office_type_id] => 1
+    [office_id] => 7
+    [event_type_id] => 2
+    [activity_name] => Injury Prevention, Safety and First Aid Seminar
+    [participants] => 70
+    [banquet_style_id] => 3
+    [guest_last_name] => 
+    [guest_first_name] => 
+    [guest_middle_initial] => 
+    [guest_dob] => 
+    [guest_address] => 
+    [guest_email] => 
+    [guest_contact] => 
+    [arrival_date] => 
+    [checkin_time] => 
+    [checkout_time] => 
+    [departure_date] => 
+    [adults_count] => 1
+    [kids_count] => 0
+    [guest_room_id] => 
+    [guest_remarks] => 
+    [venue_ids] => Array
+        (
+            [0] => 4
+            [1] => 5
+        )
+
+    [view_board_qty] => 1
+    [additional_instruction] => 
+    [action] => submit_function
+    [event_type] => Seminar and Lecture
+    [venue_id] => 4
+    [facilities_schedules] => {"venues":[{"id":"4","name":"Function Room D","floor":"Ground Floor"},{"id":"5","name":"Function Room E","floor":"Ground Floor"}],"schedules":{"1":[],"2":[],"3":[],"4":[{"date":"2026-03-30","endDate":"2026-03-30","start":"07:30","end":"12:00"}],"5":[{"date":"2026-03-30","endDate":"2026-03-30","start":"07:30","end":"12:00"}]}}
+    [miscellaneous_items] => {"basic_sound_system":{"speaker":1,"mic":2},"banquet_chairs":{"quantity":75},"view_board":{"requested":true},"rectangular_table":{"quantity":3}}
+    [terms_agreed_by] => Noche, John Kevin R.
+    [terms_position] => Faculty, Labschool
+    [terms_date] => March 24, 2026
+)
+
+[2026-03-24 08:23:41] SPECIFIC CHECK - activity_name: 'Injury Prevention, Safety and First Aid Seminar'
+[2026-03-24 08:23:41] SPECIFIC CHECK - event_type_id: '2'
+[2026-03-24 08:23:41] BEFORE CLEAN - activity_name: 'Injury Prevention, Safety and First Aid Seminar'
+[2026-03-24 08:23:41] AFTER CLEAN - activity_name: 'Injury Prevention, Safety and First Aid Seminar'
+[2026-03-24 08:23:41] event_type_id: 2
+[2026-03-24 08:23:41] FINAL activity_name: 'Injury Prevention, Safety and First Aid Seminar'
+[2026-03-24 08:23:41] facilities_schedules decoded: Array
+(
+    [venues] => Array
+        (
+            [0] => Array
+                (
+                    [id] => 4
+                    [name] => Function Room D
+                    [floor] => Ground Floor
+                )
+
+            [1] => Array
+                (
+                    [id] => 5
+                    [name] => Function Room E
+                    [floor] => Ground Floor
+                )
+
+        )
+
+    [schedules] => Array
+        (
+            [1] => Array
+                (
+                )
+
+            [2] => Array
+                (
+                )
+
+            [3] => Array
+                (
+                )
+
+            [4] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-03-30
+                            [endDate] => 2026-03-30
+                            [start] => 07:30
+                            [end] => 12:00
+                        )
+
+                )
+
+            [5] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-03-30
+                            [endDate] => 2026-03-30
+                            [start] => 07:30
+                            [end] => 12:00
+                        )
+
+                )
+
+        )
+
+)
+
+[2026-03-24 08:23:41] Times - start_datetime: 2026-03-30 07:30, end_datetime: 2026-03-30 12:00
+[2026-03-24 08:23:41] Conflict check passed for all venues
+[2026-03-24 08:23:41] Terms info captured: Noche, John Kevin R. | Faculty, Labschool
+[2026-03-24 08:23:41] SQL: INSERT INTO facility_reservations (
+        booking_no, reservation_no, last_name, first_name, middle_initial, 
+        email, contact_number, office_type_id, office_id, external_office_name, 
+        activity_name, event_type_id, venue_id, venue_setup_id, banquet_style_id,
+        start_datetime, end_datetime, participants_count, miscellaneous_items, 
+        additional_instruction
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+[2026-03-24 08:23:41] Success! Inserted ID: 38
+[2026-03-24 08:23:41] Inserted activity_name: Injury Prevention, Safety and First Aid Seminar
+[2026-03-24 08:23:41] Inserted 2 venue(s) into reservation_venues for reservation ID 38
+[2026-03-24 08:24:05] Confirmation email sent to joshuacullo360@gmail.com
+[2026-03-24 01:44:38] ========== START reservation_submit.php ==========
+[2026-03-24 08:44:38] RAW POST data: Array
+(
+    [reservation_type] => function
+    [last_name] => Ferrer
+    [first_name] => Carla Jane 
+    [middle_initial] => R
+    [email] => joshuacullo360@gmail.com
+    [contact] => 09157004261
+    [office_type_id] => 3
+    [office_id] => 82
+    [event_type_id] => 2
+    [activity_name] => Shaping a financially literate generation through awareness and action
+    [participants] => 197
+    [banquet_style_id] => 
+    [guest_last_name] => 
+    [guest_first_name] => 
+    [guest_middle_initial] => 
+    [guest_dob] => 
+    [guest_address] => 
+    [guest_email] => 
+    [guest_contact] => 
+    [arrival_date] => 
+    [checkin_time] => 
+    [checkout_time] => 
+    [departure_date] => 
+    [adults_count] => 1
+    [kids_count] => 0
+    [guest_room_id] => 
+    [guest_remarks] => 
+    [venue_ids] => Array
+        (
+            [0] => 1
+            [1] => 2
+            [2] => 3
+            [3] => 4
+            [4] => 5
+        )
+
+    [view_board_qty] => 1
+    [additional_instruction] => 25 monoblock chair
+podium
+water dispenser
+20 plates, 20 spoons, 20 fork, and 20 highball
+    [action] => submit_function
+    [event_type] => Seminar and Lecture
+    [venue_id] => 1
+    [facilities_schedules] => {"venues":[{"id":"1","name":"Function Room A","floor":"Ground Floor"},{"id":"2","name":"Function Room B","floor":"Ground Floor"},{"id":"3","name":"Function Room C","floor":"Ground Floor"},{"id":"4","name":"Function Room D","floor":"Ground Floor"},{"id":"5","name":"Function Room E","floor":"Ground Floor"}],"schedules":{"1":[{"date":"2026-03-24","endDate":"2026-03-24","start":"08:00","end":"12:00"}],"2":[{"date":"2026-03-24","endDate":"2026-03-24","start":"08:00","end":"12:00"}],"3":[{"date":"2026-03-24","endDate":"2026-03-24","start":"08:00","end":"12:00"}],"4":[{"date":"2026-03-24","endDate":"2026-03-24","start":"08:00","end":"12:00"}],"5":[{"date":"2026-03-24","endDate":"2026-03-24","start":"08:00","end":"12:00"}]}}
+    [miscellaneous_items] => {"basic_sound_system":{"speaker":1,"mic":2},"banquet_chairs":{"quantity":190},"view_board":{"requested":true}}
+    [terms_agreed_by] => Ferrer Carla Jane R.
+    [terms_position] => Comm FIMA HEAD, SSC
+    [terms_date] => March 24, 2026
+)
+
+[2026-03-24 08:44:38] SPECIFIC CHECK - activity_name: 'Shaping a financially literate generation through awareness and action'
+[2026-03-24 08:44:38] SPECIFIC CHECK - event_type_id: '2'
+[2026-03-24 08:44:38] BEFORE CLEAN - activity_name: 'Shaping a financially literate generation through awareness and action'
+[2026-03-24 08:44:38] AFTER CLEAN - activity_name: 'Shaping a financially literate generation through awareness and action'
+[2026-03-24 08:44:38] event_type_id: 2
+[2026-03-24 08:44:38] FINAL activity_name: 'Shaping a financially literate generation through awareness and action'
+[2026-03-24 08:44:38] facilities_schedules decoded: Array
+(
+    [venues] => Array
+        (
+            [0] => Array
+                (
+                    [id] => 1
+                    [name] => Function Room A
+                    [floor] => Ground Floor
+                )
+
+            [1] => Array
+                (
+                    [id] => 2
+                    [name] => Function Room B
+                    [floor] => Ground Floor
+                )
+
+            [2] => Array
+                (
+                    [id] => 3
+                    [name] => Function Room C
+                    [floor] => Ground Floor
+                )
+
+            [3] => Array
+                (
+                    [id] => 4
+                    [name] => Function Room D
+                    [floor] => Ground Floor
+                )
+
+            [4] => Array
+                (
+                    [id] => 5
+                    [name] => Function Room E
+                    [floor] => Ground Floor
+                )
+
+        )
+
+    [schedules] => Array
+        (
+            [1] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-03-24
+                            [endDate] => 2026-03-24
+                            [start] => 08:00
+                            [end] => 12:00
+                        )
+
+                )
+
+            [2] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-03-24
+                            [endDate] => 2026-03-24
+                            [start] => 08:00
+                            [end] => 12:00
+                        )
+
+                )
+
+            [3] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-03-24
+                            [endDate] => 2026-03-24
+                            [start] => 08:00
+                            [end] => 12:00
+                        )
+
+                )
+
+            [4] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-03-24
+                            [endDate] => 2026-03-24
+                            [start] => 08:00
+                            [end] => 12:00
+                        )
+
+                )
+
+            [5] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-03-24
+                            [endDate] => 2026-03-24
+                            [start] => 08:00
+                            [end] => 12:00
+                        )
+
+                )
+
+        )
+
+)
+
+[2026-03-24 08:44:38] Times - start_datetime: 2026-03-24 08:00, end_datetime: 2026-03-24 12:00
+[2026-03-24 08:44:38] Conflict check passed for all venues
+[2026-03-24 08:44:38] Terms info captured: Ferrer Carla Jane R. | Comm FIMA HEAD, SSC
+[2026-03-24 08:44:38] SQL: INSERT INTO facility_reservations (
+        booking_no, reservation_no, last_name, first_name, middle_initial, 
+        email, contact_number, office_type_id, office_id, external_office_name, 
+        activity_name, event_type_id, venue_id, venue_setup_id, banquet_style_id,
+        start_datetime, end_datetime, participants_count, miscellaneous_items, 
+        additional_instruction
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+[2026-03-24 08:44:38] Success! Inserted ID: 39
+[2026-03-24 08:44:38] Inserted activity_name: Shaping a financially literate generation through awareness and action
+[2026-03-24 08:44:39] Inserted 5 venue(s) into reservation_venues for reservation ID 39
+[2026-03-24 08:45:00] Confirmation email sent to joshuacullo360@gmail.com
+[2026-03-24 02:00:34] ========== START reservation_submit.php ==========
+[2026-03-24 09:00:34] RAW POST data: Array
+(
+    [reservation_type] => function
+    [last_name] => Barcelon
+    [first_name] => Angelica Louisse
+    [middle_initial] => N
+    [email] => joshuacullo360@gmail.com
+    [contact] => 09778352706
+    [office_type_id] => 4
+    [office_external_name] => CCF
+    [event_type_id] => 5
+    [activity_name] => CCF Inc. Elevate Youth Gathering
+    [participants] => 70
+    [banquet_style_id] => 
+    [guest_last_name] => 
+    [guest_first_name] => 
+    [guest_middle_initial] => 
+    [guest_dob] => 
+    [guest_address] => 
+    [guest_email] => 
+    [guest_contact] => 
+    [arrival_date] => 
+    [checkin_time] => 
+    [checkout_time] => 
+    [departure_date] => 
+    [adults_count] => 1
+    [kids_count] => 0
+    [guest_room_id] => 
+    [guest_remarks] => 
+    [venue_ids] => Array
+        (
+            [0] => 1
+            [1] => 2
+        )
+
+    [view_board_qty] => 1
+    [additional_instruction] => 1- Dispenser
+    [action] => submit_function
+    [event_type] => Programs and Special Events
+    [venue_id] => 1
+    [facilities_schedules] => {"venues":[{"id":"1","name":"Function Room A","floor":"Ground Floor"},{"id":"2","name":"Function Room B","floor":"Ground Floor"}],"schedules":{"1":[{"date":"2026-03-28","endDate":"2026-03-28","start":"13:00","end":"17:00"}],"2":[{"date":"2026-03-28","endDate":"2026-03-28","start":"13:00","end":"17:00"}]}}
+    [miscellaneous_items] => {"basic_sound_system":{"speaker":1,"mic":2},"banquet_chairs":{"quantity":70}}
+    [terms_agreed_by] => Barcelon, Angelica Louisse N.
+    [terms_position] => CCF Inc. Representative
+    [terms_date] => March 24, 2026
+)
+
+[2026-03-24 09:00:34] SPECIFIC CHECK - activity_name: 'CCF Inc. Elevate Youth Gathering'
+[2026-03-24 09:00:34] SPECIFIC CHECK - event_type_id: '5'
+[2026-03-24 09:00:34] BEFORE CLEAN - activity_name: 'CCF Inc. Elevate Youth Gathering'
+[2026-03-24 09:00:34] AFTER CLEAN - activity_name: 'CCF Inc. Elevate Youth Gathering'
+[2026-03-24 09:00:34] event_type_id: 5
+[2026-03-24 09:00:34] FINAL activity_name: 'CCF Inc. Elevate Youth Gathering'
+[2026-03-24 09:00:34] facilities_schedules decoded: Array
+(
+    [venues] => Array
+        (
+            [0] => Array
+                (
+                    [id] => 1
+                    [name] => Function Room A
+                    [floor] => Ground Floor
+                )
+
+            [1] => Array
+                (
+                    [id] => 2
+                    [name] => Function Room B
+                    [floor] => Ground Floor
+                )
+
+        )
+
+    [schedules] => Array
+        (
+            [1] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-03-28
+                            [endDate] => 2026-03-28
+                            [start] => 13:00
+                            [end] => 17:00
+                        )
+
+                )
+
+            [2] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-03-28
+                            [endDate] => 2026-03-28
+                            [start] => 13:00
+                            [end] => 17:00
+                        )
+
+                )
+
+        )
+
+)
+
+[2026-03-24 09:00:34] Times - start_datetime: 2026-03-28 13:00, end_datetime: 2026-03-28 17:00
+[2026-03-24 09:00:34] Conflict check passed for all venues
+[2026-03-24 09:00:34] Terms info captured: Barcelon, Angelica Louisse N. | CCF Inc. Representative
+[2026-03-24 09:00:34] SQL: INSERT INTO facility_reservations (
+        booking_no, reservation_no, last_name, first_name, middle_initial, 
+        email, contact_number, office_type_id, office_id, external_office_name, 
+        activity_name, event_type_id, venue_id, venue_setup_id, banquet_style_id,
+        start_datetime, end_datetime, participants_count, miscellaneous_items, 
+        additional_instruction
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+[2026-03-24 09:00:34] Success! Inserted ID: 40
+[2026-03-24 09:00:34] Inserted activity_name: CCF Inc. Elevate Youth Gathering
+[2026-03-24 09:00:34] Inserted 2 venue(s) into reservation_venues for reservation ID 40
+[2026-03-24 09:01:12] Confirmation email sent to joshuacullo360@gmail.com
+[2026-03-24 02:15:36] ========== START reservation_submit.php ==========
+[2026-03-24 09:15:36] RAW POST data: Array
+(
+    [reservation_type] => function
+    [last_name] => Tiangco
+    [first_name] => Marithel
+    [middle_initial] => J
+    [email] => joshuacullo360@gmail.com
+    [contact] => 09756164034
+    [office_type_id] => 4
+    [office_external_name] => BCBP 
+    [event_type_id] => 5
+    [activity_name] => BCBP- Recollection Day
+    [participants] => 40
+    [banquet_style_id] => 
+    [guest_last_name] => 
+    [guest_first_name] => 
+    [guest_middle_initial] => 
+    [guest_dob] => 
+    [guest_address] => 
+    [guest_email] => 
+    [guest_contact] => 
+    [arrival_date] => 
+    [checkin_time] => 
+    [checkout_time] => 
+    [departure_date] => 
+    [adults_count] => 1
+    [kids_count] => 0
+    [guest_room_id] => 
+    [guest_remarks] => 
+    [venue_ids] => Array
+        (
+            [0] => 1
+        )
+
+    [view_board_qty] => 1
+    [additional_instruction] => 1-Dispenser
+    [action] => submit_function
+    [event_type] => Programs and Special Events
+    [venue_id] => 1
+    [facilities_schedules] => {"venues":[{"id":"1","name":"Function Room A","floor":"Ground Floor"}],"schedules":{"1":[{"date":"2026-03-29","endDate":"2026-03-29","start":"08:00","end":"12:00"}]}}
+    [miscellaneous_items] => {"basic_sound_system":{"speaker":1,"mic":2},"banquet_chairs":{"quantity":40}}
+    [terms_agreed_by] => TIANGCO, MARITHEL J.
+    [terms_position] => BCBP- Representative
+    [terms_date] => March 24, 2026
+)
+
+[2026-03-24 09:15:36] SPECIFIC CHECK - activity_name: 'BCBP- Recollection Day'
+[2026-03-24 09:15:36] SPECIFIC CHECK - event_type_id: '5'
+[2026-03-24 09:15:36] BEFORE CLEAN - activity_name: 'BCBP- Recollection Day'
+[2026-03-24 09:15:36] AFTER CLEAN - activity_name: 'BCBP- Recollection Day'
+[2026-03-24 09:15:36] event_type_id: 5
+[2026-03-24 09:15:36] FINAL activity_name: 'BCBP- Recollection Day'
+[2026-03-24 09:15:36] facilities_schedules decoded: Array
+(
+    [venues] => Array
+        (
+            [0] => Array
+                (
+                    [id] => 1
+                    [name] => Function Room A
+                    [floor] => Ground Floor
+                )
+
+        )
+
+    [schedules] => Array
+        (
+            [1] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-03-29
+                            [endDate] => 2026-03-29
+                            [start] => 08:00
+                            [end] => 12:00
+                        )
+
+                )
+
+        )
+
+)
+
+[2026-03-24 09:15:36] Times - start_datetime: 2026-03-29 08:00, end_datetime: 2026-03-29 12:00
+[2026-03-24 09:15:36] Conflict check passed for all venues
+[2026-03-24 09:15:36] Terms info captured: TIANGCO, MARITHEL J. | BCBP- Representative
+[2026-03-24 09:15:36] SQL: INSERT INTO facility_reservations (
+        booking_no, reservation_no, last_name, first_name, middle_initial, 
+        email, contact_number, office_type_id, office_id, external_office_name, 
+        activity_name, event_type_id, venue_id, venue_setup_id, banquet_style_id,
+        start_datetime, end_datetime, participants_count, miscellaneous_items, 
+        additional_instruction
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+[2026-03-24 09:15:36] Success! Inserted ID: 41
+[2026-03-24 09:15:36] Inserted activity_name: BCBP- Recollection Day
+[2026-03-24 09:15:36] Inserted 1 venue(s) into reservation_venues for reservation ID 41
+[2026-03-24 09:16:12] Confirmation email sent to joshuacullo360@gmail.com
+[2026-03-24 02:30:05] ========== START reservation_submit.php ==========
+[2026-03-24 09:30:05] RAW POST data: Array
+(
+    [reservation_type] => function
+    [last_name] => Angga
+    [first_name] => Charlene
+    [middle_initial] => A
+    [email] => joshuacullo360@gmail.com
+    [contact] => 09163335940
+    [office_type_id] => 1
+    [office_id] => 1
+    [event_type_id] => 5
+    [activity_name] => IHTM DAY
+    [participants] => 200
+    [banquet_style_id] => 
+    [guest_last_name] => 
+    [guest_first_name] => 
+    [guest_middle_initial] => 
+    [guest_dob] => 
+    [guest_address] => 
+    [guest_email] => 
+    [guest_contact] => 
+    [arrival_date] => 
+    [checkin_time] => 
+    [checkout_time] => 
+    [departure_date] => 
+    [adults_count] => 1
+    [kids_count] => 0
+    [guest_room_id] => 
+    [guest_remarks] => 
+    [venue_ids] => Array
+        (
+            [0] => 1
+            [1] => 2
+            [2] => 3
+            [3] => 4
+            [4] => 5
+        )
+
+    [view_board_qty] => 1
+    [additional_instruction] => 1-Dispenser, podium, and, backdrop
+    [action] => submit_function
+    [event_type] => Programs and Special Events
+    [venue_id] => 1
+    [facilities_schedules] => {"venues":[{"id":"1","name":"Function Room A","floor":"Ground Floor"},{"id":"2","name":"Function Room B","floor":"Ground Floor"},{"id":"3","name":"Function Room C","floor":"Ground Floor"},{"id":"4","name":"Function Room D","floor":"Ground Floor"},{"id":"5","name":"Function Room E","floor":"Ground Floor"}],"schedules":{"1":[{"date":"2026-04-15","endDate":"2026-04-15","start":"08:00","end":"16:00"}],"2":[{"date":"2026-04-15","endDate":"2026-04-15","start":"08:00","end":"16:00"}],"3":[{"date":"2026-04-15","endDate":"2026-04-15","start":"08:00","end":"16:00"}],"4":[{"date":"2026-04-15","endDate":"2026-04-15","start":"08:00","end":"16:00"}],"5":[{"date":"2026-04-15","endDate":"2026-04-15","start":"08:00","end":"16:00"}]}}
+    [miscellaneous_items] => {"basic_sound_system":{"speaker":2,"mic":2},"banquet_chairs":{"quantity":150},"view_board":{"requested":true},"rectangular_table":{"quantity":3}}
+    [terms_agreed_by] => ANGGANA, CHARLENE A.
+    [terms_position] => Lecturer I
+    [terms_date] => March 24, 2026
+)
+
+[2026-03-24 09:30:05] SPECIFIC CHECK - activity_name: 'IHTM DAY'
+[2026-03-24 09:30:05] SPECIFIC CHECK - event_type_id: '5'
+[2026-03-24 09:30:05] BEFORE CLEAN - activity_name: 'IHTM DAY'
+[2026-03-24 09:30:05] AFTER CLEAN - activity_name: 'IHTM DAY'
+[2026-03-24 09:30:05] event_type_id: 5
+[2026-03-24 09:30:05] FINAL activity_name: 'IHTM DAY'
+[2026-03-24 09:30:05] facilities_schedules decoded: Array
+(
+    [venues] => Array
+        (
+            [0] => Array
+                (
+                    [id] => 1
+                    [name] => Function Room A
+                    [floor] => Ground Floor
+                )
+
+            [1] => Array
+                (
+                    [id] => 2
+                    [name] => Function Room B
+                    [floor] => Ground Floor
+                )
+
+            [2] => Array
+                (
+                    [id] => 3
+                    [name] => Function Room C
+                    [floor] => Ground Floor
+                )
+
+            [3] => Array
+                (
+                    [id] => 4
+                    [name] => Function Room D
+                    [floor] => Ground Floor
+                )
+
+            [4] => Array
+                (
+                    [id] => 5
+                    [name] => Function Room E
+                    [floor] => Ground Floor
+                )
+
+        )
+
+    [schedules] => Array
+        (
+            [1] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-04-15
+                            [endDate] => 2026-04-15
+                            [start] => 08:00
+                            [end] => 16:00
+                        )
+
+                )
+
+            [2] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-04-15
+                            [endDate] => 2026-04-15
+                            [start] => 08:00
+                            [end] => 16:00
+                        )
+
+                )
+
+            [3] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-04-15
+                            [endDate] => 2026-04-15
+                            [start] => 08:00
+                            [end] => 16:00
+                        )
+
+                )
+
+            [4] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-04-15
+                            [endDate] => 2026-04-15
+                            [start] => 08:00
+                            [end] => 16:00
+                        )
+
+                )
+
+            [5] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-04-15
+                            [endDate] => 2026-04-15
+                            [start] => 08:00
+                            [end] => 16:00
+                        )
+
+                )
+
+        )
+
+)
+
+[2026-03-24 09:30:05] Times - start_datetime: 2026-04-15 08:00, end_datetime: 2026-04-15 16:00
+[2026-03-24 09:30:05] Conflict check passed for all venues
+[2026-03-24 09:30:05] Terms info captured: ANGGANA, CHARLENE A. | Lecturer I
+[2026-03-24 09:30:05] SQL: INSERT INTO facility_reservations (
+        booking_no, reservation_no, last_name, first_name, middle_initial, 
+        email, contact_number, office_type_id, office_id, external_office_name, 
+        activity_name, event_type_id, venue_id, venue_setup_id, banquet_style_id,
+        start_datetime, end_datetime, participants_count, miscellaneous_items, 
+        additional_instruction
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+[2026-03-24 09:30:05] Success! Inserted ID: 42
+[2026-03-24 09:30:05] Inserted activity_name: IHTM DAY
+[2026-03-24 09:30:05] Inserted 5 venue(s) into reservation_venues for reservation ID 42
+[2026-03-24 09:30:29] Confirmation email sent to joshuacullo360@gmail.com
+[2026-03-24 02:40:53] ========== START reservation_submit.php ==========
+[2026-03-24 09:40:53] RAW POST data: Array
+(
+    [reservation_type] => function
+    [last_name] => Perea
+    [first_name] => Maria Mariel
+    [middle_initial] => D
+    [email] => joshuacullo360@gmail.com
+    [contact] => 09756164034
+    [office_type_id] => 1
+    [office_id] => 1
+    [event_type_id] => 2
+    [activity_name] => Risksphere
+    [participants] => 40
+    [banquet_style_id] => 
+    [guest_last_name] => 
+    [guest_first_name] => 
+    [guest_middle_initial] => 
+    [guest_dob] => 
+    [guest_address] => 
+    [guest_email] => 
+    [guest_contact] => 
+    [arrival_date] => 
+    [checkin_time] => 
+    [checkout_time] => 
+    [departure_date] => 
+    [adults_count] => 1
+    [kids_count] => 0
+    [guest_room_id] => 
+    [guest_remarks] => 
+    [venue_ids] => Array
+        (
+            [0] => 4
+            [1] => 5
+        )
+
+    [view_board_qty] => 1
+    [additional_instruction] => 1-Dispenser
+    [action] => submit_function
+    [event_type] => Seminar and Lecture
+    [venue_id] => 4
+    [facilities_schedules] => {"venues":[{"id":"4","name":"Function Room D","floor":"Ground Floor"},{"id":"5","name":"Function Room E","floor":"Ground Floor"}],"schedules":{"4":[{"date":"2026-03-31","endDate":"2026-03-31","start":"09:30","end":"12:00"}],"5":[{"date":"2026-03-31","endDate":"2026-03-31","start":"09:00","end":"12:00"}]}}
+    [miscellaneous_items] => {"basic_sound_system":{"speaker":1,"mic":2},"banquet_chairs":{"quantity":45},"view_board":{"requested":true},"rectangular_table":{"quantity":2}}
+    [terms_agreed_by] => Perea, Maria Mariel D.
+    [terms_position] => Adviser, JPAMA
+    [terms_date] => March 24, 2026
+)
+
+[2026-03-24 09:40:53] SPECIFIC CHECK - activity_name: 'Risksphere'
+[2026-03-24 09:40:53] SPECIFIC CHECK - event_type_id: '2'
+[2026-03-24 09:40:53] BEFORE CLEAN - activity_name: 'Risksphere'
+[2026-03-24 09:40:53] AFTER CLEAN - activity_name: 'Risksphere'
+[2026-03-24 09:40:53] event_type_id: 2
+[2026-03-24 09:40:53] FINAL activity_name: 'Risksphere'
+[2026-03-24 09:40:53] facilities_schedules decoded: Array
+(
+    [venues] => Array
+        (
+            [0] => Array
+                (
+                    [id] => 4
+                    [name] => Function Room D
+                    [floor] => Ground Floor
+                )
+
+            [1] => Array
+                (
+                    [id] => 5
+                    [name] => Function Room E
+                    [floor] => Ground Floor
+                )
+
+        )
+
+    [schedules] => Array
+        (
+            [4] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-03-31
+                            [endDate] => 2026-03-31
+                            [start] => 09:30
+                            [end] => 12:00
+                        )
+
+                )
+
+            [5] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-03-31
+                            [endDate] => 2026-03-31
+                            [start] => 09:00
+                            [end] => 12:00
+                        )
+
+                )
+
+        )
+
+)
+
+[2026-03-24 09:40:53] Times - start_datetime: 2026-03-31 09:30, end_datetime: 2026-03-31 12:00
+[2026-03-24 09:40:53] Conflict check passed for all venues
+[2026-03-24 09:40:53] Terms info captured: Perea, Maria Mariel D. | Adviser, JPAMA
+[2026-03-24 09:40:53] SQL: INSERT INTO facility_reservations (
+        booking_no, reservation_no, last_name, first_name, middle_initial, 
+        email, contact_number, office_type_id, office_id, external_office_name, 
+        activity_name, event_type_id, venue_id, venue_setup_id, banquet_style_id,
+        start_datetime, end_datetime, participants_count, miscellaneous_items, 
+        additional_instruction
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+[2026-03-24 09:40:53] Success! Inserted ID: 43
+[2026-03-24 09:40:53] Inserted activity_name: Risksphere
+[2026-03-24 09:40:53] Inserted 2 venue(s) into reservation_venues for reservation ID 43
+[2026-03-24 09:41:11] Confirmation email sent to joshuacullo360@gmail.com
+[2026-03-24 04:49:27] ========== START reservation_submit.php ==========
+[2026-03-24 11:49:27] RAW POST data: Array
+(
+    [reservation_type] => function
+    [last_name] => Cananea 
+    [first_name] => Mayette
+    [middle_initial] => A
+    [email] => joshuacullo360@gmail.com
+    [contact] => 09178322895
+    [position] => Assoc. Dean, CABEIHM
+    [office_type_id] => 1
+    [office_id] => 1
+    [event_type_id] => 5
+    [activity_name] => Global Bump
+    [participants] => 50
+    [banquet_style_id] => 11
+    [guest_last_name] => 
+    [guest_first_name] => 
+    [guest_middle_initial] => 
+    [guest_dob] => 
+    [guest_address] => 
+    [guest_email] => 
+    [guest_contact] => 
+    [arrival_date] => 
+    [checkin_time] => 
+    [checkout_time] => 
+    [departure_date] => 
+    [adults_count] => 1
+    [kids_count] => 0
+    [guest_room_id] => 
+    [guest_remarks] => 
+    [venue_ids] => Array
+        (
+            [0] => 1
+            [1] => 2
+            [2] => 3
+            [3] => 4
+            [4] => 5
+        )
+
+    [view_board_qty] => 1
+    [additional_instruction] => Plates, spoons, forks, podium. dispenser,and  backdrop
+    [action] => submit_function
+    [event_type] => Programs and Special Events
+    [venue_id] => 1
+    [facilities_schedules] => {"venues":[{"id":"1","name":"Function Room A","floor":"Ground Floor"},{"id":"2","name":"Function Room B","floor":"Ground Floor"},{"id":"3","name":"Function Room C","floor":"Ground Floor"},{"id":"4","name":"Function Room D","floor":"Ground Floor"},{"id":"5","name":"Function Room E","floor":"Ground Floor"}],"schedules":{"1":[{"date":"2026-04-11","endDate":"2026-04-28","start":"07:00","end":"22:00"}],"2":[{"date":"2026-04-11","endDate":"2026-04-28","start":"07:00","end":"22:00"}],"3":[{"date":"2026-04-11","endDate":"2026-04-28","start":"07:00","end":"22:00"}],"4":[{"date":"2026-04-11","endDate":"2026-04-28","start":"07:00","end":"22:00"}],"5":[{"date":"2026-04-11","endDate":"2026-04-28","start":"07:00","end":"22:00"}]}}
+    [miscellaneous_items] => {"basic_sound_system":{"speaker":2,"mic":2},"banquet_chairs":{"quantity":50},"view_board":{"requested":true}}
+    [terms_agreed_by] => Cananea, Mayette A.
+    [terms_position] => Assoc. Dean, CABEIHM
+    [terms_date] => March 24, 2026
+)
+
+[2026-03-24 11:49:27] SPECIFIC CHECK - activity_name: 'Global Bump'
+[2026-03-24 11:49:27] SPECIFIC CHECK - event_type_id: '5'
+[2026-03-24 11:49:27] BEFORE CLEAN - activity_name: 'Global Bump'
+[2026-03-24 11:49:27] AFTER CLEAN - activity_name: 'Global Bump'
+[2026-03-24 11:49:27] event_type_id: 5
+[2026-03-24 11:49:27] FINAL activity_name: 'Global Bump'
+[2026-03-24 11:49:27] facilities_schedules decoded: Array
+(
+    [venues] => Array
+        (
+            [0] => Array
+                (
+                    [id] => 1
+                    [name] => Function Room A
+                    [floor] => Ground Floor
+                )
+
+            [1] => Array
+                (
+                    [id] => 2
+                    [name] => Function Room B
+                    [floor] => Ground Floor
+                )
+
+            [2] => Array
+                (
+                    [id] => 3
+                    [name] => Function Room C
+                    [floor] => Ground Floor
+                )
+
+            [3] => Array
+                (
+                    [id] => 4
+                    [name] => Function Room D
+                    [floor] => Ground Floor
+                )
+
+            [4] => Array
+                (
+                    [id] => 5
+                    [name] => Function Room E
+                    [floor] => Ground Floor
+                )
+
+        )
+
+    [schedules] => Array
+        (
+            [1] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-04-11
+                            [endDate] => 2026-04-28
+                            [start] => 07:00
+                            [end] => 22:00
+                        )
+
+                )
+
+            [2] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-04-11
+                            [endDate] => 2026-04-28
+                            [start] => 07:00
+                            [end] => 22:00
+                        )
+
+                )
+
+            [3] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-04-11
+                            [endDate] => 2026-04-28
+                            [start] => 07:00
+                            [end] => 22:00
+                        )
+
+                )
+
+            [4] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-04-11
+                            [endDate] => 2026-04-28
+                            [start] => 07:00
+                            [end] => 22:00
+                        )
+
+                )
+
+            [5] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-04-11
+                            [endDate] => 2026-04-28
+                            [start] => 07:00
+                            [end] => 22:00
+                        )
+
+                )
+
+        )
+
+)
+
+[2026-03-24 11:49:27] Times - start_datetime: 2026-04-11 07:00, end_datetime: 2026-04-28 22:00
+[2026-03-24 11:49:27] Conflict check passed for all venues
+[2026-03-24 11:49:27] Terms info captured: Cananea, Mayette A. | Assoc. Dean, CABEIHM
+[2026-03-24 11:49:27] SQL: INSERT INTO facility_reservations (
+        booking_no, reservation_no, last_name, first_name, middle_initial, 
+        email, contact_number, office_type_id, office_id, external_office_name, 
+        activity_name, event_type_id, venue_id, venue_setup_id, banquet_style_id,
+        start_datetime, end_datetime, participants_count, miscellaneous_items, 
+        additional_instruction
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+[2026-03-24 11:49:27] Success! Inserted ID: 44
+[2026-03-24 11:49:27] Inserted activity_name: Global Bump
+[2026-03-24 11:49:27] Inserted 5 venue(s) into reservation_venues for reservation ID 44
+[2026-03-24 11:49:51] Confirmation email sent to joshuacullo360@gmail.com

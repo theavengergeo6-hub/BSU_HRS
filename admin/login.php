@@ -18,6 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $admin = $result->fetch_assoc();
     
     if ($admin && password_verify($password, $admin['password'])) {
+        session_regenerate_id(true);
         $_SESSION['admin_id'] = $admin['id'];
         $_SESSION['admin_username'] = $admin['username'];
         $_SESSION['admin_role'] = $admin['role'];

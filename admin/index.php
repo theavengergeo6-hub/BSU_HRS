@@ -51,16 +51,6 @@ $pencil_guest = $conn->query("
 ")->fetch_assoc()['count'] ?? 0;
 $pencil_count = (int)$pencil_fac + (int)$pencil_guest;
 
-// Available rooms today
-$occupied_rooms = $conn->query("
-    SELECT COUNT(DISTINCT venue_id) as count 
-    FROM facility_reservations 
-    WHERE DATE(start_datetime) = '$today' 
-    AND status = 'approved'
-")->fetch_assoc()['count'];
-
-$total_rooms = $conn->query("SELECT COUNT(*) as count FROM venues WHERE is_active = 1")->fetch_assoc()['count'];
-$available_rooms = $total_rooms - $occupied_rooms;
 
 // Upcoming events (next 5 days)
 $upcoming = $conn->query("
@@ -207,7 +197,7 @@ $guest_preview = $conn->query("
 /* Stats Cards Grid - 4 columns */
 .dashboard-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 1.25rem;
     margin-bottom: 2rem;
 }
@@ -619,16 +609,6 @@ $guest_preview = $conn->query("
             <?php endif; ?>
         </a>
 
-        <!-- Available Rooms Card -->
-        <a href="rooms.php" class="nav-card">
-            <div class="nav-card-icon">
-                <i class="bi bi-door-open"></i>
-            </div>
-            <div class="nav-card-content">
-                <div class="nav-card-title">Available Rooms</div>
-                <div class="nav-card-value"><?= $available_rooms ?>/<?= $total_rooms ?></div>
-            </div>
-        </a>
     </div>
 
     <!-- First Row - Pending and Pencil Previews -->

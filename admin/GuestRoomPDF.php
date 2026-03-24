@@ -101,7 +101,7 @@ class GuestRoomPDF
         $this->bg($pdf, self::PAGE1_B64);
 
         $d = $this->data;
-        [$last, $first, $mi] = $this->splitName((string)($d['guest_name'] ?? ''));
+        [$last, $first, $mi] = $this->splitName((string) ($d['guest_name'] ?? ''));
 
         // Principal guest name
         $this->putCenter($pdf, 62, 79.5, 70.0, mb_strtoupper($last));
@@ -109,19 +109,19 @@ class GuestRoomPDF
         $this->putCenter($pdf, 155.0, 79.5, 25.0, mb_strtoupper($mi));
 
         // Personal info
-        $this->put($pdf, 110.0, 94.5, $this->fmtDate((string)($d['guest_dob'] ?? '')));
-        $this->put($pdf, 105.0, 100.0, $this->trunc((string)($d['guest_address'] ?? ''), 80));
-        $this->put($pdf, 105.0, 107.5, (string)($d['guest_email'] ?? ''));
-        $this->put($pdf, 110.0, 114.0, (string)($d['guest_contact'] ?? ''));
+        $this->put($pdf, 110.0, 94.5, $this->fmtDate((string) ($d['guest_dob'] ?? '')));
+        $this->put($pdf, 105.0, 100.0, $this->trunc((string) ($d['guest_address'] ?? ''), 80));
+        $this->put($pdf, 105.0, 107.5, (string) ($d['guest_email'] ?? ''));
+        $this->put($pdf, 110.0, 114.0, (string) ($d['guest_contact'] ?? ''));
 
         // Other guests — 4 slots on page 1
         $others = $this->decodeGuests($d['other_guests'] ?? '[]');
         $guestYs = [134.5, 141.5, 147.5, 154.5];
         foreach ($guestYs as $i => $gy) {
             $g = $others[$i] ?? null;
-            $name = $g ? trim((string)($g['name'] ?? '')) : '';
-            $age = $g ? trim((string)($g['age'] ?? '')) : '';
-            $dob = $g ? $this->fmtDateShort((string)($g['dob'] ?? '')) : '';
+            $name = $g ? trim((string) ($g['name'] ?? '')) : '';
+            $age = $g ? trim((string) ($g['age'] ?? '')) : '';
+            $dob = $g ? $this->fmtDateShort((string) ($g['dob'] ?? '')) : '';
             if ($name !== '')
                 $this->put($pdf, 36.0, $gy, $this->trunc($name, 30));
             if ($age !== '')
@@ -135,13 +135,13 @@ class GuestRoomPDF
         $this->put($pdf, 150.0, 168.5, $this->fmtDateShort($d['check_out_date'] ?? ''));
         $this->put($pdf, 67, 174.5, $this->fmtTime($d['check_in_time'] ?? ''));
         $this->put($pdf, 150.0, 174.5, $this->fmtTime($d['check_out_time'] ?? ''));
-        $this->put($pdf, 68.0, 181, (string)(int)($d['adults_count'] ?? 0));
-        $this->put($pdf, 150.0, 181.0, (string)(int)($d['children_count'] ?? 0));
-        $this->put($pdf, 63, 187.5, (string)($d['room_name'] ?? ''));
-        $this->put($pdf, 150.0, 187.5, ucfirst((string)($d['room_type'] ?? '')));
+        $this->put($pdf, 68.0, 181, (string) (int) ($d['adults_count'] ?? 0));
+        $this->put($pdf, 150.0, 181.0, (string) (int) ($d['children_count'] ?? 0));
+        $this->put($pdf, 63, 187.5, (string) ($d['room_name'] ?? ''));
+        $this->put($pdf, 150.0, 187.5, ucfirst((string) ($d['room_type'] ?? '')));
 
         // Remarks
-        $remarks = trim((string)($d['special_requests'] ?? ''));
+        $remarks = trim((string) ($d['special_requests'] ?? ''));
         if ($remarks !== '') {
             $pdf->SetFont('helvetica', '', 9);
             $pdf->SetTextColor(0, 0, 0);
@@ -150,11 +150,11 @@ class GuestRoomPDF
         }
 
         // Registered by
-        $regBy = trim((string)($d['terms_accepted_by'] ?? $d['registered_by'] ?? ''));
+        $regBy = trim((string) ($d['terms_accepted_by'] ?? $d['registered_by'] ?? ''));
         $this->put($pdf, 80.0, 215.0, $regBy);
 
         // Digital signature (page 1)
-        $sig = trim((string)($d['digital_signature'] ?? ''));
+        $sig = trim((string) ($d['digital_signature'] ?? ''));
         $this->drawDigitalSignature($pdf, $sig);
 
         // Principal guest printed name (ALL CAPS) for the signature block (page 1)
@@ -192,9 +192,9 @@ class GuestRoomPDF
 
         for ($i = 0; $i < 24; $i++) {
             $g = $others[$i + 4] ?? null;
-            $name = $g ? trim((string)($g['name'] ?? '')) : '';
-            $age = $g ? trim((string)($g['age'] ?? '')) : '';
-            $dob = $g ? $this->fmtDateShort((string)($g['dob'] ?? '')) : '';
+            $name = $g ? trim((string) ($g['name'] ?? '')) : '';
+            $age = $g ? trim((string) ($g['age'] ?? '')) : '';
+            $dob = $g ? $this->fmtDateShort((string) ($g['dob'] ?? '')) : '';
             $y = $startY + ($i * $lineH);
             if ($name !== '')
                 $this->put($pdf, 38.0, $y, $this->trunc($name, 30));
@@ -215,7 +215,8 @@ class GuestRoomPDF
 
     // ── Page 3 ────────────────────────────────────────────────────────────────
 
-    private function renderPage3(\TCPDF $pdf): void    {
+    private function renderPage3(\TCPDF $pdf): void
+    {
         $pdf->AddPage();
         $this->bg($pdf, self::PAGE3_B64);
 
@@ -233,7 +234,8 @@ class GuestRoomPDF
 
             $pdf->SetXY($nameX, $fieldY);
             $pdf->Cell($textWidth, 5, $fullPrintedName, 0, 0, 'L', false, '', 0, false, 'T', 'M');
-        }    }
+        }
+    }
     // ── Helpers ───────────────────────────────────────────────────────────────
 
     private function splitName(string $full): array
@@ -249,16 +251,14 @@ class GuestRoomPDF
 
             $tokens = preg_split('/\s+/', $rest) ?: [];
             if (count($tokens) >= 2) {
-                $miToken = (string)end($tokens);
+                $miToken = (string) end($tokens);
                 $mi = rtrim($miToken, '.');
                 array_pop($tokens);
                 $first = implode(' ', $tokens);
-            }
-            elseif (count($tokens) === 1) {
+            } elseif (count($tokens) === 1) {
                 $first = $tokens[0];
             }
-        }
-        else {
+        } else {
             // Legacy format: "FIRST NAME MI. LAST NAME (may include spaces)"
             $tokens = preg_split('/\s+/', $full) ?: [];
             $miIndex = null;
@@ -277,18 +277,15 @@ class GuestRoomPDF
             if ($miIndex !== null) {
                 $first = implode(' ', array_slice($tokens, 0, $miIndex));
                 $last = implode(' ', array_slice($tokens, $miIndex + 1));
-            }
-            else {
+            } else {
                 // Fallback: best-effort for simple cases
                 $parts = $tokens;
                 $n = count($parts);
                 if ($n === 1) {
                     $first = $parts[0];
-                }
-                elseif ($n === 2) {
+                } elseif ($n === 2) {
                     [$first, $last] = $parts;
-                }
-                else {
+                } else {
                     $first = $parts[0];
                     $last = $parts[$n - 1];
                     $mi = rtrim($parts[1], '.');
@@ -296,7 +293,7 @@ class GuestRoomPDF
             }
         }
 
-        $mi = trim((string)$mi);
+        $mi = trim((string) $mi);
         if ($mi !== '' && mb_strlen($mi) > 1)
             $mi = mb_strtoupper(mb_substr($mi, 0, 1));
         return [$last, $first, $mi];
@@ -304,7 +301,7 @@ class GuestRoomPDF
 
     private function principalGuestPrintedNameLineAllCaps(): string
     {
-        $guestName = (string)($this->data['guest_name'] ?? '');
+        $guestName = (string) ($this->data['guest_name'] ?? '');
         if (trim($guestName) === '')
             return '';
 
@@ -312,9 +309,9 @@ class GuestRoomPDF
         if (trim($last) === '' && trim($first) === '' && trim($mi) === '')
             return '';
 
-        $lastU = mb_strtoupper(trim((string)$last));
-        $firstU = mb_strtoupper(trim((string)$first));
-        $miU = mb_strtoupper(trim((string)$mi));
+        $lastU = mb_strtoupper(trim((string) $last));
+        $firstU = mb_strtoupper(trim((string) $first));
+        $miU = mb_strtoupper(trim((string) $mi));
 
         // Required printed name order: First name + Middle initial + Last name
         // Example: "GEO MAR C. DE GUZMAN"
@@ -367,7 +364,7 @@ class GuestRoomPDF
     {
         if (is_array($raw))
             return $raw;
-        $decoded = json_decode((string)$raw, true);
+        $decoded = json_decode((string) $raw, true);
         return is_array($decoded) ? $decoded : [];
     }
 

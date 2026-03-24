@@ -154,16 +154,26 @@ if ($view === 'guest') {
         ORDER BY gr.check_in_date ASC
     ");
 
-    // Build events_by_date: each reservation appears ONLY on its check-in date as a dot.
-    // The JS renders a horizontal stay-bar from check_in_date → check_out_date.
-    // This avoids the same reservation showing dots on every day of the stay.
-    $guest_by_date   = [];  // keyed by check-in date — for dot/badge rendering
-    $guest_stays_raw = [];  // flat array of all reservations — for stay-bar rendering
+    $guest_by_date   = [];  // keyed by date — for dot/badge rendering
+    $guest_stays_raw = [];  // flat array of all reservations — for modal filtering
     while ($row = $gr_result->fetch_assoc()) {
-        $arr = $row['arrival_date'];
-        // Each reservation placed once, on its arrival date only
-        $guest_by_date[$arr][] = array_merge($row, ['event_type' => 'checkin']);
-        $guest_stays_raw[]     = $row;
+        $guest_stays_raw[] = $row;
+        
+        $start = new DateTime($row['arrival_date']);
+        $end   = new DateTime($row['departure_date']);
+        $iter  = clone $start;
+        $iter->setTime(0,0,0);
+        $limit = clone $end;
+        $limit->setTime(0,0,0);
+        
+        while ($iter <= $limit) {
+            $d = $iter->format('Y-m-d');
+            $type = ($d === $row['arrival_date']) ? 'checkin' 
+                  : (($d === $row['departure_date']) ? 'checkout' : 'stay');
+            
+            $guest_by_date[$d][] = array_merge($row, ['event_type' => $type]);
+            $iter->modify('+1 day');
+        }
     }
 }
 
@@ -371,6 +381,16 @@ foreach ($rows as $row):
 }
 .calendar-nav-btn:hover { border-color:var(--bsu-red);color:var(--bsu-red); }
 
+/* Picker styling */
+.calendar-picker { display: flex; align-items: center; gap: 0.5rem; }
+.calendar-picker select {
+    padding: 0.35rem 0.6rem; border-radius: 8px; border: 1px solid #dee2e6;
+    font-size: 0.95rem; font-weight: 600; color: #212529; cursor: pointer;
+    background: white; transition: all 0.15s ease;
+}
+.calendar-picker select:hover { border-color: var(--bsu-red); }
+.calendar-picker select:focus { outline: none; border-color: var(--bsu-red); box-shadow: 0 0 0 2px rgba(183,28,28,0.1); }
+
 /* ── Filter bar ───────────────────────────────────────────────────────────── */
 .calendar-filters {
     display: flex; align-items: center; gap: 1.25rem;
@@ -577,13 +597,27 @@ foreach ($rows as $row):
     </div>
 
     <!-- Calendar -->
-    <div class="calendar-wrapper">
+    <div class="calendar-wrapper" id="calendar-top">
         <div class="calendar-header">
-            <div class="calendar-title"><h2><?= $month_name ?> <?= $year ?></h2></div>
+            <div class="calendar-title">
+                <form action="" method="GET" class="calendar-picker">
+                    <input type="hidden" name="view" value="function">
+                    <select name="month" onchange="this.form.submit()">
+                        <?php foreach($month_names as $m_num => $m_name): ?>
+                            <option value="<?= $m_num ?>" <?= $month == $m_num ? 'selected' : '' ?>><?= $m_name ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                    <select name="year" onchange="this.form.submit()">
+                        <?php for($y = 2020; $y <= 2040; $y++): ?>
+                            <option value="<?= $y ?>" <?= $year == $y ? 'selected' : '' ?>><?= $y ?></option>
+                        <?php endfor; ?>
+                    </select>
+                </form>
+            </div>
             <div class="calendar-nav">
-                <a href="?view=function&month=<?= $prev_month ?>&year=<?= $prev_year ?>" class="calendar-nav-btn" title="Previous month"><i class="bi bi-chevron-left"></i></a>
-                <a href="?view=function&month=<?= date('m') ?>&year=<?= date('Y') ?>" class="calendar-nav-btn" title="Today"><i class="bi bi-calendar3"></i></a>
-                <a href="?view=function&month=<?= $next_month ?>&year=<?= $next_year ?>" class="calendar-nav-btn" title="Next month"><i class="bi bi-chevron-right"></i></a>
+                <a href="?view=function&month=<?= $prev_month ?>&year=<?= $prev_year ?>#calendar-top" class="calendar-nav-btn" title="Previous month"><i class="bi bi-chevron-left"></i></a>
+                <a href="?view=function&month=<?= date('m') ?>&year=<?= date('Y') ?>#calendar-top" class="calendar-nav-btn" title="Today"><i class="bi bi-calendar3"></i></a>
+                <a href="?view=function&month=<?= $next_month ?>&year=<?= $next_year ?>#calendar-top" class="calendar-nav-btn" title="Next month"><i class="bi bi-chevron-right"></i></a>
             </div>
         </div>
 
@@ -821,13 +855,27 @@ foreach ($rows as $row):
     </div>
 
     <!-- Calendar -->
-    <div class="calendar-wrapper">
+    <div class="calendar-wrapper" id="calendar-top">
         <div class="calendar-header">
-            <div class="calendar-title"><h2><?= $month_name ?> <?= $year ?></h2></div>
+            <div class="calendar-title">
+                <form action="" method="GET" class="calendar-picker">
+                    <input type="hidden" name="view" value="guest">
+                    <select name="month" onchange="this.form.submit()">
+                        <?php foreach($month_names as $m_num => $m_name): ?>
+                            <option value="<?= $m_num ?>" <?= $month == $m_num ? 'selected' : '' ?>><?= $m_name ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                    <select name="year" onchange="this.form.submit()">
+                        <?php for($y = 2020; $y <= 2040; $y++): ?>
+                            <option value="<?= $y ?>" <?= $year == $y ? 'selected' : '' ?>><?= $y ?></option>
+                        <?php endfor; ?>
+                    </select>
+                </form>
+            </div>
             <div class="calendar-nav">
-                <a href="?view=guest&month=<?= $prev_month ?>&year=<?= $prev_year ?>" class="calendar-nav-btn" title="Previous month"><i class="bi bi-chevron-left"></i></a>
-                <a href="?view=guest&month=<?= date('m') ?>&year=<?= date('Y') ?>" class="calendar-nav-btn" title="Today"><i class="bi bi-calendar3"></i></a>
-                <a href="?view=guest&month=<?= $next_month ?>&year=<?= $next_year ?>" class="calendar-nav-btn" title="Next month"><i class="bi bi-chevron-right"></i></a>
+                <a href="?view=guest&month=<?= $prev_month ?>&year=<?= $prev_year ?>#calendar-top" class="calendar-nav-btn" title="Previous month"><i class="bi bi-chevron-left"></i></a>
+                <a href="?view=guest&month=<?= date('m') ?>&year=<?= date('Y') ?>#calendar-top" class="calendar-nav-btn" title="Today"><i class="bi bi-calendar3"></i></a>
+                <a href="?view=guest&month=<?= $next_month ?>&year=<?= $next_year ?>#calendar-top" class="calendar-nav-btn" title="Next month"><i class="bi bi-chevron-right"></i></a>
             </div>
         </div>
 
@@ -993,7 +1041,8 @@ foreach ($rows as $row):
 
                     var lbl = document.createElement('span');
                     lbl.style.cssText = 'color:#333;overflow:hidden;text-overflow:ellipsis;font-weight:600;';
-                    lbl.textContent   = ev.room_name + ' \u00b7 ' + nights + 'n';
+                    var sub = ev.event_type === 'checkin' ? 'In' : (ev.event_type === 'checkout' ? 'Out' : 'Stay');
+                    lbl.textContent   = ev.room_name + ' \u00b7 ' + sub;
                     bar.appendChild(lbl);
 
                     dotsEl.appendChild(bar);
@@ -1114,8 +1163,17 @@ foreach ($rows as $row):
         window.showGuestEvents  = showGuestEvents;
         window.closeGuestModal  = closeGuestModal;
 
-       
+        /* ── Init ────────────────────────────────────────────────────────── */
         renderGuestDots();
+
+        // ── Auto-scroll to calendar if month/year was changed ──────────────
+        if (window.location.search.indexOf('month=') !== -1 || window.location.search.indexOf('year=') !== -1) {
+            // Give a tiny delay for layout to settle
+            setTimeout(function() {
+                var cal = document.getElementById('calendar-top');
+                if (cal) cal.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
+        }
     }());
     </script>
 

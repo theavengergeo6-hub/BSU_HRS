@@ -168,17 +168,19 @@ class FunctionRoomPDF
             $pdf->Cell(0, 0, $text, 0, 0, 'L', false, '', 0, false, 'T', 'T');
         };
 
-        /**
-         * Place text strictly confined to a box of width $w.
-         * Tries 9.2 → 8.5 → 8.0 → 7.5 pt before wrapping, so short/medium
-         * values stay on one line and only genuinely long values wrap.
-         */
-        $putMulti = function (float $x, float $y, string $text, float $w, float $size = 9.2, float $lineH = 4.5) use ($pdf): void {
+
+
+        $putMulti = function (float $x, float $y, string $text, float $w, float $size = 9.2, float $lineH = 4.5, array $scaleSet = null) use ($pdf): void {
             $text = trim($text);
             if ($text === '')
                 return;
-            // Step font down before resorting to line-wrapping
-            foreach ([$size, 8.5, 8.0, 7.5] as $fs) {
+
+            // Default scale set: scales down to 6.5pt to ensure fit
+            if ($scaleSet === null) {
+                $scaleSet = [$size, 8.5, 8.0, 7.5, 7.0, 6.5];
+            }
+
+            foreach ($scaleSet as $fs) {
                 $pdf->SetFont('helvetica', '', $fs);
                 if ($pdf->GetStringWidth($text) <= $w)
                     break;
@@ -216,7 +218,12 @@ class FunctionRoomPDF
         // Event No. removed per request
 
         // Row 1 — Name | Office/College
-        $putMulti($xLeft, $y1, $this->requestorName(), $leftColW, 9.2, 4.2);
+        $nameAndPos = $this->requestorName();
+        $pos = trim((string) ($d['terms_position'] ?? ''));
+        if ($pos !== '') {
+            $nameAndPos .= "\n" . $pos;
+        }
+        $putMulti($xLeft, $y1, $nameAndPos, $leftColW, 9.2, 4.2);
         $office = trim((string) ($d['office_display'] ?? ''));
         if ($office !== '') {
             $words = preg_split('/\s+/', $office);
@@ -245,7 +252,8 @@ class FunctionRoomPDF
         $putMulti($xOffice, $y1, $office, $rightColWOffice, 8.0, 3.8);
 
         // Row 2 — Activity | Venue (may be multiple rooms)
-        $putMulti($xLeft, $y2, (string) ($d['activity_name'] ?? ''), $leftColW, 9.2, 4.2);
+        // Reduced width from 70 to 62 to force earlier wrapping and avoid "Venue" label
+        $putMulti($xLeft, $y2, (string) ($d['activity_name'] ?? ''), 60.0, 9.2, 4.2, [9.2, 8.5, 8.0]);
         // One function room per line (Function Room A\nFunction Room B\n...)
         $venueRaw = trim((string) ($d['venue_names'] ?? ''));
         if ($venueRaw !== '') {
@@ -267,8 +275,9 @@ class FunctionRoomPDF
 
         // Row 4 — Participants | Contact number / email
         $put($xLeft, $y4, (string) ($d['participants_count'] ?? ''), 9.2);
-        $contactStr = trim((string) ($d['contact_number'] ?? '') . ' / ' . (string) ($d['email'] ?? ''));
-        $putMulti($xContact, $y4, $contactStr, $rightColWContact, 8.0, 4.0);
+        // Put contact number and email on separate lines for better fit
+        $contactStr = trim((string) ($d['contact_number'] ?? '')) . "\n" . trim((string) ($d['email'] ?? ''));
+        $putMulti($xContact, $y4 - 0.5, $contactStr, $rightColWContact, 8.0, 3.5);
 
         // ── Miscellaneous items ──────────────────────────────────────────────
         $misc = $this->parseMisc($d['miscellaneous_items'] ?? '{}');
@@ -365,10 +374,12 @@ class FunctionRoomPDF
         // ── Additional instruction box ───────────────────────────────────────
         $inst = trim((string) ($d['additional_instruction'] ?? ''));
         if ($inst !== '') {
+            // Force no newlines to prevent overlap with signatures below
+            $inst = str_replace(["\r", "\n"], ' ', $inst);
             $pdf->SetFont('helvetica', '', 9.0);
             $pdf->SetTextColor(0, 0, 0);
             $pdf->SetXY(67.0, 187.0);
-            $pdf->MultiCell(120.0, 4.5, $inst, 0, 'L', false, 1);
+            $pdf->MultiCell(120.0, 4.5, $inst, 0, 'L', false, 1, null, null, true, 0, false, true, 26.0);
         }
 
         // ── Signatures Overlay (Panel 0: Requestor) ──────────────────────────

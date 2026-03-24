@@ -431,6 +431,10 @@ if ($result) {
                     <i class="bi bi-file-text"></i>
                     Reports
                 </a>
+                <a href="settings.php" class="<?= $current_page == 'settings.php' ? 'active' : '' ?>">
+                    <i class="bi bi-gear"></i>
+                    Settings
+                </a>
 
 
                 <div class="nav-divider"></div>
@@ -452,7 +456,9 @@ if ($result) {
                 </div>
                 <div class="user-menu">
                     <div class="user-info">
-                        <div class="user-name"><?= htmlspecialchars($admin['username'] ?? 'Admin') ?></div>
+                        <div class="user-name">
+                            <a href="settings.php" class="text-decoration-none text-dark"><?= htmlspecialchars($admin['username'] ?? 'Admin') ?></a>
+                        </div>
                         <div class="user-role"><?= htmlspecialchars($admin['role'] ?? 'Administrator') ?></div>
                     </div>
                     <a href="logout.php" class="btn-logout">
