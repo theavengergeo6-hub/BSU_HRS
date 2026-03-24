@@ -430,10 +430,6 @@ $pending_count = (int)$pending_fac + (int)$pending_guest;
                     <i class="bi bi-x-circle"></i>
                     Cancelled Events
                 </a>
-                <a href="reports.php" class="<?= $current_page == 'reports.php' ? 'active' : '' ?>">
-                    <i class="bi bi-file-text"></i>
-                    Reports
-                </a>
                 <a href="settings.php" class="<?= $current_page == 'settings.php' ? 'active' : '' ?>">
                     <i class="bi bi-gear"></i>
                     Settings
