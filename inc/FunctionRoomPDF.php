@@ -111,7 +111,8 @@ class FunctionRoomPDF
                 $docDir . 'memo_guidelines_page1.jpg',
                 $docDir . 'memo_guidelines_page2.jpg',
             ];
-        } else {
+        }
+        else {
             // Function Rooms House Rules 2026
             $pages = [
                 $docDir . 'house_rules_page1.jpg',
@@ -193,7 +194,7 @@ class FunctionRoomPDF
         // ── Per-field coordinates (right column needs independent alignment) ─
         // Left column value area
         $xLeft = 70.0;
-        $leftColW = 77.0;   // space from $xLeft to the centre divider
+        $leftColW = 77.0; // space from $xLeft to the centre divider
 
         // Right column value areas — set per row for better alignment
         $xOffice = 155.0;
@@ -209,22 +210,17 @@ class FunctionRoomPDF
         // ── Row Y positions — top of each data row in the template ───────────
         // Measured from the top of the A4 page (0 mm) to the top of the row's
         // value area. Each row is ~14 mm tall; values sit ~2 mm from the top.
-        $yEvent = 77.5;   // "Event No." line near the top
-        $y1 = 87.0;   // Row 1 — Name / Office
-        $y2 = 105.0;   // Row 2 — Activity / Venue
-        $y3 = 125.0;   // Row 3 — Date & Time / Venue set-up
-        $y4 = 137.5;   // Row 4 — Participants / Contact
+        $yEvent = 77.5; // "Event No." line near the top
+        $y1 = 87.0; // Row 1 — Name / Office
+        $y2 = 105.0; // Row 2 — Activity / Venue
+        $y3 = 125.0; // Row 3 — Date & Time / Venue set-up
+        $y4 = 137.5; // Row 4 — Participants / Contact
 
         // Event No. removed per request
 
         // Row 1 — Name | Office/College
-        $nameAndPos = $this->requestorName();
-        $pos = trim((string) ($d['terms_position'] ?? ''));
-        if ($pos !== '') {
-            $nameAndPos .= "\n" . $pos;
-        }
-        $putMulti($xLeft, $y1, $nameAndPos, $leftColW, 9.2, 4.2);
-        $office = trim((string) ($d['office_display'] ?? ''));
+        $putMulti($xLeft, $y1, $this->requestorName(), $leftColW, 9.2, 4.2);
+        $office = trim((string)($d['office_display'] ?? ''));
         if ($office !== '') {
             $words = preg_split('/\s+/', $office);
             $lines = [];
@@ -238,7 +234,8 @@ class FunctionRoomPDF
                 if (strlen($try) > $maxChars && $current !== '') {
                     $lines[] = $current;
                     $current = $w;
-                } else {
+                }
+                else {
                     $current = $try;
                 }
             }
@@ -253,9 +250,9 @@ class FunctionRoomPDF
 
         // Row 2 — Activity | Venue (may be multiple rooms)
         // Reduced width from 70 to 62 to force earlier wrapping and avoid "Venue" label
-        $putMulti($xLeft, $y2, (string) ($d['activity_name'] ?? ''), 60.0, 9.2, 4.2, [9.2, 8.5, 8.0]);
+        $putMulti($xLeft, $y2, (string)($d['activity_name'] ?? ''), 60.0, 9.2, 4.2, [9.2, 8.5, 8.0]);
         // One function room per line (Function Room A\nFunction Room B\n...)
-        $venueRaw = trim((string) ($d['venue_names'] ?? ''));
+        $venueRaw = trim((string)($d['venue_names'] ?? ''));
         if ($venueRaw !== '') {
             $venueParts = array_values(array_filter(array_map('trim', explode(',', $venueRaw)), fn($v) => $v !== ''));
             if (count($venueParts) > 1) {
@@ -271,12 +268,12 @@ class FunctionRoomPDF
         $pdf->SetXY($xLeft, $y3);
         $pdf->MultiCell($leftColW, 4.2, $dateLine . "\n" . $timeLine, 0, 'L', false, 0);
 
-        $putMulti($xSetup, $y3, (string) ($d['banquet_name'] ?? $d['venue_setup_name'] ?? ''), $rightColWSetup, 8.8, 4.0);
+        $putMulti($xSetup, $y3, (string)($d['banquet_name'] ?? $d['venue_setup_name'] ?? ''), $rightColWSetup, 8.8, 4.0);
 
         // Row 4 — Participants | Contact number / email
-        $put($xLeft, $y4, (string) ($d['participants_count'] ?? ''), 9.2);
+        $put($xLeft, $y4, (string)($d['participants_count'] ?? ''), 9.2);
         // Put contact number and email on separate lines for better fit
-        $contactStr = trim((string) ($d['contact_number'] ?? '')) . "\n" . trim((string) ($d['email'] ?? ''));
+        $contactStr = trim((string)($d['contact_number'] ?? '')) . "\n" . trim((string)($d['email'] ?? ''));
         $putMulti($xContact, $y4 - 0.5, $contactStr, $rightColWContact, 8.0, 3.5);
 
         // ── Miscellaneous items ──────────────────────────────────────────────
@@ -286,13 +283,13 @@ class FunctionRoomPDF
             if ($v === null)
                 return 0;
             if (is_array($v))
-                return (int) ($v['quantity'] ?? 0);
-            return (int) $v;
+                return (int)($v['quantity'] ?? 0);
+            return (int)$v;
         };
 
         $basicArr = is_array($misc['basic_sound_system'] ?? null) ? $misc['basic_sound_system'] : [];
-        $spCnt = (int) ($basicArr['speaker'] ?? 0);
-        $mcCnt = (int) ($basicArr['mic'] ?? 0);
+        $spCnt = (int)($basicArr['speaker'] ?? 0);
+        $mcCnt = (int)($basicArr['mic'] ?? 0);
         $basicOn = !empty($misc['basic_sound_system']) || $spCnt > 0 || $mcCnt > 0;
         $roundQty = $qty($misc['round_table'] ?? null);
         $banqQty = $qty($misc['banquet_chairs'] ?? null);
@@ -341,28 +338,28 @@ class FunctionRoomPDF
         // ── Quantity / value blanks ──────────────────────────────────────────
         // Basic Sound System — always print counts if > 0 (even if checkbox logic is off)
         if ($spCnt > 0)
-            $put(70.0, $cbYBasic + 0.2, (string) $spCnt, 9.0);
+            $put(70.0, $cbYBasic + 0.2, (string)$spCnt, 9.0);
         if ($mcCnt > 0)
-            $put(110.0, $cbYBasic + 0.2, (string) $mcCnt, 9.0);
+            $put(110.0, $cbYBasic + 0.2, (string)$mcCnt, 9.0);
 
         // Round Table quantity
         if ($roundQty > 0) {
-            $put(80.0, $cbYRound + 0.2, (string) $roundQty, 9.0);
+            $put(80.0, $cbYRound + 0.2, (string)$roundQty, 9.0);
         }
 
         // Banquet Chairs quantity
         if ($banqQty > 0) {
-            $put(80.0, $cbYBanq + 1.2, (string) $banqQty, 9.0);
+            $put(80.0, $cbYBanq + 1.2, (string)$banqQty, 9.0);
         }
 
         // Rectangular Table quantity
         if ($rectQty > 0) {
-            $put(185.0, $cbYRect + 0.2, (string) $rectQty, 9.0);
+            $put(185.0, $cbYRect + 0.2, (string)$rectQty, 9.0);
         }
 
         // Mono Block Chairs quantity
         if ($monoQty > 0) {
-            $put(185.0, $cbYMono + 0.2, (string) $monoQty, 9.0);
+            $put(185.0, $cbYMono + 0.2, (string)$monoQty, 9.0);
         }
 
         // Others — positioned to the right of the Mono Block row on template
@@ -372,7 +369,7 @@ class FunctionRoomPDF
         }
 
         // ── Additional instruction box ───────────────────────────────────────
-        $inst = trim((string) ($d['additional_instruction'] ?? ''));
+        $inst = trim((string)($d['additional_instruction'] ?? ''));
         if ($inst !== '') {
             // Force no newlines to prevent overlap with signatures below
             $inst = str_replace(["\r", "\n"], ' ', $inst);
@@ -398,8 +395,16 @@ class FunctionRoomPDF
                 }
             }
             $pdf->SetTextColor(0, 0, 0);
-            $pdf->SetXY(18.0, 215.5);
+            $pdf->SetXY(18.0, 212.5);
             $pdf->Cell($cellWidth, 5, strtoupper($reqName), 0, 0, 'C');
+
+            // Position line below the name
+            $pos = trim((string)($d['terms_position'] ?? ''));
+            if ($pos !== '') {
+                $pdf->SetFont('helvetica', '', 8.5);
+                $pdf->SetXY(18.0, 215.5);
+                $pdf->Cell($cellWidth, 5, $pos, 0, 0, 'C');
+            }
         }
     }
 
@@ -410,8 +415,8 @@ class FunctionRoomPDF
     private function drawForm(\TCPDF $pdf): void
     {
         $d = $this->data;
-        $lm = 12;   // left margin mm
-        $W = 210;  // A4 width mm
+        $lm = 12; // left margin mm
+        $W = 210; // A4 width mm
         $pw = $W - $lm * 2; // usable width
 
         // ── 1. FULL-PAGE BORDER ───────────────────────────────────────────────
@@ -480,7 +485,7 @@ class FunctionRoomPDF
         $half = $pw / 2;
 
         // Calculate dynamic row heights: venue row may need extra height
-        $venueText = (string) ($d['venue_names'] ?? '—');
+        $venueText = (string)($d['venue_names'] ?? '—');
         $venueNeedsWrap = (strlen($venueText) > 28); // rough threshold
 
         $rows = [
@@ -492,7 +497,7 @@ class FunctionRoomPDF
             [
                 ['Name of Activity:', $d['activity_name'] ?? '—'],
                 ['Venue:', $venueText],
-                $venueNeedsWrap ? 18 : 14,        // taller if venue wraps
+                $venueNeedsWrap ? 18 : 14, // taller if venue wraps
             ],
             [
                 ['Date & Time:', $this->formatDateTimeRange()],
@@ -500,7 +505,7 @@ class FunctionRoomPDF
                 14,
             ],
             [
-                ['No. of Participants:', (string) ($d['participants_count'] ?? '—')],
+                ['No. of Participants:', (string)($d['participants_count'] ?? '—')],
                 ['Contact Number / Email:', trim(($d['contact_number'] ?? '') . '  ' . ($d['email'] ?? ''))],
                 14,
             ],
@@ -551,7 +556,7 @@ class FunctionRoomPDF
 
         $pdf->SetDrawColor(100, 100, 100);
         $pdf->SetLineWidth(0.2);
-        $mh = 8;  // misc row height — slightly taller for readability
+        $mh = 8; // misc row height — slightly taller for readability
         $leftW = $half - 2;
         $rightW = $half - 2;
 
@@ -605,14 +610,14 @@ class FunctionRoomPDF
             $pdf->Rect($lm + $p * $panelW, $y, $panelW, $panelH, 'D');
         }
 
-        // Panel 0 — Requested by (name from reservation, First Last MI, all caps)
         $this->sigPanel(
             $pdf,
             $lm + 1,
             $y + 2,
             $panelW - 2,
             'Requested by:',
-            $this->requestedByName()
+            $this->requestedByName(),
+            (string)($d['terms_position'] ?? '')
         );
 
         // Panel 1 — Request received by
@@ -753,7 +758,7 @@ class FunctionRoomPDF
     /**
      * Signature panel where the requestor fills in their name and signs.
      */
-    private function sigPanel(\TCPDF $pdf, float $x, float $y, float $w, string $header, string $name): void
+    private function sigPanel(\TCPDF $pdf, float $x, float $y, float $w, string $header, string $name, string $position = ''): void
     {
         $pdf->SetFont('times', 'B', 8);
         $pdf->SetTextColor(80, 80, 80);
@@ -765,10 +770,17 @@ class FunctionRoomPDF
         $pdf->SetXY($x, $y + 10);
         $pdf->MultiCell($w, 5, $name !== '' ? strtoupper($name) : '', 0, 'C', false, 1);
 
+        $afterName = $pdf->GetY();
+        if ($position !== '') {
+            $pdf->SetFont('times', '', 8.5);
+            $pdf->SetXY($x, $afterName);
+            $pdf->MultiCell($w, 4, $position, 0, 'C', false, 1);
+            $afterName = $pdf->GetY();
+        }
+
         $pdf->SetDrawColor(0, 0, 0);
         $pdf->SetLineWidth(0.3);
-        $afterName = $pdf->GetY();
-        $lineY = max($afterName + 2, $y + 21);
+        $lineY = max($afterName + 1.5, $y + 21);
         $pdf->Line($x + 3, $lineY, $x + $w - 3, $lineY);
 
         $pdf->SetFont('times', '', 7.5);
@@ -862,9 +874,9 @@ class FunctionRoomPDF
     private function isCollegeOrStudentOrg(): bool
     {
         // office_type_id: 1=College, 2=Office, 3=Student Org, 4=External
-        $tid = (string) ($this->data['office_type_id'] ?? '');
+        $tid = (string)($this->data['office_type_id'] ?? '');
         // Also accept a string label stored in _client_type by older code
-        $ct = strtolower((string) ($this->data['_client_type'] ?? ''));
+        $ct = strtolower((string)($this->data['_client_type'] ?? ''));
         return in_array($tid, ['1', '3'], true)
             || in_array($ct, ['college', 'student_org', 'student organization'], true);
     }
@@ -882,7 +894,8 @@ class FunctionRoomPDF
 
         if ($dateS === $dateE) {
             return $dateS . ', ' . $start . ' – ' . $end;
-        } else {
+        }
+        else {
             return $dateS . ' ' . $start . ' to ' . $dateE . ' ' . $end;
         }
     }
@@ -904,7 +917,8 @@ class FunctionRoomPDF
 
         if ($dateS === $dateE) {
             return [$dateS, $start . ' – ' . $end];
-        } else {
+        }
+        else {
             return [$dateS . ' to ' . $dateE, $start . ' – ' . $end];
         }
     }
@@ -922,8 +936,8 @@ class FunctionRoomPDF
     {
         if (empty($misc['basic_sound_system']))
             return 'No';
-        $s = (int) ($misc['basic_sound_system']['speaker'] ?? 0);
-        $m = (int) ($misc['basic_sound_system']['mic'] ?? 0);
+        $s = (int)($misc['basic_sound_system']['speaker'] ?? 0);
+        $m = (int)($misc['basic_sound_system']['mic'] ?? 0);
         if ($s === 0 && $m === 0)
             return 'No';
         return $s . ' Speaker(s), ' . $m . ' Mic(s)';
@@ -935,9 +949,9 @@ class FunctionRoomPDF
         if ($v === null)
             return '—';
         if (is_array($v))
-            $qty = (int) ($v['quantity'] ?? 0);
+            $qty = (int)($v['quantity'] ?? 0);
         else
-            $qty = (int) $v;
+            $qty = (int)$v;
         return $qty > 0 ? $qty . ' unit(s)' : '—';
     }
 
@@ -968,9 +982,10 @@ class FunctionRoomPDF
                 continue;
             $label = ucwords(str_replace('_', ' ', $k));
             if (is_array($v) && isset($v['quantity'])) {
-                $out[] = $label . ': ' . (int) $v['quantity'];
-            } elseif (is_numeric($v) && (int) $v > 0) {
-                $out[] = $label . ': ' . (int) $v;
+                $out[] = $label . ': ' . (int)$v['quantity'];
+            }
+            elseif (is_numeric($v) && (int)$v > 0) {
+                $out[] = $label . ': ' . (int)$v;
             }
         }
         return implode(', ', $out) ?: '—';
