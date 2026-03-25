@@ -59,6 +59,144 @@
             if (overlay) overlay.classList.remove('show');
         };
 
+        // Real-time Notification System
+        (function() {
+            let lastFacId = 0;
+            let lastGuestId = 0;
+            let isFirstCheck = true;
+
+            // Generate notification sound using Web Audio API
+            function playNotificationSound() {
+                try {
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    if (!AudioContext) return;
+                    
+                    const ctx = new AudioContext();
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(880, ctx.currentTime); // High pitch (A5)
+                    osc.frequency.exponentialRampToValueAtTime(440, ctx.currentTime + 0.1); 
+                    
+                    gain.gain.setValueAtTime(0, ctx.currentTime);
+                    gain.gain.linearRampToValueAtTime(0.3, ctx.currentTime + 0.05);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+                    
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.5);
+                } catch (e) {
+                    console.log('Audio disabled by browser policy until interaction');
+                }
+            }
+
+            // Create notification Toast container
+            function showToast(message) {
+                let container = document.getElementById('notification-toast-container');
+                if (!container) {
+                    container = document.createElement('div');
+                    container.id = 'notification-toast-container';
+                    container.className = 'toast-container position-fixed bottom-0 end-0 p-3';
+                    container.style.zIndex = '1055';
+                    document.body.appendChild(container);
+                }
+
+                const toastEl = document.createElement('div');
+                toastEl.className = 'toast bg-white border-0 shadow-lg';
+                toastEl.setAttribute('role', 'alert');
+                toastEl.setAttribute('aria-live', 'assertive');
+                toastEl.setAttribute('aria-atomic', 'true');
+                toastEl.innerHTML = `
+                    <div class="toast-header bg-danger text-white border-0" style="background-color: var(--bsu-red) !important;">
+                        <i class="bi bi-bell-fill me-2"></i>
+                        <strong class="me-auto">New Reservation</strong>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                    <div class="toast-body fw-semibold text-dark">
+                        ${message}
+                    </div>
+                `;
+                container.appendChild(toastEl);
+                
+                const toast = new bootstrap.Toast(toastEl, { autohide: true, delay: 5000 });
+                toast.show();
+                
+                toastEl.addEventListener('hidden.bs.toast', () => toastEl.remove());
+            }
+
+            // Soft-refresh the main content area via AJAX
+            function refreshContentArea() {
+                const contentArea = document.querySelector('.content-area');
+                if (!contentArea) return;
+
+                fetch(window.location.href)
+                    .then(response => response.text())
+                    .then(html => {
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(html, 'text/html');
+                        
+                        // Replace main content
+                        const newContentArea = doc.querySelector('.content-area');
+                        if (newContentArea) {
+                            contentArea.innerHTML = newContentArea.innerHTML;
+                        }
+
+                        // Also update sidebar badge counters if they exist
+                        const currentBadges = document.querySelectorAll('.badge-count');
+                        const newBadges = doc.querySelectorAll('.badge-count');
+                        if (currentBadges.length > 0 && newBadges.length > 0) {
+                            currentBadges.forEach((badge, index) => {
+                                if (newBadges[index]) {
+                                    badge.innerHTML = newBadges[index].innerHTML;
+                                }
+                            });
+                        }
+                    })
+                    .catch(err => console.error('Failed to refresh content area:', err));
+            }
+
+            // Polling routine
+            function checkNewReservations() {
+                const url = `<?= BASE_URL ?>admin/ajax/check_new_reservations.php?last_fac_id=${lastFacId}&last_guest_id=${lastGuestId}`;
+                fetch(url)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (!data.success) return;
+
+                        if (!isFirstCheck && data.has_new) {
+                            playNotificationSound();
+                            
+                            let msg = "A new reservation has been submitted.";
+                            if (data.new_fac_count > 0 && data.new_guest_count > 0) {
+                                msg = `${data.new_fac_count} new Function Room and ${data.new_guest_count} new Guest Room reservations received.`;
+                            } else if (data.new_fac_count > 0) {
+                                msg = `${data.new_fac_count} new Function Room reservation(s) received.`;
+                            } else if (data.new_guest_count > 0) {
+                                msg = `${data.new_guest_count} new Guest Room reservation(s) received.`;
+                            }
+                            showToast(msg);
+                            
+                            // Refresh interface
+                            refreshContentArea();
+                        }
+
+                        // Update trackers
+                        if (data.current_max_fac > lastFacId) lastFacId = data.current_max_fac;
+                        if (data.current_max_guest > lastGuestId) lastGuestId = data.current_max_guest;
+                        
+                        isFirstCheck = false;
+                    })
+                    .catch(err => console.error("Polling error:", err));
+            }
+
+            // Start polling every 5 seconds
+            setInterval(checkNewReservations, 5000);
+            checkNewReservations(); // initial call
+        })();
+
         // Mobile menu toggle (already in header, but keeping for compatibility)
         document.addEventListener('DOMContentLoaded', function() {
             // Any additional footer-specific scripts

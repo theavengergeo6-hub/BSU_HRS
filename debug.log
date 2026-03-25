@@ -5613,3 +5613,936 @@ water dispenser
 [2026-03-24 15:38:14] Inserted activity_name: 4th year OJT Orientation
 [2026-03-24 15:38:14] Inserted 3 venue(s) into reservation_venues for reservation ID 45
 [2026-03-24 15:38:38] Confirmation email sent to 22-70720@g.batstate-u.edu.ph
+[2026-03-25 09:27:04] ========== START reservation_submit.php ==========
+[2026-03-25 16:27:04] RAW POST data: Array
+(
+    [reservation_type] => function
+    [last_name] => Tiangco
+    [first_name] => Marithel
+    [middle_initial] => J
+    [email] => delavega.emerishjem15@gmail.com
+    [contact] => 09287842104
+    [position] => BCBP, Representative
+    [office_type_id] => 4
+    [office_external_name] => BCBP
+    [event_type_id] => 5
+    [activity_name] => BCBP Gathering
+    [participants] => 40
+    [banquet_style_id] => 11
+    [guest_last_name] => 
+    [guest_first_name] => 
+    [guest_middle_initial] => 
+    [guest_dob] => 
+    [guest_address] => 
+    [guest_email] => 
+    [guest_contact] => 
+    [arrival_date] => 
+    [checkin_time] => 
+    [checkout_time] => 
+    [departure_date] => 
+    [adults_count] => 1
+    [kids_count] => 0
+    [guest_room_id] => 
+    [guest_remarks] => 
+    [venue_ids] => Array
+        (
+            [0] => 4
+            [1] => 5
+        )
+
+    [view_board_qty] => 1
+    [additional_instruction] => Water Dispenser, Table Cloth, Center Piece, and Backdrop designs
+    [action] => submit_function
+    [event_type] => Programs and Special Events
+    [venue_id] => 4
+    [facilities_schedules] => {"venues":[{"id":"4","name":"Function Room D","floor":"Ground Floor"},{"id":"5","name":"Function Room E","floor":"Ground Floor"}],"schedules":{"4":[{"date":"2026-03-29","endDate":"2026-03-29","start":"17:00","end":"21:00"}],"5":[{"date":"2026-03-29","endDate":"2026-03-29","start":"17:00","end":"21:00"}]}}
+    [miscellaneous_items] => {"basic_sound_system":{"speaker":1,"mic":2},"round_table":{"quantity":5},"banquet_chairs":{"quantity":40},"view_board":{"requested":true},"rectangular_table":{"quantity":2}}
+    [terms_agreed_by] => Tiangco, DR. Marithel J.
+    [terms_position] => BCBP, Representative
+    [terms_date] => March 25, 2026
+)
+
+[2026-03-25 16:27:04] SPECIFIC CHECK - activity_name: 'BCBP Gathering'
+[2026-03-25 16:27:04] SPECIFIC CHECK - event_type_id: '5'
+[2026-03-25 16:27:04] BEFORE CLEAN - activity_name: 'BCBP Gathering'
+[2026-03-25 16:27:04] AFTER CLEAN - activity_name: 'BCBP Gathering'
+[2026-03-25 16:27:04] event_type_id: 5
+[2026-03-25 16:27:04] FINAL activity_name: 'BCBP Gathering'
+[2026-03-25 16:27:04] facilities_schedules decoded: Array
+(
+    [venues] => Array
+        (
+            [0] => Array
+                (
+                    [id] => 4
+                    [name] => Function Room D
+                    [floor] => Ground Floor
+                )
+
+            [1] => Array
+                (
+                    [id] => 5
+                    [name] => Function Room E
+                    [floor] => Ground Floor
+                )
+
+        )
+
+    [schedules] => Array
+        (
+            [4] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-03-29
+                            [endDate] => 2026-03-29
+                            [start] => 17:00
+                            [end] => 21:00
+                        )
+
+                )
+
+            [5] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-03-29
+                            [endDate] => 2026-03-29
+                            [start] => 17:00
+                            [end] => 21:00
+                        )
+
+                )
+
+        )
+
+)
+
+[2026-03-25 16:27:04] Times - start_datetime: 2026-03-29 17:00, end_datetime: 2026-03-29 21:00
+[2026-03-25 16:27:04] Conflict check passed for all venues
+[2026-03-25 16:27:04] Terms info captured: Tiangco, DR. Marithel J. | BCBP, Representative
+[2026-03-25 16:27:04] SQL: INSERT INTO facility_reservations (
+        booking_no, reservation_no, last_name, first_name, middle_initial, 
+        email, contact_number, office_type_id, office_id, external_office_name, 
+        activity_name, event_type_id, venue_id, venue_setup_id, banquet_style_id,
+        start_datetime, end_datetime, participants_count, miscellaneous_items, 
+        additional_instruction
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+[2026-03-25 16:27:04] Success! Inserted ID: 46
+[2026-03-25 16:27:04] Inserted activity_name: BCBP Gathering
+[2026-03-25 16:27:04] Inserted 2 venue(s) into reservation_venues for reservation ID 46
+[2026-03-25 16:27:49] Confirmation email sent to delavega.emerishjem15@gmail.com
+[2026-03-25 09:37:57] ========== START reservation_submit.php ==========
+[2026-03-25 16:37:57] RAW POST data: Array
+(
+    [reservation_type] => function
+    [last_name] => Tiangco
+    [first_name] => Marithel
+    [middle_initial] => J
+    [email] => joshuacullo360@gmail.com
+    [contact] => 09756164034
+    [position] => BCBP, Representative
+    [office_type_id] => 4
+    [office_external_name] => BCBP 
+    [event_type_id] => 5
+    [activity_name] => BCBP Gathering
+    [participants] => 40
+    [banquet_style_id] => 11
+    [guest_last_name] => 
+    [guest_first_name] => 
+    [guest_middle_initial] => 
+    [guest_dob] => 
+    [guest_address] => 
+    [guest_email] => 
+    [guest_contact] => 
+    [arrival_date] => 
+    [checkin_time] => 
+    [checkout_time] => 
+    [departure_date] => 
+    [adults_count] => 1
+    [kids_count] => 0
+    [guest_room_id] => 
+    [guest_remarks] => 
+    [venue_ids] => Array
+        (
+            [0] => 4
+            [1] => 5
+        )
+
+    [view_board_qty] => 1
+    [additional_instruction] => WATER DISPENSER, TABLE CLOTH, BACKDROP, DESIGNS AND ETC.
+    [action] => submit_function
+    [event_type] => Programs and Special Events
+    [venue_id] => 4
+    [facilities_schedules] => {"venues":[{"id":"4","name":"Function Room D","floor":"Ground Floor"},{"id":"5","name":"Function Room E","floor":"Ground Floor"}],"schedules":{"4":[{"date":"2026-03-28","endDate":"2026-03-28","start":"17:00","end":"21:00"}],"5":[{"date":"2026-03-28","endDate":"2026-03-28","start":"17:00","end":"21:00"}]}}
+    [miscellaneous_items] => {"basic_sound_system":{"speaker":1,"mic":2},"round_table":{"quantity":5},"banquet_chairs":{"quantity":40},"rectangular_table":{"quantity":2}}
+    [terms_agreed_by] => Dr. MARITHEL JONSON-TIANGCO
+    [terms_position] => BCBP, Representative
+    [terms_date] => March 25, 2026
+)
+
+[2026-03-25 16:37:57] SPECIFIC CHECK - activity_name: 'BCBP Gathering'
+[2026-03-25 16:37:57] SPECIFIC CHECK - event_type_id: '5'
+[2026-03-25 16:37:57] BEFORE CLEAN - activity_name: 'BCBP Gathering'
+[2026-03-25 16:37:57] AFTER CLEAN - activity_name: 'BCBP Gathering'
+[2026-03-25 16:37:57] event_type_id: 5
+[2026-03-25 16:37:57] FINAL activity_name: 'BCBP Gathering'
+[2026-03-25 16:37:57] facilities_schedules decoded: Array
+(
+    [venues] => Array
+        (
+            [0] => Array
+                (
+                    [id] => 4
+                    [name] => Function Room D
+                    [floor] => Ground Floor
+                )
+
+            [1] => Array
+                (
+                    [id] => 5
+                    [name] => Function Room E
+                    [floor] => Ground Floor
+                )
+
+        )
+
+    [schedules] => Array
+        (
+            [4] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-03-28
+                            [endDate] => 2026-03-28
+                            [start] => 17:00
+                            [end] => 21:00
+                        )
+
+                )
+
+            [5] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-03-28
+                            [endDate] => 2026-03-28
+                            [start] => 17:00
+                            [end] => 21:00
+                        )
+
+                )
+
+        )
+
+)
+
+[2026-03-25 16:37:57] Times - start_datetime: 2026-03-28 17:00, end_datetime: 2026-03-28 21:00
+[2026-03-25 16:37:57] Conflict check passed for all venues
+[2026-03-25 16:37:57] Terms info captured: Dr. MARITHEL JONSON-TIANGCO | BCBP, Representative
+[2026-03-25 16:37:57] SQL: INSERT INTO facility_reservations (
+        booking_no, reservation_no, last_name, first_name, middle_initial, 
+        email, contact_number, office_type_id, office_id, external_office_name, 
+        activity_name, event_type_id, venue_id, venue_setup_id, banquet_style_id,
+        start_datetime, end_datetime, participants_count, miscellaneous_items, 
+        additional_instruction
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+[2026-03-25 16:37:57] Success! Inserted ID: 47
+[2026-03-25 16:37:57] Inserted activity_name: BCBP Gathering
+[2026-03-25 16:37:57] Inserted 2 venue(s) into reservation_venues for reservation ID 47
+[2026-03-25 16:38:40] Confirmation email sent to joshuacullo360@gmail.com
+[2026-03-25 09:46:41] ========== START reservation_submit.php ==========
+[2026-03-25 16:46:41] RAW POST data: Array
+(
+    [reservation_type] => function
+    [last_name] => Panganiban 
+    [first_name] => Kristine
+    [middle_initial] => M
+    [email] => joshuacullo360@gmail.com
+    [contact] => 09095568976
+    [position] => JPMAP Member
+    [office_type_id] => 1
+    [office_id] => 1
+    [event_type_id] => 2
+    [activity_name] => Who am I in HR? Personality, People and the Workplace
+    [participants] => 125
+    [banquet_style_id] => 3
+    [guest_last_name] => 
+    [guest_first_name] => 
+    [guest_middle_initial] => 
+    [guest_dob] => 
+    [guest_address] => 
+    [guest_email] => 
+    [guest_contact] => 
+    [arrival_date] => 
+    [checkin_time] => 
+    [checkout_time] => 
+    [departure_date] => 
+    [adults_count] => 1
+    [kids_count] => 0
+    [guest_room_id] => 
+    [guest_remarks] => 
+    [venue_ids] => Array
+        (
+            [0] => 1
+            [1] => 2
+            [2] => 3
+        )
+
+    [view_board_qty] => 1
+    [additional_instruction] => 
+    [action] => submit_function
+    [event_type] => Seminar and Lecture
+    [venue_id] => 1
+    [facilities_schedules] => {"venues":[{"id":"1","name":"Function Room A","floor":"Ground Floor"},{"id":"2","name":"Function Room B","floor":"Ground Floor"},{"id":"3","name":"Function Room C","floor":"Ground Floor"}],"schedules":{"1":[{"date":"2026-03-30","endDate":"2026-03-30","start":"07:00","end":"12:00"}],"2":[{"date":"2026-03-30","endDate":"2026-03-30","start":"07:00","end":"12:00"}],"3":[{"date":"2026-03-30","endDate":"2026-03-30","start":"07:00","end":"12:00"}]}}
+    [miscellaneous_items] => {"basic_sound_system":{"speaker":1,"mic":2},"banquet_chairs":{"quantity":125},"view_board":{"requested":true}}
+    [terms_agreed_by] => KRISTINE M. PANGANIBAN
+    [terms_position] => JPMAP Member
+    [terms_date] => March 25, 2026
+)
+
+[2026-03-25 16:46:41] SPECIFIC CHECK - activity_name: 'Who am I in HR? Personality, People and the Workplace'
+[2026-03-25 16:46:41] SPECIFIC CHECK - event_type_id: '2'
+[2026-03-25 16:46:41] BEFORE CLEAN - activity_name: 'Who am I in HR? Personality, People and the Workplace'
+[2026-03-25 16:46:42] AFTER CLEAN - activity_name: 'Who am I in HR? Personality, People and the Workplace'
+[2026-03-25 16:46:42] event_type_id: 2
+[2026-03-25 16:46:42] FINAL activity_name: 'Who am I in HR? Personality, People and the Workplace'
+[2026-03-25 16:46:42] facilities_schedules decoded: Array
+(
+    [venues] => Array
+        (
+            [0] => Array
+                (
+                    [id] => 1
+                    [name] => Function Room A
+                    [floor] => Ground Floor
+                )
+
+            [1] => Array
+                (
+                    [id] => 2
+                    [name] => Function Room B
+                    [floor] => Ground Floor
+                )
+
+            [2] => Array
+                (
+                    [id] => 3
+                    [name] => Function Room C
+                    [floor] => Ground Floor
+                )
+
+        )
+
+    [schedules] => Array
+        (
+            [1] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-03-30
+                            [endDate] => 2026-03-30
+                            [start] => 07:00
+                            [end] => 12:00
+                        )
+
+                )
+
+            [2] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-03-30
+                            [endDate] => 2026-03-30
+                            [start] => 07:00
+                            [end] => 12:00
+                        )
+
+                )
+
+            [3] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-03-30
+                            [endDate] => 2026-03-30
+                            [start] => 07:00
+                            [end] => 12:00
+                        )
+
+                )
+
+        )
+
+)
+
+[2026-03-25 16:46:42] Times - start_datetime: 2026-03-30 07:00, end_datetime: 2026-03-30 12:00
+[2026-03-25 16:46:42] Conflict check passed for all venues
+[2026-03-25 16:46:42] Terms info captured: KRISTINE M. PANGANIBAN | JPMAP Member
+[2026-03-25 16:46:42] SQL: INSERT INTO facility_reservations (
+        booking_no, reservation_no, last_name, first_name, middle_initial, 
+        email, contact_number, office_type_id, office_id, external_office_name, 
+        activity_name, event_type_id, venue_id, venue_setup_id, banquet_style_id,
+        start_datetime, end_datetime, participants_count, miscellaneous_items, 
+        additional_instruction
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+[2026-03-25 16:46:42] Success! Inserted ID: 48
+[2026-03-25 16:46:42] Inserted activity_name: Who am I in HR? Personality, People and the Workplace
+[2026-03-25 16:46:42] Inserted 3 venue(s) into reservation_venues for reservation ID 48
+[2026-03-25 16:46:59] Confirmation email sent to joshuacullo360@gmail.com
+[2026-03-25 09:51:32] ========== START reservation_submit.php ==========
+[2026-03-25 16:51:32] RAW POST data: Array
+(
+    [reservation_type] => function
+    [last_name] => Noche
+    [first_name] => Kevin John 
+    [middle_initial] => R
+    [email] => 23-74589@g.batstate-u.edu.ph
+    [contact] => 0928784210
+    [position] => Laboratory School Teacher
+    [office_type_id] => 1
+    [office_id] => 7
+    [event_type_id] => 2
+    [activity_name] => Grade 9 - First Aid Seminar
+    [participants] => 70
+    [banquet_style_id] => 3
+    [guest_last_name] => 
+    [guest_first_name] => 
+    [guest_middle_initial] => 
+    [guest_dob] => 
+    [guest_address] => 
+    [guest_email] => 
+    [guest_contact] => 
+    [arrival_date] => 
+    [checkin_time] => 
+    [checkout_time] => 
+    [departure_date] => 
+    [adults_count] => 1
+    [kids_count] => 0
+    [guest_room_id] => 
+    [guest_remarks] => 
+    [venue_ids] => Array
+        (
+            [0] => 4
+            [1] => 5
+        )
+
+    [view_board_qty] => 1
+    [additional_instruction] => water dispenser
+    [action] => submit_function
+    [event_type] => Seminar and Lecture
+    [venue_id] => 4
+    [facilities_schedules] => {"venues":[{"id":"4","name":"Function Room D","floor":"Ground Floor"},{"id":"5","name":"Function Room E","floor":"Ground Floor"}],"schedules":{"4":[{"date":"2026-03-31","endDate":"2026-03-31","start":"07:00","end":"12:00"}],"5":[{"date":"2026-03-31","endDate":"2026-03-31","start":"07:00","end":"12:00"}]}}
+    [miscellaneous_items] => {"basic_sound_system":{"speaker":1,"mic":2},"banquet_chairs":{"quantity":70},"view_board":{"requested":true},"rectangular_table":{"quantity":3}}
+    [terms_agreed_by] => Noche, Kevin John  R.
+    [terms_position] => Laboratory School Teacher
+    [terms_date] => March 25, 2026
+)
+
+[2026-03-25 16:51:32] SPECIFIC CHECK - activity_name: 'Grade 9 - First Aid Seminar'
+[2026-03-25 16:51:32] SPECIFIC CHECK - event_type_id: '2'
+[2026-03-25 16:51:32] BEFORE CLEAN - activity_name: 'Grade 9 - First Aid Seminar'
+[2026-03-25 16:51:32] AFTER CLEAN - activity_name: 'Grade 9 - First Aid Seminar'
+[2026-03-25 16:51:32] event_type_id: 2
+[2026-03-25 16:51:32] FINAL activity_name: 'Grade 9 - First Aid Seminar'
+[2026-03-25 16:51:32] facilities_schedules decoded: Array
+(
+    [venues] => Array
+        (
+            [0] => Array
+                (
+                    [id] => 4
+                    [name] => Function Room D
+                    [floor] => Ground Floor
+                )
+
+            [1] => Array
+                (
+                    [id] => 5
+                    [name] => Function Room E
+                    [floor] => Ground Floor
+                )
+
+        )
+
+    [schedules] => Array
+        (
+            [4] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-03-31
+                            [endDate] => 2026-03-31
+                            [start] => 07:00
+                            [end] => 12:00
+                        )
+
+                )
+
+            [5] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-03-31
+                            [endDate] => 2026-03-31
+                            [start] => 07:00
+                            [end] => 12:00
+                        )
+
+                )
+
+        )
+
+)
+
+[2026-03-25 16:51:32] Times - start_datetime: 2026-03-31 07:00, end_datetime: 2026-03-31 12:00
+[2026-03-25 16:51:32] Conflict check passed for all venues
+[2026-03-25 16:51:32] Terms info captured: Noche, Kevin John  R. | Laboratory School Teacher
+[2026-03-25 16:51:32] SQL: INSERT INTO facility_reservations (
+        booking_no, reservation_no, last_name, first_name, middle_initial, 
+        email, contact_number, office_type_id, office_id, external_office_name, 
+        activity_name, event_type_id, venue_id, venue_setup_id, banquet_style_id,
+        start_datetime, end_datetime, participants_count, miscellaneous_items, 
+        additional_instruction
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+[2026-03-25 16:51:32] Success! Inserted ID: 49
+[2026-03-25 16:51:32] Inserted activity_name: Grade 9 - First Aid Seminar
+[2026-03-25 16:51:32] Inserted 2 venue(s) into reservation_venues for reservation ID 49
+[2026-03-25 16:51:50] Confirmation email sent to 23-74589@g.batstate-u.edu.ph
+[2026-03-25 10:08:26] ========== START reservation_submit.php ==========
+[2026-03-25 17:08:26] RAW POST data: Array
+(
+    [reservation_type] => function
+    [last_name] => Zambal
+    [first_name] => Vivian
+    [middle_initial] => G
+    [email] => joshuacullo360@gmail.com
+    [contact] => 09977951800
+    [position] => FM Sub, ORG President
+    [office_type_id] => 1
+    [office_id] => 1
+    [event_type_id] => 2
+    [activity_name] => Raising Flag 2026
+    [participants] => 100
+    [banquet_style_id] => 3
+    [guest_last_name] => 
+    [guest_first_name] => 
+    [guest_middle_initial] => 
+    [guest_dob] => 
+    [guest_address] => 
+    [guest_email] => 
+    [guest_contact] => 
+    [arrival_date] => 
+    [checkin_time] => 
+    [checkout_time] => 
+    [departure_date] => 
+    [adults_count] => 1
+    [kids_count] => 0
+    [guest_room_id] => 
+    [guest_remarks] => 
+    [venue_ids] => Array
+        (
+            [0] => 1
+            [1] => 2
+            [2] => 3
+        )
+
+    [view_board_qty] => 1
+    [additional_instruction] => 1-Dispenser
+    [action] => submit_function
+    [event_type] => Seminar and Lecture
+    [venue_id] => 1
+    [facilities_schedules] => {"venues":[{"id":"1","name":"Function Room A","floor":"Ground Floor"},{"id":"2","name":"Function Room B","floor":"Ground Floor"},{"id":"3","name":"Function Room C","floor":"Ground Floor"}],"schedules":{"1":[{"date":"2026-05-05","endDate":"2026-05-05","start":"08:00","end":"12:00"}],"2":[{"date":"2026-05-05","endDate":"2026-05-05","start":"08:00","end":"12:00"}],"3":[{"date":"2026-05-05","endDate":"2026-05-05","start":"08:00","end":"12:00"}]}}
+    [miscellaneous_items] => {"basic_sound_system":{"speaker":2,"mic":2},"banquet_chairs":{"quantity":100},"view_board":{"requested":true},"rectangular_table":{"quantity":3}}
+    [terms_agreed_by] => Zambal, Vivian G.
+    [terms_position] => FM Sub, ORG President
+    [terms_date] => March 25, 2026
+)
+
+[2026-03-25 17:08:26] SPECIFIC CHECK - activity_name: 'Raising Flag 2026'
+[2026-03-25 17:08:26] SPECIFIC CHECK - event_type_id: '2'
+[2026-03-25 17:08:26] BEFORE CLEAN - activity_name: 'Raising Flag 2026'
+[2026-03-25 17:08:26] AFTER CLEAN - activity_name: 'Raising Flag 2026'
+[2026-03-25 17:08:26] event_type_id: 2
+[2026-03-25 17:08:26] FINAL activity_name: 'Raising Flag 2026'
+[2026-03-25 17:08:26] facilities_schedules decoded: Array
+(
+    [venues] => Array
+        (
+            [0] => Array
+                (
+                    [id] => 1
+                    [name] => Function Room A
+                    [floor] => Ground Floor
+                )
+
+            [1] => Array
+                (
+                    [id] => 2
+                    [name] => Function Room B
+                    [floor] => Ground Floor
+                )
+
+            [2] => Array
+                (
+                    [id] => 3
+                    [name] => Function Room C
+                    [floor] => Ground Floor
+                )
+
+        )
+
+    [schedules] => Array
+        (
+            [1] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-05-05
+                            [endDate] => 2026-05-05
+                            [start] => 08:00
+                            [end] => 12:00
+                        )
+
+                )
+
+            [2] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-05-05
+                            [endDate] => 2026-05-05
+                            [start] => 08:00
+                            [end] => 12:00
+                        )
+
+                )
+
+            [3] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-05-05
+                            [endDate] => 2026-05-05
+                            [start] => 08:00
+                            [end] => 12:00
+                        )
+
+                )
+
+        )
+
+)
+
+[2026-03-25 17:08:26] Times - start_datetime: 2026-05-05 08:00, end_datetime: 2026-05-05 12:00
+[2026-03-25 17:08:26] Conflict check passed for all venues
+[2026-03-25 17:08:26] Terms info captured: Zambal, Vivian G. | FM Sub, ORG President
+[2026-03-25 17:08:26] SQL: INSERT INTO facility_reservations (
+        booking_no, reservation_no, last_name, first_name, middle_initial, 
+        email, contact_number, office_type_id, office_id, external_office_name, 
+        activity_name, event_type_id, venue_id, venue_setup_id, banquet_style_id,
+        start_datetime, end_datetime, participants_count, miscellaneous_items, 
+        additional_instruction
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+[2026-03-25 17:08:26] Success! Inserted ID: 50
+[2026-03-25 17:08:26] Inserted activity_name: Raising Flag 2026
+[2026-03-25 17:08:26] Inserted 3 venue(s) into reservation_venues for reservation ID 50
+[2026-03-25 17:08:52] Confirmation email sent to joshuacullo360@gmail.com
+[2026-03-25 10:21:48] ========== START reservation_submit.php ==========
+[2026-03-25 17:21:48] RAW POST data: Array
+(
+    [reservation_type] => function
+    [last_name] => Capadosa
+    [first_name] => Arabella, Juliana
+    [middle_initial] => D
+    [email] => alfemorganization@g.batstate-u.edu.ph
+    [contact] => 0957461935
+    [position] => ALFEM VPEA
+    [office_type_id] => 1
+    [office_id] => 6
+    [event_type_id] => 2
+    [activity_name] => SALITAN 2: Writing with precision and purpose
+    [participants] => 60
+    [banquet_style_id] => 14
+    [guest_last_name] => 
+    [guest_first_name] => 
+    [guest_middle_initial] => 
+    [guest_dob] => 
+    [guest_address] => 
+    [guest_email] => 
+    [guest_contact] => 
+    [arrival_date] => 
+    [checkin_time] => 
+    [checkout_time] => 
+    [departure_date] => 
+    [adults_count] => 1
+    [kids_count] => 0
+    [guest_room_id] => 
+    [guest_remarks] => 
+    [venue_ids] => Array
+        (
+            [0] => 4
+            [1] => 5
+        )
+
+    [view_board_qty] => 1
+    [additional_instruction] => 1-Dispenser
+    [action] => submit_function
+    [event_type] => Seminar and Lecture
+    [venue_id] => 4
+    [facilities_schedules] => {"venues":[{"id":"4","name":"Function Room D","floor":"Ground Floor"},{"id":"5","name":"Function Room E","floor":"Ground Floor"}],"schedules":{"4":[{"date":"2026-04-07","endDate":"2026-04-07","start":"12:00","end":"17:00"}],"5":[{"date":"2026-04-07","endDate":"2026-04-07","start":"12:00","end":"17:00"}]}}
+    [miscellaneous_items] => {"basic_sound_system":{"speaker":1,"mic":2},"banquet_chairs":{"quantity":60},"view_board":{"requested":true},"rectangular_table":{"quantity":8}}
+    [terms_agreed_by] => Capadosa, Arabella, Juliana D.
+    [terms_position] => ALFEM VPEA
+    [terms_date] => March 25, 2026
+)
+
+[2026-03-25 17:21:48] SPECIFIC CHECK - activity_name: 'SALITAN 2: Writing with precision and purpose'
+[2026-03-25 17:21:48] SPECIFIC CHECK - event_type_id: '2'
+[2026-03-25 17:21:48] BEFORE CLEAN - activity_name: 'SALITAN 2: Writing with precision and purpose'
+[2026-03-25 17:21:48] AFTER CLEAN - activity_name: 'SALITAN 2: Writing with precision and purpose'
+[2026-03-25 17:21:48] event_type_id: 2
+[2026-03-25 17:21:48] FINAL activity_name: 'SALITAN 2: Writing with precision and purpose'
+[2026-03-25 17:21:48] facilities_schedules decoded: Array
+(
+    [venues] => Array
+        (
+            [0] => Array
+                (
+                    [id] => 4
+                    [name] => Function Room D
+                    [floor] => Ground Floor
+                )
+
+            [1] => Array
+                (
+                    [id] => 5
+                    [name] => Function Room E
+                    [floor] => Ground Floor
+                )
+
+        )
+
+    [schedules] => Array
+        (
+            [4] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-04-07
+                            [endDate] => 2026-04-07
+                            [start] => 12:00
+                            [end] => 17:00
+                        )
+
+                )
+
+            [5] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-04-07
+                            [endDate] => 2026-04-07
+                            [start] => 12:00
+                            [end] => 17:00
+                        )
+
+                )
+
+        )
+
+)
+
+[2026-03-25 17:21:48] Times - start_datetime: 2026-04-07 12:00, end_datetime: 2026-04-07 17:00
+[2026-03-25 17:21:48] Conflict check passed for all venues
+[2026-03-25 17:21:48] Terms info captured: Capadosa, Arabella, Juliana D. | ALFEM VPEA
+[2026-03-25 17:21:48] SQL: INSERT INTO facility_reservations (
+        booking_no, reservation_no, last_name, first_name, middle_initial, 
+        email, contact_number, office_type_id, office_id, external_office_name, 
+        activity_name, event_type_id, venue_id, venue_setup_id, banquet_style_id,
+        start_datetime, end_datetime, participants_count, miscellaneous_items, 
+        additional_instruction
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+[2026-03-25 17:21:48] Success! Inserted ID: 51
+[2026-03-25 17:21:48] Inserted activity_name: SALITAN 2: Writing with precision and purpose
+[2026-03-25 17:21:48] Inserted 2 venue(s) into reservation_venues for reservation ID 51
+[2026-03-25 17:22:07] Confirmation email sent to alfemorganization@g.batstate-u.edu.ph
+[2026-03-25 10:44:31] ========== START reservation_submit.php ==========
+[2026-03-25 17:44:31] RAW POST data: Array
+(
+    [reservation_type] => function
+    [last_name] => Perea
+    [first_name] => Maria Mariel 
+    [middle_initial] => D
+    [email] => joshuacullo360@gmail.com
+    [contact] => 09914159175
+    [position] => Head, External Affairs
+    [office_type_id] => 2
+    [office_id] => 17
+    [event_type_id] => 5
+    [activity_name] => G2L LEX- Design Thinking
+    [participants] => 50
+    [banquet_style_id] => 11
+    [guest_last_name] => 
+    [guest_first_name] => 
+    [guest_middle_initial] => 
+    [guest_dob] => 
+    [guest_address] => 
+    [guest_email] => 
+    [guest_contact] => 
+    [arrival_date] => 
+    [checkin_time] => 
+    [checkout_time] => 
+    [departure_date] => 
+    [adults_count] => 1
+    [kids_count] => 0
+    [guest_room_id] => 
+    [guest_remarks] => 
+    [venue_ids] => Array
+        (
+            [0] => 1
+            [1] => 2
+            [2] => 3
+            [3] => 4
+            [4] => 5
+        )
+
+    [view_board_qty] => 1
+    [additional_instruction] => Borrow Coffee maker, spoon, fork, cup, etc table cloths
+    [action] => submit_function
+    [event_type] => Programs and Special Events
+    [venue_id] => 1
+    [facilities_schedules] => {"venues":[{"id":"1","name":"Function Room A","floor":"Ground Floor"},{"id":"2","name":"Function Room B","floor":"Ground Floor"},{"id":"3","name":"Function Room C","floor":"Ground Floor"},{"id":"4","name":"Function Room D","floor":"Ground Floor"},{"id":"5","name":"Function Room E","floor":"Ground Floor"}],"schedules":{"1":[{"date":"2026-04-08","endDate":"2026-04-09","start":"08:00","end":"21:00"}],"2":[{"date":"2026-04-08","endDate":"2026-04-09","start":"08:00","end":"21:00"}],"3":[{"date":"2026-04-08","endDate":"2026-04-09","start":"08:00","end":"21:00"}],"4":[{"date":"2026-04-08","endDate":"2026-04-09","start":"08:00","end":"21:00"}],"5":[{"date":"2026-04-08","endDate":"2026-04-09","start":"08:00","end":"21:00"}]}}
+    [miscellaneous_items] => {"basic_sound_system":{"speaker":2,"mic":2},"round_table":{"quantity":6},"banquet_chairs":{"quantity":50},"view_board":{"requested":true}}
+    [terms_agreed_by] => Perea, Maria Mariel  D.
+    [terms_position] => Head, External Affairs
+    [terms_date] => March 25, 2026
+)
+
+[2026-03-25 17:44:31] SPECIFIC CHECK - activity_name: 'G2L LEX- Design Thinking'
+[2026-03-25 17:44:31] SPECIFIC CHECK - event_type_id: '5'
+[2026-03-25 17:44:31] BEFORE CLEAN - activity_name: 'G2L LEX- Design Thinking'
+[2026-03-25 17:44:31] AFTER CLEAN - activity_name: 'G2L LEX- Design Thinking'
+[2026-03-25 17:44:31] event_type_id: 5
+[2026-03-25 17:44:31] FINAL activity_name: 'G2L LEX- Design Thinking'
+[2026-03-25 17:44:31] facilities_schedules decoded: Array
+(
+    [venues] => Array
+        (
+            [0] => Array
+                (
+                    [id] => 1
+                    [name] => Function Room A
+                    [floor] => Ground Floor
+                )
+
+            [1] => Array
+                (
+                    [id] => 2
+                    [name] => Function Room B
+                    [floor] => Ground Floor
+                )
+
+            [2] => Array
+                (
+                    [id] => 3
+                    [name] => Function Room C
+                    [floor] => Ground Floor
+                )
+
+            [3] => Array
+                (
+                    [id] => 4
+                    [name] => Function Room D
+                    [floor] => Ground Floor
+                )
+
+            [4] => Array
+                (
+                    [id] => 5
+                    [name] => Function Room E
+                    [floor] => Ground Floor
+                )
+
+        )
+
+    [schedules] => Array
+        (
+            [1] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-04-08
+                            [endDate] => 2026-04-09
+                            [start] => 08:00
+                            [end] => 21:00
+                        )
+
+                )
+
+            [2] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-04-08
+                            [endDate] => 2026-04-09
+                            [start] => 08:00
+                            [end] => 21:00
+                        )
+
+                )
+
+            [3] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-04-08
+                            [endDate] => 2026-04-09
+                            [start] => 08:00
+                            [end] => 21:00
+                        )
+
+                )
+
+            [4] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-04-08
+                            [endDate] => 2026-04-09
+                            [start] => 08:00
+                            [end] => 21:00
+                        )
+
+                )
+
+            [5] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-04-08
+                            [endDate] => 2026-04-09
+                            [start] => 08:00
+                            [end] => 21:00
+                        )
+
+                )
+
+        )
+
+)
+
+[2026-03-25 17:44:31] Times - start_datetime: 2026-04-08 08:00, end_datetime: 2026-04-09 21:00
+[2026-03-25 17:44:31] Conflict check passed for all venues
+[2026-03-25 17:44:31] Terms info captured: Perea, Maria Mariel  D. | Head, External Affairs
+[2026-03-25 17:44:31] SQL: INSERT INTO facility_reservations (
+        booking_no, reservation_no, last_name, first_name, middle_initial, 
+        email, contact_number, office_type_id, office_id, external_office_name, 
+        activity_name, event_type_id, venue_id, venue_setup_id, banquet_style_id,
+        start_datetime, end_datetime, participants_count, miscellaneous_items, 
+        additional_instruction
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+[2026-03-25 17:44:31] Success! Inserted ID: 52
+[2026-03-25 17:44:31] Inserted activity_name: G2L LEX- Design Thinking
+[2026-03-25 17:44:31] Inserted 5 venue(s) into reservation_venues for reservation ID 52
+[2026-03-25 17:45:09] Confirmation email sent to joshuacullo360@gmail.com

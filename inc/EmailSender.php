@@ -38,7 +38,7 @@ class EmailSender {
      * @return bool True if sent successfully
      */
     public function sendFunctionRoomConfirmation($toEmail, $customerName, $bookingNo, $activityName, $pdfContent, $pdfFilename = '') {
-        $subject = 'Function Room Reservation Confirmation - ' . $activityName;
+        $subject = 'Function Room Reservation Confirmation';
         if ($pdfFilename === '') {
             $pdfFilename = 'Reservation-' . $bookingNo . '.pdf';
         }
@@ -124,7 +124,7 @@ class EmailSender {
      */
     public function sendFunctionRoomStatusUpdate($toEmail, $customerName, $bookingNo, $activityName, $status, $adminRemarks = '') {
         $statusLabel = ucfirst(str_replace('_', ' ', $status));
-        $subject = "Reservation Status Update: $statusLabel - $bookingNo";
+        $subject = "Reservation Status Update: $statusLabel";
         $htmlBody = $this->buildStatusUpdateEmailBody($customerName, $bookingNo, $activityName, $status, $adminRemarks, 'Function Room');
         return $this->sendWithAttachment($toEmail, $subject, $htmlBody);
     }
@@ -134,7 +134,7 @@ class EmailSender {
      */
     public function sendGuestRoomStatusUpdate($toEmail, $customerName, $bookingNo, $status, $adminRemarks = '') {
         $statusLabel = ucfirst(str_replace('_', ' ', $status));
-        $subject = "Room Registration Status Update: $statusLabel - $bookingNo";
+        $subject = "Room Registration Status Update: $statusLabel";
         $htmlBody = $this->buildStatusUpdateEmailBody($customerName, $bookingNo, 'Guest Room Reservation', $status, $adminRemarks, 'Guest Room');
         return $this->sendWithAttachment($toEmail, $subject, $htmlBody);
     }
@@ -151,7 +151,6 @@ class EmailSender {
         $html .= '<p style="margin: 0 0 16px; color: #333;">Dear ' . htmlspecialchars($customerName) . ',</p>';
         $html .= '<p style="margin: 0 0 16px; color: #555; line-height: 1.6;">Thank you for submitting your function room reservation. Your request has been received and is pending approval.</p>';
         $html .= '<table style="width: 100%; border-collapse: collapse; margin: 20px 0;">';
-        $html .= '<tr><td style="padding: 10px 12px; background: #f9f9f9; border: 1px solid #eee; font-weight: bold; width: 140px;">Booking Reference</td><td style="padding: 10px 12px; border: 1px solid #eee;">' . htmlspecialchars($bookingNo) . '</td></tr>';
         $html .= '<tr><td style="padding: 10px 12px; background: #f9f9f9; border: 1px solid #eee; font-weight: bold;">Activity / Event</td><td style="padding: 10px 12px; border: 1px solid #eee;">' . htmlspecialchars($activityName) . '</td></tr>';
         $html .= '<tr><td style="padding: 10px 12px; background: #f9f9f9; border: 1px solid #eee; font-weight: bold;">Status</td><td style="padding: 10px 12px; border: 1px solid #eee;"><span style="color: #e65100; font-weight: bold;">Pending Approval</span></td></tr>';
         $html .= '</table>';
@@ -192,8 +191,7 @@ class EmailSender {
         $html .= '<p style="margin: 0 0 16px; color: #333;">Dear ' . htmlspecialchars($customerName) . ',</p>';
         $html .= '<p style="margin: 0 0 16px; color: #555; line-height: 1.6;">' . $statusMsg . '</p>';
         $html .= '<table style="width: 100%; border-collapse: collapse; margin: 20px 0;">';
-        $html .= '<tr><td style="padding: 10px 12px; background: #f9f9f9; border: 1px solid #eee; font-weight: bold; width: 140px;">Booking Reference</td><td style="padding: 10px 12px; border: 1px solid #eee;">' . htmlspecialchars($bookingNo) . '</td></tr>';
-        $html .= '<tr><td style="padding: 10px 12px; background: #f9f9f9; border: 1px solid #eee; font-weight: bold;">Reservation Type</td><td style="padding: 10px 12px; border: 1px solid #eee;">' . htmlspecialchars($typeLabel) . '</td></tr>';
+        $html .= '<tr><td style="padding: 10px 12px; background: #f9f9f9; border: 1px solid #eee; font-weight: bold; width: 140px;">Reservation Type</td><td style="padding: 10px 12px; border: 1px solid #eee;">' . htmlspecialchars($typeLabel) . '</td></tr>';
         if ($typeLabel === 'Function Room') {
             $html .= '<tr><td style="padding: 10px 12px; background: #f9f9f9; border: 1px solid #eee; font-weight: bold;">Activity / Event</td><td style="padding: 10px 12px; border: 1px solid #eee;">' . htmlspecialchars($activityName) . '</td></tr>';
         }
