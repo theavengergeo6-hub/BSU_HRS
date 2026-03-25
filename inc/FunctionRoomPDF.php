@@ -398,11 +398,20 @@ class FunctionRoomPDF
             $pdf->SetXY(18.0, 212.5);
             $pdf->Cell($cellWidth, 5, strtoupper($reqName), 0, 0, 'C');
 
-            // Position line below the name
+            // Position line below the name — with auto-scaling for long titles
             $pos = trim((string)($d['terms_position'] ?? ''));
             if ($pos !== '') {
-                $pdf->SetFont('helvetica', '', 8.5);
-                $pdf->SetXY(18.0, 215.5);
+                $posFontSize = 8.5;
+                $pdf->SetFont('helvetica', '', $posFontSize);
+                // Scale down font if position is too wide for the cell
+                foreach ([8.5, 7.5, 6.5, 5.5] as $fs) {
+                    $pdf->SetFont('helvetica', '', $fs);
+                    if ($pdf->GetStringWidth($pos) <= $cellWidth - 1) {
+                        break;
+                    }
+                }
+                $pdf->SetTextColor(0, 0, 0);
+                $pdf->SetXY(18.0, 215.5); // Placed correctly under the "Position:" label area
                 $pdf->Cell($cellWidth, 5, $pos, 0, 0, 'C');
             }
         }
