@@ -1,4 +1,9 @@
 <?php
+// Prevent browser from caching admin pages
+header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+header("Cache-Control: post-check=0, pre-check=0", false);
+header("Pragma: no-cache");
+
 require_once __DIR__ . '/../../inc/essentials.php'; // Load global functions first
 require_once __DIR__ . '/auth.php';
 requireAdminLogin();
