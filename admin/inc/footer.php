@@ -61,8 +61,13 @@
 
         // Real-time Notification System
         (function() {
-            let lastFacId = 0;
-            let lastGuestId = 0;
+            <?php
+            // Get initial max IDs to set as baseline for this page instance
+            $init_fac_id = $conn->query("SELECT MAX(id) FROM facility_reservations")->fetch_row()[0] ?? 0;
+            $init_guest_id = $conn->query("SELECT MAX(id) FROM guest_room_reservations")->fetch_row()[0] ?? 0;
+            ?>
+            let lastFacId = <?= (int)$init_fac_id ?>;
+            let lastGuestId = <?= (int)$init_guest_id ?>;
             let isFirstCheck = true;
 
             // Generate notification sound using Web Audio API
@@ -141,19 +146,43 @@
                         // Replace main content
                         const newContentArea = doc.querySelector('.content-area');
                         if (newContentArea) {
+                            // Clear and append to ensure scripts are NOT ignored if we manually handle them,
+                            // OR just replace innerHTML and then find/run scripts.
                             contentArea.innerHTML = newContentArea.innerHTML;
-                        }
-
-                        // Also update sidebar badge counters if they exist
-                        const currentBadges = document.querySelectorAll('.badge-count');
-                        const newBadges = doc.querySelectorAll('.badge-count');
-                        if (currentBadges.length > 0 && newBadges.length > 0) {
-                            currentBadges.forEach((badge, index) => {
-                                if (newBadges[index]) {
-                                    badge.innerHTML = newBadges[index].innerHTML;
-                                }
+                            
+                            // Re-execute scripts inside the new content area
+                            const scripts = newContentArea.querySelectorAll('script');
+                            scripts.forEach(oldScript => {
+                                const newScript = document.createElement('script');
+                                Array.from(oldScript.attributes).forEach(attr => {
+                                    newScript.setAttribute(attr.name, attr.value);
+                                });
+                                newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+                                contentArea.appendChild(newScript);
+                                // Remove the dummy script tag we just added to keep DOM clean
+                                newScript.parentNode.removeChild(newScript);
                             });
                         }
+
+                        // Also update sidebar badge counters
+                        const currentBadges = document.querySelectorAll('.badge-count');
+                        const newBadges = doc.querySelectorAll('.badge-count');
+                        newBadges.forEach((newBadge, index) => {
+                            const currentBadge = currentBadges[index];
+                            if (currentBadge) {
+                                currentBadge.innerHTML = newBadge.innerHTML;
+                                // Handle visibility
+                                const count = parseInt(newBadge.innerHTML) || 0;
+                                if (count > 0) {
+                                    currentBadge.classList.remove('d-none');
+                                } else {
+                                    currentBadge.classList.add('d-none');
+                                }
+                            }
+                        });
+
+                        // Notify page that a refresh occurred
+                        window.dispatchEvent(new CustomEvent('adminRefreshComplete'));
                     })
                     .catch(err => console.error('Failed to refresh content area:', err));
             }

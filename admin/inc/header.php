@@ -423,9 +423,7 @@ $pending_count = (int)$pending_fac + (int)$pending_guest;
                 <a href="reservations.php" class="<?= $current_page == 'reservations.php' ? 'active' : '' ?>">
                     <i class="bi bi-calendar-check"></i>
                     Reservations
-                    <?php if ($pending_count > 0): ?>
-                        <span class="badge-count"><?= $pending_count ?></span>
-                    <?php endif; ?>
+                    <span class="badge-count <?= ($pending_count > 0) ? '' : 'd-none' ?>"><?= $pending_count ?></span>
                 </a>
                 <a href="rooms.php" class="<?= $current_page == 'rooms.php' ? 'active' : '' ?>">
                     <i class="bi bi-building"></i>
