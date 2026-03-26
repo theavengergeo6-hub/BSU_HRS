@@ -6772,3 +6772,122 @@ water dispenser
 [2026-03-26 14:10:49] Inserted activity_name: Arirang Release
 [2026-03-26 14:10:49] Inserted 2 venue(s) into reservation_venues for reservation ID 53
 [2026-03-26 14:11:01] Email send failed: SMTP Error: Could not connect to SMTP host. Failed to connect to server SMTP server error: Failed to connect to server Additional SMTP info: php_network_getaddresses: getaddrinfo for smtp.gmail.com failed: No such host is known. 
+[2026-03-26 09:03:43] ========== START reservation_submit.php ==========
+[2026-03-26 16:03:43] RAW POST data: Array
+(
+    [reservation_type] => function
+    [last_name] => Sermania
+    [first_name] => Rafael
+    [middle_initial] => D
+    [email] => healthservices.nasugbu@g.batstate-u.edu.ph
+    [contact] => 09914159175
+    [position] => MAN, RN, RM, LPT
+    [office_type_id] => 2
+    [office_id] => 22
+    [event_type_id] => 1
+    [activity_name] => HEALTH FORUM ON COMMON DISEASE
+    [participants] => 85
+    [banquet_style_id] => 3
+    [guest_last_name] => 
+    [guest_first_name] => 
+    [guest_middle_initial] => 
+    [guest_dob] => 
+    [guest_address] => 
+    [guest_email] => 
+    [guest_contact] => 
+    [arrival_date] => 
+    [checkin_time] => 
+    [checkout_time] => 
+    [departure_date] => 
+    [adults_count] => 1
+    [kids_count] => 0
+    [guest_room_id] => 
+    [guest_remarks] => 
+    [venue_ids] => Array
+        (
+            [0] => 1
+            [1] => 2
+        )
+
+    [view_board_qty] => 1
+    [additional_instruction] => Podium and mic stand
+    [action] => submit_function
+    [event_type] => Meeting and Conference
+    [venue_id] => 1
+    [facilities_schedules] => {"venues":[{"id":"1","name":"Function Room A","floor":"2nd Floor"},{"id":"2","name":"Function Room B","floor":"2nd Floor"}],"schedules":{"1":[{"date":"2026-04-07","endDate":"2026-04-07","start":"09:00","end":"11:30"}],"2":[{"date":"2026-04-07","endDate":"2026-04-07","start":"09:00","end":"11:30"}]}}
+    [miscellaneous_items] => {"basic_sound_system":{"speaker":1,"mic":2},"banquet_chairs":{"quantity":85},"view_board":{"requested":true}}
+    [terms_agreed_by] => Sermania, Rafael D.
+    [terms_position] => MAN, RN, RM, LPT
+    [terms_date] => March 26, 2026
+)
+
+[2026-03-26 16:03:43] SPECIFIC CHECK - activity_name: 'HEALTH FORUM ON COMMON DISEASE'
+[2026-03-26 16:03:43] SPECIFIC CHECK - event_type_id: '1'
+[2026-03-26 16:03:43] BEFORE CLEAN - activity_name: 'HEALTH FORUM ON COMMON DISEASE'
+[2026-03-26 16:03:43] AFTER CLEAN - activity_name: 'HEALTH FORUM ON COMMON DISEASE'
+[2026-03-26 16:03:43] event_type_id: 1
+[2026-03-26 16:03:43] FINAL activity_name: 'HEALTH FORUM ON COMMON DISEASE'
+[2026-03-26 16:03:43] facilities_schedules decoded: Array
+(
+    [venues] => Array
+        (
+            [0] => Array
+                (
+                    [id] => 1
+                    [name] => Function Room A
+                    [floor] => 2nd Floor
+                )
+
+            [1] => Array
+                (
+                    [id] => 2
+                    [name] => Function Room B
+                    [floor] => 2nd Floor
+                )
+
+        )
+
+    [schedules] => Array
+        (
+            [1] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-04-07
+                            [endDate] => 2026-04-07
+                            [start] => 09:00
+                            [end] => 11:30
+                        )
+
+                )
+
+            [2] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-04-07
+                            [endDate] => 2026-04-07
+                            [start] => 09:00
+                            [end] => 11:30
+                        )
+
+                )
+
+        )
+
+)
+
+[2026-03-26 16:03:43] Times - start_datetime: 2026-04-07 09:00, end_datetime: 2026-04-07 11:30
+[2026-03-26 16:03:43] Conflict check passed for all venues
+[2026-03-26 16:03:43] Terms info captured: Sermania, Rafael D. | MAN, RN, RM, LPT
+[2026-03-26 16:03:43] SQL: INSERT INTO facility_reservations (
+        booking_no, reservation_no, last_name, first_name, middle_initial, 
+        email, contact_number, office_type_id, office_id, external_office_name, 
+        activity_name, event_type_id, venue_id, venue_setup_id, banquet_style_id,
+        start_datetime, end_datetime, participants_count, miscellaneous_items, 
+        additional_instruction
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+[2026-03-26 16:03:43] Success! Inserted ID: 54
+[2026-03-26 16:03:43] Inserted activity_name: HEALTH FORUM ON COMMON DISEASE
+[2026-03-26 16:03:43] Inserted 2 venue(s) into reservation_venues for reservation ID 54
+[2026-03-26 16:04:14] Confirmation email sent to healthservices.nasugbu@g.batstate-u.edu.ph

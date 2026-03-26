@@ -537,6 +537,89 @@ foreach ($rows as $row):
 .stay-stay     { background:#e2f0fb;color:#004085; }
 .stay-checkout { background:#f8d7da;color:#721c24; }
 
+/* ── Search feature ─────────────────────────────────────────────────────── */
+.search-container {
+    position: relative;
+    margin-left: 1.5rem;
+    flex: 1;
+    max-width: 350px;
+}
+.search-input-group {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+.search-input-group i {
+    position: absolute;
+    left: 12px;
+    color: #adb5bd;
+    font-size: 0.9rem;
+}
+.search-input {
+    padding: 0.45rem 0.75rem 0.45rem 2.2rem;
+    border-radius: 20px;
+    border: 1px solid #dee2e6;
+    font-size: 0.875rem;
+    width: 100%;
+    transition: all 0.2s ease;
+    background: #f8f9fa;
+}
+.search-input:focus {
+    outline: none;
+    border-color: var(--bsu-red);
+    background: white;
+    box-shadow: 0 0 0 3px rgba(183,28,28,0.1);
+}
+.search-results {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    margin-top: 8px;
+    z-index: 1000;
+    max-height: 400px;
+    overflow-y: auto;
+    display: none;
+    border: 1px solid #e9ecef;
+}
+.search-results.active { display: block; }
+.search-item {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #f1f3f5;
+    cursor: pointer;
+    transition: background 0.15s ease;
+    text-decoration: none;
+    display: block;
+    color: inherit;
+}
+.search-item:last-child { border-bottom: none; }
+.search-item:hover { background: #fff5f5; }
+.search-item-title {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #212529;
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.search-item-meta {
+    font-size: 0.75rem;
+    color: #6c757d;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.search-no-results {
+    padding: 1.5rem;
+    text-align: center;
+    color: #6c757d;
+    font-size: 0.85rem;
+}
+
 /* ── Responsive ───────────────────────────────────────────────────────────── */
 @media(max-width:900px)  { .stats-grid{grid-template-columns:repeat(2,1fr);} }
 @media(max-width:768px)  {
@@ -545,10 +628,11 @@ foreach ($rows as $row):
     .modal-card{width:96%;border-radius:14px;}
     .calendar-filters{gap:0.65rem;}
     .event-details{grid-template-columns:1fr;}
+    .search-container { max-width: none; margin-left: 0; order: 3; width: 100%; margin-top: 0.5rem; }
 }
 @media(max-width:576px)  {
     .stats-grid{grid-template-columns:1fr 1fr;}
-    .calendar-header{flex-direction:column;gap:0.6rem;align-items:flex-start;}
+    .calendar-header{flex-direction:row; flex-wrap: wrap; gap:0.6rem;align-items:center;}
     .view-tabs{width:100%;justify-content:center;}
 }
 @media(max-width:400px)  { .stats-grid{grid-template-columns:1fr;} }
@@ -620,7 +704,7 @@ foreach ($rows as $row):
     <!-- Calendar -->
     <div class="calendar-wrapper" id="calendar-top">
         <div class="calendar-header">
-            <div class="calendar-title">
+            <div class="calendar-title d-flex align-items-center flex-grow-1">
                 <form action="" method="GET" class="calendar-picker">
                     <input type="hidden" name="view" value="function">
                     <select name="month" onchange="this.form.submit()">
@@ -634,8 +718,16 @@ foreach ($rows as $row):
                         <?php endfor; ?>
                     </select>
                 </form>
+
+                <div class="search-container">
+                    <div class="search-input-group">
+                        <i class="bi bi-search"></i>
+                        <input type="text" class="search-input" id="resSearchInput" placeholder="Search event or requester..." autocomplete="off">
+                    </div>
+                    <div class="search-results" id="resSearchResults"></div>
+                </div>
             </div>
-            <div class="calendar-nav">
+            <div class="calendar-nav ms-2">
                 <a href="?view=function&month=<?= $prev_month ?>&year=<?= $prev_year ?>#calendar-top" class="calendar-nav-btn" title="Previous month"><i class="bi bi-chevron-left"></i></a>
                 <a href="?view=function&month=<?= date('m') ?>&year=<?= date('Y') ?>#calendar-top" class="calendar-nav-btn" title="Today"><i class="bi bi-calendar3"></i></a>
                 <a href="?view=function&month=<?= $next_month ?>&year=<?= $next_year ?>#calendar-top" class="calendar-nav-btn" title="Next month"><i class="bi bi-chevron-right"></i></a>
@@ -835,6 +927,66 @@ foreach ($rows as $row):
 
         /* ── Init ────────────────────────────────────────────────────────── */
         renderFacilityDots();
+
+        /* ── Search Logic ────────────────────────────────────────────────── */
+        var searchInput = document.getElementById('resSearchInput');
+        var searchResults = document.getElementById('resSearchResults');
+        var searchTimeout = null;
+
+        searchInput.addEventListener('input', function() {
+            var q = this.value.trim();
+            clearTimeout(searchTimeout);
+            if (q.length < 2) {
+                searchResults.innerHTML = '';
+                searchResults.classList.remove('active');
+                return;
+            }
+
+            searchTimeout = setTimeout(function() {
+                fetch('ajax/search_reservations.php?view=function&q=' + encodeURIComponent(q))
+                    .then(r => r.json())
+                    .then(data => {
+                        searchResults.innerHTML = '';
+                        if (data.length === 0) {
+                            searchResults.innerHTML = '<div class="search-no-results">No reservations found for "' + esc(q) + '"</div>';
+                        } else {
+                            data.forEach(item => {
+                                var div = document.createElement('a');
+                                div.className = 'search-item';
+                                div.href = 'reservation_details.php?id=' + item.id;
+                                
+                                var pillCls = item.status === 'approved' ? 'pill-approved' : (item.status === 'pencil_booked' ? 'pill-pencil' : 'pill-pending');
+                                
+                                div.innerHTML = `
+                                    <div class="search-item-title">${esc(item.title)}</div>
+                                    <div class="search-item-meta">
+                                        <span><i class="bi bi-person me-1"></i>${esc(item.requester)}</span>
+                                        <span class="event-status-pill ${pillCls}">${item.status.replace('_',' ').toUpperCase()}</span>
+                                    </div>
+                                    <div class="search-item-meta mt-1">
+                                        <span><i class="bi bi-calendar-event me-1"></i>${item.formatted_date}</span>
+                                    </div>
+                                `;
+                                searchResults.appendChild(div);
+                            });
+                        }
+                        searchResults.classList.add('active');
+                    });
+            }, 300);
+        });
+
+        document.addEventListener('click', function(e) {
+            if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+                searchResults.classList.remove('active');
+            }
+        });
+
+        function esc(str) {
+            if (!str) return '';
+            var d = document.createElement('div');
+            d.appendChild(document.createTextNode(String(str)));
+            return d.innerHTML;
+        }
     }());
     </script>
 
@@ -878,7 +1030,7 @@ foreach ($rows as $row):
     <!-- Calendar -->
     <div class="calendar-wrapper" id="calendar-top">
         <div class="calendar-header">
-            <div class="calendar-title">
+            <div class="calendar-title d-flex align-items-center flex-grow-1">
                 <form action="" method="GET" class="calendar-picker">
                     <input type="hidden" name="view" value="guest">
                     <select name="month" onchange="this.form.submit()">
@@ -892,8 +1044,16 @@ foreach ($rows as $row):
                         <?php endfor; ?>
                     </select>
                 </form>
+
+                <div class="search-container">
+                    <div class="search-input-group">
+                        <i class="bi bi-search"></i>
+                        <input type="text" class="search-input" id="resSearchInputGuest" placeholder="Search guest name..." autocomplete="off">
+                    </div>
+                    <div class="search-results" id="resSearchResultsGuest"></div>
+                </div>
             </div>
-            <div class="calendar-nav">
+            <div class="calendar-nav ms-2">
                 <a href="?view=guest&month=<?= $prev_month ?>&year=<?= $prev_year ?>#calendar-top" class="calendar-nav-btn" title="Previous month"><i class="bi bi-chevron-left"></i></a>
                 <a href="?view=guest&month=<?= date('m') ?>&year=<?= date('Y') ?>#calendar-top" class="calendar-nav-btn" title="Today"><i class="bi bi-calendar3"></i></a>
                 <a href="?view=guest&month=<?= $next_month ?>&year=<?= $next_year ?>#calendar-top" class="calendar-nav-btn" title="Next month"><i class="bi bi-chevron-right"></i></a>
@@ -1186,6 +1346,59 @@ foreach ($rows as $row):
 
         /* ── Init ────────────────────────────────────────────────────────── */
         renderGuestDots();
+
+        /* ── Search Logic (Guest) ─────────────────────────────────────────── */
+        var searchInputG = document.getElementById('resSearchInputGuest');
+        var searchResultsG = document.getElementById('resSearchResultsGuest');
+        var searchTimeoutG = null;
+
+        searchInputG.addEventListener('input', function() {
+            var q = this.value.trim();
+            clearTimeout(searchTimeoutG);
+            if (q.length < 2) {
+                searchResultsG.innerHTML = '';
+                searchResultsG.classList.remove('active');
+                return;
+            }
+
+            searchTimeoutG = setTimeout(function() {
+                fetch('ajax/search_reservations.php?view=guest&q=' + encodeURIComponent(q))
+                    .then(r => r.json())
+                    .then(data => {
+                        searchResultsG.innerHTML = '';
+                        if (data.length === 0) {
+                            searchResultsG.innerHTML = '<div class="search-no-results">No guest reservations found...</div>';
+                        } else {
+                            data.forEach(item => {
+                                var div = document.createElement('a');
+                                div.className = 'search-item';
+                                div.href = 'guest_reservation_details.php?id=' + item.id;
+                                
+                                var pillCls = (item.status === 'confirmed' || item.status === 'checked_in') ? 'pill-approved' : (item.status === 'pencil_booked' ? 'pill-pencil' : 'pill-pending');
+                                
+                                div.innerHTML = `
+                                    <div class="search-item-title">${esc(item.title)}</div>
+                                    <div class="search-item-meta">
+                                        <span><i class="bi bi-door-open me-1"></i>${esc(item.requester)}</span>
+                                        <span class="event-status-pill ${pillCls}">${item.status.replace('_',' ').toUpperCase()}</span>
+                                    </div>
+                                    <div class="search-item-meta mt-1">
+                                        <span><i class="bi bi-calendar-event me-1"></i>${item.formatted_date}</span>
+                                    </div>
+                                `;
+                                searchResultsG.appendChild(div);
+                            });
+                        }
+                        searchResultsG.classList.add('active');
+                    });
+            }, 300);
+        });
+
+        document.addEventListener('click', function(e) {
+            if (!searchInputG.contains(e.target) && !searchResultsG.contains(e.target)) {
+                searchResultsG.classList.remove('active');
+            }
+        });
 
         // ── Auto-scroll to calendar if month/year was changed ──────────────
         if (window.location.search.indexOf('month=') !== -1 || window.location.search.indexOf('year=') !== -1) {
