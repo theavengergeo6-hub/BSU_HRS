@@ -6546,3 +6546,229 @@ water dispenser
 [2026-03-25 17:44:31] Inserted activity_name: G2L LEX- Design Thinking
 [2026-03-25 17:44:31] Inserted 5 venue(s) into reservation_venues for reservation ID 52
 [2026-03-25 17:45:09] Confirmation email sent to joshuacullo360@gmail.com
+[2026-03-26 07:10:21] ========== START reservation_submit.php ==========
+[2026-03-26 14:10:21] RAW POST data: Array
+(
+    [reservation_type] => function
+    [last_name] => Taehyung
+    [first_name] => Kim
+    [middle_initial] => V
+    [email] => geomarc789@gmail.com
+    [contact] => 0975222454
+    [position] => BTS Member
+    [office_type_id] => 4
+    [office_external_name] => 
+    [event_type_id] => 3
+    [activity_name] => Arirang Release
+    [participants] => 60
+    [banquet_style_id] => 11
+    [guest_last_name] => 
+    [guest_first_name] => 
+    [guest_middle_initial] => 
+    [guest_dob] => 
+    [guest_address] => 
+    [guest_email] => 
+    [guest_contact] => 
+    [arrival_date] => 
+    [checkin_time] => 
+    [checkout_time] => 
+    [departure_date] => 
+    [adults_count] => 1
+    [kids_count] => 0
+    [guest_room_id] => 
+    [guest_remarks] => 
+    [venue_ids] => Array
+        (
+            [0] => 1
+            [1] => 2
+        )
+
+    [view_board_qty] => 1
+    [additional_instruction] => 
+    [action] => submit_function
+    [event_type] => Buffet and Celebrations
+    [venue_id] => 1
+    [facilities_schedules] => {"venues":[{"id":"1","name":"Function Room A","floor":"2nd Floor"},{"id":"2","name":"Function Room B","floor":"2nd Floor"}],"schedules":{"1":[{"date":"2026-03-27","endDate":"2026-03-27","start":"07:00","end":"12:00"}],"2":[{"date":"2026-03-27","endDate":"2026-03-27","start":"07:00","end":"12:00"}]}}
+    [miscellaneous_items] => {"basic_sound_system":{"speaker":2,"mic":1},"round_table":{"quantity":6},"banquet_chairs":{"quantity":60},"view_board":{"requested":true}}
+    [terms_agreed_by] => Taehyung, Kim V.
+    [terms_position] => BTS Member
+    [terms_date] => March 26, 2026
+)
+
+[2026-03-26 14:10:21] SPECIFIC CHECK - activity_name: 'Arirang Release'
+[2026-03-26 14:10:21] SPECIFIC CHECK - event_type_id: '3'
+[2026-03-26 14:10:21] BEFORE CLEAN - activity_name: 'Arirang Release'
+[2026-03-26 14:10:21] AFTER CLEAN - activity_name: 'Arirang Release'
+[2026-03-26 14:10:21] event_type_id: 3
+[2026-03-26 14:10:21] FINAL activity_name: 'Arirang Release'
+[2026-03-26 14:10:21] facilities_schedules decoded: Array
+(
+    [venues] => Array
+        (
+            [0] => Array
+                (
+                    [id] => 1
+                    [name] => Function Room A
+                    [floor] => 2nd Floor
+                )
+
+            [1] => Array
+                (
+                    [id] => 2
+                    [name] => Function Room B
+                    [floor] => 2nd Floor
+                )
+
+        )
+
+    [schedules] => Array
+        (
+            [1] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-03-27
+                            [endDate] => 2026-03-27
+                            [start] => 07:00
+                            [end] => 12:00
+                        )
+
+                )
+
+            [2] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-03-27
+                            [endDate] => 2026-03-27
+                            [start] => 07:00
+                            [end] => 12:00
+                        )
+
+                )
+
+        )
+
+)
+
+[2026-03-26 14:10:21] Times - start_datetime: 2026-03-27 07:00, end_datetime: 2026-03-27 12:00
+[2026-03-26 14:10:21] ERROR: External office name is required
+[2026-03-26 07:10:49] ========== START reservation_submit.php ==========
+[2026-03-26 14:10:49] RAW POST data: Array
+(
+    [reservation_type] => function
+    [last_name] => Taehyung
+    [first_name] => Kim
+    [middle_initial] => V
+    [email] => geomarc789@gmail.com
+    [contact] => 0975222454
+    [position] => BTS Member
+    [office_type_id] => 4
+    [office_external_name] => Los Angeles Lakers
+    [event_type_id] => 3
+    [activity_name] => Arirang Release
+    [participants] => 60
+    [banquet_style_id] => 11
+    [guest_last_name] => 
+    [guest_first_name] => 
+    [guest_middle_initial] => 
+    [guest_dob] => 
+    [guest_address] => 
+    [guest_email] => 
+    [guest_contact] => 
+    [arrival_date] => 
+    [checkin_time] => 
+    [checkout_time] => 
+    [departure_date] => 
+    [adults_count] => 1
+    [kids_count] => 0
+    [guest_room_id] => 
+    [guest_remarks] => 
+    [venue_ids] => Array
+        (
+            [0] => 1
+            [1] => 2
+        )
+
+    [view_board_qty] => 1
+    [additional_instruction] => 
+    [action] => submit_function
+    [event_type] => Buffet and Celebrations
+    [venue_id] => 1
+    [facilities_schedules] => {"venues":[{"id":"1","name":"Function Room A","floor":"2nd Floor"},{"id":"2","name":"Function Room B","floor":"2nd Floor"}],"schedules":{"1":[{"date":"2026-03-27","endDate":"2026-03-27","start":"07:00","end":"12:00"}],"2":[{"date":"2026-03-27","endDate":"2026-03-27","start":"07:00","end":"12:00"}]}}
+    [miscellaneous_items] => {"basic_sound_system":{"speaker":2,"mic":1},"round_table":{"quantity":6},"banquet_chairs":{"quantity":60},"view_board":{"requested":true}}
+    [terms_agreed_by] => Taehyung, Kim V.
+    [terms_position] => BTS Member
+    [terms_date] => March 26, 2026
+)
+
+[2026-03-26 14:10:49] SPECIFIC CHECK - activity_name: 'Arirang Release'
+[2026-03-26 14:10:49] SPECIFIC CHECK - event_type_id: '3'
+[2026-03-26 14:10:49] BEFORE CLEAN - activity_name: 'Arirang Release'
+[2026-03-26 14:10:49] AFTER CLEAN - activity_name: 'Arirang Release'
+[2026-03-26 14:10:49] event_type_id: 3
+[2026-03-26 14:10:49] FINAL activity_name: 'Arirang Release'
+[2026-03-26 14:10:49] facilities_schedules decoded: Array
+(
+    [venues] => Array
+        (
+            [0] => Array
+                (
+                    [id] => 1
+                    [name] => Function Room A
+                    [floor] => 2nd Floor
+                )
+
+            [1] => Array
+                (
+                    [id] => 2
+                    [name] => Function Room B
+                    [floor] => 2nd Floor
+                )
+
+        )
+
+    [schedules] => Array
+        (
+            [1] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-03-27
+                            [endDate] => 2026-03-27
+                            [start] => 07:00
+                            [end] => 12:00
+                        )
+
+                )
+
+            [2] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-03-27
+                            [endDate] => 2026-03-27
+                            [start] => 07:00
+                            [end] => 12:00
+                        )
+
+                )
+
+        )
+
+)
+
+[2026-03-26 14:10:49] Times - start_datetime: 2026-03-27 07:00, end_datetime: 2026-03-27 12:00
+[2026-03-26 14:10:49] Conflict check passed for all venues
+[2026-03-26 14:10:49] Terms info captured: Taehyung, Kim V. | BTS Member
+[2026-03-26 14:10:49] SQL: INSERT INTO facility_reservations (
+        booking_no, reservation_no, last_name, first_name, middle_initial, 
+        email, contact_number, office_type_id, office_id, external_office_name, 
+        activity_name, event_type_id, venue_id, venue_setup_id, banquet_style_id,
+        start_datetime, end_datetime, participants_count, miscellaneous_items, 
+        additional_instruction
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+[2026-03-26 14:10:49] Success! Inserted ID: 53
+[2026-03-26 14:10:49] Inserted activity_name: Arirang Release
+[2026-03-26 14:10:49] Inserted 2 venue(s) into reservation_venues for reservation ID 53
+[2026-03-26 14:11:01] Email send failed: SMTP Error: Could not connect to SMTP host. Failed to connect to server SMTP server error: Failed to connect to server Additional SMTP info: php_network_getaddresses: getaddrinfo for smtp.gmail.com failed: No such host is known. 

@@ -173,8 +173,8 @@ $assets_base = $base . '/assets/images/';
             <div class="contact-prompt-box scroll-animate scale-in delay-3 float-element">
                 <div class="icon-box"><i class="bi bi-chat-dots-fill"></i></div>
                 <h3 class="section-title">Still have questions?</h3>
-                <p class="lead" style="color: #666; font-size: 1.1rem;">If you cannot find an answer to your question in our FAQ, please feel free to book your reservation now!</p>
-                <a href="reservation.php" class="btn-learn-more mt-3">Book Now</a>
+                <p class="lead" style="color: #666; font-size: 1.1rem;">If you cannot find an answer to your question in our FAQ, please feel free to email us at <a href="mailto:hostel.nasugbu@g.batstate-u.edu.ph" style="color: var(--bsu-red); text-decoration: none; font-weight: 600;">hostel.nasugbu@g.batstate-u.edu.ph</a></p>
+                <a href="mailto:hostel.nasugbu@g.batstate-u.edu.ph" class="btn-learn-more mt-3">Contact Us</a>
             </div>
         </div>
     </section>

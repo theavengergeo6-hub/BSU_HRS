@@ -4072,6 +4072,9 @@ Thank you. We look forward in welcoming your group here at the Hostel!`;
 
         // Reset modal UI elements
         document.getElementById('timeModalDateInput').value = '';
+        var modalEndDateInput = document.getElementById('timeModalEndDate');
+        if (modalEndDateInput) modalEndDateInput.value = '';
+
         document.getElementById('timeModalStart').innerHTML = '<option value="">Select date first</option>';
         document.getElementById('timeModalEnd').innerHTML = '<option value="">Select start time first</option>';
         document.getElementById('bookedSlotsInfo').style.display = 'none';
@@ -4141,6 +4144,11 @@ Thank you. We look forward in welcoming your group here at the Hostel!`;
             dateInput.removeEventListener('change', _timeModalDateHandler);
             _timeModalDateHandler = null;
         }
+        var endInputEl = document.getElementById('timeModalEndDate');
+        if (window._timeModalEndDateHandler && endInputEl) {
+            endInputEl.removeEventListener('change', window._timeModalEndDateHandler);
+            window._timeModalEndDateHandler = null;
+        }
         var startSel = document.getElementById('timeModalStart');
         if (_timeModalStartHandler) {
             startSel.removeEventListener('change', _timeModalStartHandler);
@@ -4178,7 +4186,7 @@ Thank you. We look forward in welcoming your group here at the Hostel!`;
         document.getElementById('timeModalDateInput').addEventListener('change', _timeModalDateHandler);
 
         // Re-fetch when END DATE changes
-        _timeModalEndDateHandler = function () {
+        window._timeModalEndDateHandler = function () {
             var startDate = document.getElementById('timeModalDateInput').value;
             var endDate = this.value;
             if (!startDate || !endDate) return;
@@ -4188,8 +4196,8 @@ Thank you. We look forward in welcoming your group here at the Hostel!`;
                 populateTimeDropdowns(data.available_starts, data.booked_slots, venueId);
             }, myGeneration);
         };
-        var endInputEl = document.getElementById('timeModalEndDate');
-        if (endInputEl) endInputEl.addEventListener('change', _timeModalEndDateHandler);
+        var endInputEl2 = document.getElementById('timeModalEndDate');
+        if (endInputEl2) endInputEl2.addEventListener('change', window._timeModalEndDateHandler);
 
         // Populate end times when start time is selected (named function so it can be removed)
         _timeModalStartHandler = function () {
