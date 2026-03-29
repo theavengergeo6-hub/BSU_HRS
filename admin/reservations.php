@@ -1248,7 +1248,7 @@ foreach ($rows as $row):
             var all = guestStays.filter(function (ev) {
                 var inTs  = new Date(ev.arrival_date).getTime();
                 var outTs = new Date(ev.departure_date).getTime();
-                return clickedTs >= inTs && clickedTs < outTs;
+                return clickedTs >= inTs && clickedTs <= outTs;
             });
 
             // Dedupe by id (take first occurrence)

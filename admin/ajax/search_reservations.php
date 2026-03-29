@@ -8,7 +8,7 @@ if (!isAdminLoggedIn()) {
 }
 
 $query = $_GET['q'] ?? '';
-$view  = $_GET['view'] ?? 'function';
+$view = $_GET['view'] ?? 'function';
 
 if (strlen($query) < 2) {
     echo json_encode([]);
@@ -35,7 +35,8 @@ if ($view === 'function') {
         $row['formatted_date'] = date('M d, Y', strtotime($row['start_datetime']));
         $results[] = $row;
     }
-} else {
+}
+else {
     $sql = "SELECT gr.id, gr.guest_name as title, gr.check_in_date as start_datetime, gr.check_out_date as end_datetime, gr.status,
                    g.room_name as requester
             FROM guest_room_reservations gr
