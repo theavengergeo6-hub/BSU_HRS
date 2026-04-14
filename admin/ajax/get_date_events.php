@@ -58,15 +58,26 @@ array_unshift($refs, $types);
 call_user_func_array([$stmt, 'bind_param'], $refs);
 $stmt->execute();
 $res  = $stmt->get_result();
-$rows = []; $seen = [];
+$rows = []; $ordered_ids = [];
 while ($row = $res->fetch_assoc()) {
-    if (empty($seen[$row['id']])) { $rows[] = $row; $seen[$row['id']] = true; }
+    $rid = $row['id'];
+    $vinf = $row['venue_name'] . ($row['floor'] ? ' (' . $row['floor'] . ')' : '');
+    if (!isset($rows[$rid])) {
+        $ordered_ids[] = $rid;
+        $row['all_venues'] = [$vinf];
+        $rows[$rid] = $row;
+    } else {
+        if (!in_array($vinf, $rows[$rid]['all_venues'])) {
+            $rows[$rid]['all_venues'][] = $vinf;
+        }
+    }
 }
 if (empty($rows)) {
     echo '<div class="text-center py-5"><i class="bi bi-calendar-x fs-1 text-muted d-block mb-2"></i>No events scheduled for this day.</div>';
     exit;
 }
-foreach ($rows as $row):
+foreach ($ordered_ids as $rid):
+    $row = $rows[$rid];
     $sc  = strtolower($row['status']);
     $pil = $sc==='approved'?'pill-approved':($sc==='pending'?'pill-pending':'pill-pencil');
     $s   = new DateTime($row['start_datetime']);
@@ -79,7 +90,7 @@ foreach ($rows as $row):
     </div>
     <div class="event-time"><i class="bi bi-clock me-1"></i><?= $s->format('g:i A') ?> – <?= $e->format('g:i A') ?></div>
     <div class="event-details">
-        <div class="event-detail-item"><i class="bi bi-building"></i><span><?= htmlspecialchars($row['venue_name'].' ('.$row['floor'].')')?></span></div>
+        <div class="event-detail-item"><i class="bi bi-building"></i><span><?= htmlspecialchars(implode(', ', $row['all_venues'])) ?></span></div>
         <div class="event-detail-item"><i class="bi bi-person"></i><span><?= htmlspecialchars($row['requester']) ?></span></div>
         <div class="event-detail-item"><i class="bi bi-people"></i><span><?= $row['participants_count'] ?> participants</span></div>
         <div class="event-detail-item"><i class="bi bi-briefcase"></i><span><?= htmlspecialchars($row['office_type_name']??'N/A') ?><?php if (!empty($row['office_name'])): ?> – <?= htmlspecialchars($row['office_name']) ?><?php endif; ?></span></div>

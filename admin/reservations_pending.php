@@ -97,9 +97,30 @@ $reservations = $conn->query("
             r.additional_instruction,
             v.name as venue_name, 
             v.floor,
-            CONCAT(r.last_name, ', ', r.first_name) as requester_name
+            CONCAT(r.last_name, ', ', r.first_name) as requester_name,
+            r.created_at
         FROM facility_reservations r
         JOIN venues v ON r.venue_id = v.id
+        WHERE r.status IN ('pending', 'pencil_booked')
+        
+        UNION ALL
+
+        SELECT 
+            'function' AS res_type,
+            r.id, 
+            r.activity_name,
+            r.status,
+            r.start_datetime,
+            r.end_datetime,
+            r.participants_count,
+            r.additional_instruction,
+            v.name as venue_name, 
+            v.floor,
+            CONCAT(r.last_name, ', ', r.first_name) as requester_name,
+            r.created_at
+        FROM reservation_venues rv
+        JOIN facility_reservations r ON rv.reservation_id = r.id
+        JOIN venues v ON rv.venue_id = v.id
         WHERE r.status IN ('pending', 'pencil_booked')
         
         UNION ALL
@@ -115,17 +136,13 @@ $reservations = $conn->query("
             gr.special_requests AS additional_instruction,
             g.room_name AS venue_name,
             g.floor AS floor,
-            gr.guest_name AS requester_name
+            gr.guest_name AS requester_name,
+            gr.created_at
         FROM guest_room_reservations gr
         JOIN guest_rooms g ON gr.guest_room_id = g.id
         WHERE gr.status IN ('pending', 'pencil_booked') AND gr.deleted = 0
     ) AS combined
-    ORDER BY 
-        CASE status 
-            WHEN 'pending' THEN 1 
-            WHEN 'pencil_booked' THEN 2 
-        END,
-        start_datetime ASC
+    ORDER BY created_at DESC
 ");
 
 // Get separate counts
@@ -795,9 +812,26 @@ $guest_max_id = $conn->query("SELECT MAX(id) as max_id FROM guest_room_reservati
     <!-- Reservations Grid -->
     <?php if ($total_count > 0): ?>
         <div class="reservation-grid" id="reservationGrid">
+            <div class="reservations-container">
             <?php 
-            $reservations->data_seek(0); // Reset pointer
-            while ($row = $reservations->fetch_assoc()): 
+            $aggregated = [];
+            $ordered_keys = [];
+            while ($row = $reservations->fetch_assoc()) {
+                $key = $row['res_type'] . '_' . $row['id'];
+                $vinf = $row['venue_name'] . ($row['floor'] ? ' (' . $row['floor'] . ')' : '');
+                if (!isset($aggregated[$key])) {
+                    $ordered_keys[] = $key;
+                    $row['all_venues'] = [$vinf];
+                    $aggregated[$key] = $row;
+                } else {
+                    if (!in_array($vinf, $aggregated[$key]['all_venues'])) {
+                        $aggregated[$key]['all_venues'][] = $vinf;
+                    }
+                }
+            }
+
+            foreach ($ordered_keys as $key):
+                $row = $aggregated[$key];
                 $is_pending = $row['status'] === 'pending';
                 $card_class = $is_pending ? 'pending-card' : 'pencil-card';
                 $badge_class = $is_pending ? 'pending' : 'pencil';
@@ -832,7 +866,7 @@ $guest_max_id = $conn->query("SELECT MAX(id) as max_id FROM guest_room_reservati
                         <div class="detail-icon"><i class="bi bi-building"></i></div>
                         <div class="detail-content">
                             <div class="detail-label">Venue</div>
-                            <div class="detail-value"><?= htmlspecialchars($row['venue_name'] . ' (' . $row['floor'] . ')') ?></div>
+                            <div class="detail-value"><?= htmlspecialchars(implode(', ', $row['all_venues'])) ?></div>
                         </div>
                     </div>
                     
@@ -879,7 +913,7 @@ $guest_max_id = $conn->query("SELECT MAX(id) as max_id FROM guest_room_reservati
                     </button>
                 </div>
             </div>
-            <?php endwhile; ?>
+            <?php endforeach; ?>
         </div>
     <?php else: ?>
         <div class="empty-state">
