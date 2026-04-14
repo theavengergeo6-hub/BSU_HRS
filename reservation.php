@@ -1277,14 +1277,13 @@ if ($selected_customer_type) {
                                     name="email" id="email" required></div>
                         </div>
                         <div class="col-md-4">
-                            <div class="form-group"><label>Contact Number *</label><input type="tel"
-                                    class="form-control" name="contact" id="contact" maxlength="11" pattern="[0-9]{11}"
-                                    required></div>
+                            <div class="form-group"><label>Contact Number</label><input type="tel" class="form-control"
+                                    name="contact" id="contact" maxlength="11" pattern="[0-9]{11}"></div>
                         </div>
                         <div class="col-md-4">
-                            <div class="form-group"><label>Position / Designation *</label>
+                            <div class="form-group"><label>Position / Designation</label>
                                 <input type="text" id="termsPosition" name="position" class="form-control"
-                                    placeholder="e.g. Dean / Professor" required>
+                                    placeholder="e.g. Dean / Professor">
                             </div>
                         </div>
                     </div>
@@ -1297,7 +1296,8 @@ if ($selected_customer_type) {
                                     <?php foreach ($office_types as $ot): ?>
                                         <option value="<?= (int) $ot['id'] ?>"
                                             data-name="<?= htmlspecialchars($ot['name']) ?>">
-                                            <?= htmlspecialchars($ot['name']) ?></option>
+                                            <?= htmlspecialchars($ot['name']) ?>
+                                        </option>
                                     <?php endforeach; ?>
                                 </select>
                             </div>
@@ -1412,9 +1412,9 @@ if ($selected_customer_type) {
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label>Contact Number *</label>
+                                        <label>Contact Number</label>
                                         <input type="tel" class="form-control" name="guest_contact" id="guest_contact"
-                                            maxlength="11" pattern="[0-9]{11}" required>
+                                            maxlength="11" pattern="[0-9]{11}">
                                     </div>
                                 </div>
                             </div>
@@ -2787,7 +2787,6 @@ Thank you. We look forward in welcoming your group here at the Hostel!`;
             { id: 'guest_dob', label: 'Date of Birth' },
             { id: 'guest_address', label: 'Address' },
             { id: 'guest_email', label: 'Email Address' },
-            { id: 'guest_contact', label: 'Contact Number' },
             { id: 'arrival_date', label: 'Arrival Date' },
             { id: 'checkin_time', label: 'Check-in Time' },
             { id: 'departure_date', label: 'Departure Date' },
@@ -5271,14 +5270,14 @@ Thank you. We look forward in welcoming your group here at the Hostel!`;
         // Prevent Enter / Next Line on Additional Instructions (Function Room)
         var addInstEl = document.getElementById('additionalInstruction');
         if (addInstEl) {
-            addInstEl.addEventListener('keydown', function(e) {
+            addInstEl.addEventListener('keydown', function (e) {
                 if (e.key === 'Enter') {
                     e.preventDefault();
                     return false;
                 }
             });
             // Also prevent paste of newlines
-            addInstEl.addEventListener('paste', function(e) {
+            addInstEl.addEventListener('paste', function (e) {
                 var text = (e.clipboardData || window.clipboardData).getData('text');
                 if (text.includes('\n') || text.includes('\r')) {
                     e.preventDefault();

@@ -93,7 +93,6 @@ if (!$first_name)      $missing[] = 'First Name';
 if (!$guest_dob)       $missing[] = 'Date of Birth';
 if (!$guest_address)   $missing[] = 'Address';
 if (!$guest_email)     $missing[] = 'Email';
-if (!$guest_contact)   $missing[] = 'Contact Number';
 if (!$check_in_date)   $missing[] = 'Arrival Date';
 if (!$check_out_date)  $missing[] = 'Departure Date';
 if (!$check_in_time)   $missing[] = 'Check-in Time';

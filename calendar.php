@@ -40,7 +40,9 @@ $color_index = 0;
 while ($row = $venue_query->fetch_assoc()) {
     $rooms_filter_list[] = $row;
     // Assign a default color based on index
-    $venues_colors[$row['id']] = $default_colors[$color_index % count($default_colors)];
+    $color = $default_colors[$color_index % count($default_colors)];
+    $venues_colors[$row['id']] = $color;
+    $venue_name_colors[$row['name']] = $color; // Map name to color
     $color_index++;
 }
 
@@ -125,10 +127,14 @@ while($row = $v_res->fetch_assoc()){
 
 // 2. Fetch all guest room reservations that intersect the visible range
 $g_query = $conn->prepare("
-    SELECT gr.id as reservation_id, gr.check_in_date as start_datetime, gr.check_out_date as end_datetime,
+    SELECT gr.id as reservation_id, 
+           gr.check_in_date as start_date, 
+           gr.check_out_date as end_date,
+           gr.check_in_time, 
+           gr.check_out_time,
            g.room_name as venue_name, g.id as venue_id, g.floor,
-           gr.guest_name as activity_name, 'Guest Stay' as event_type_name,
-           gr.guest_name, 'Guest' as office_type_name,
+           gr.guest_name as activity_name, 
+           gr.guest_name, 
            gr.status
     FROM guest_room_reservations gr
     JOIN guest_rooms g ON gr.guest_room_id = g.id
@@ -136,29 +142,36 @@ $g_query = $conn->prepare("
       AND gr.status IN ('approved', 'confirmed', 'checked_in')
       AND gr.check_in_date <= ?
       AND gr.check_out_date >= ?
+" . ($filter_venue > 0 ? " AND g.room_name = (SELECT name FROM venues WHERE id = $filter_venue LIMIT 1)" : "") . "
     ORDER BY gr.check_in_date ASC
 ");
 
-$g_query->bind_param("ss", $range_end_bound, $range_start_bound);
+// Use bounds to ensure we get everything visible
+$range_start_sql = $range_start_dt;
+$range_end_sql = $range_end_dt;
+$g_query->bind_param("ss", $range_end_sql, $range_start_sql);
 $g_query->execute();
 $g_res = $g_query->get_result();
 
-$guest_color = '#6a1b9a'; // Purple for guest rooms
+$guest_color = '#f4511e'; // Deep Orange for guest rooms (distinct from venue colors)
 
 while($row = $g_res->fetch_assoc()){
     $rid = 'G' . $row['reservation_id']; // Prefix to avoid collision
     
+    // Get color from venue name mapping or fallback to Purple (Guest Rooms All)
+    $mapped_color = $venue_name_colors[$row['venue_name']] ?? $venue_name_colors['Guest Rooms (All)'] ?? '#6a1b9a';
+
     $v_info = [
         'id' => $row['venue_id'],
         'name' => $row['venue_name'],
         'floor' => $row['floor'],
-        'color' => $guest_color,
+        'color' => $mapped_color,
         'is_guest' => true
     ];
 
     // Place it on every day it spans within the visible range
-    $start_dt = new DateTime($row['start_datetime']);
-    $end_dt   = new DateTime($row['end_datetime']);
+    $start_dt = new DateTime($row['start_date']);
+    $end_dt   = new DateTime($row['end_date']);
     $range_end = new DateTime($range_end_dt);
     
     // Iterate from start date to end date inclusive
@@ -173,29 +186,41 @@ while($row = $g_res->fetch_assoc()){
         if(!isset($events_by_date[$d])) $events_by_date[$d] = [];
         
         $curr_row = $row;
-        $curr_row['venues'] = [$v_info];
         $curr_row['is_guest'] = true;
+        
+        // Determine labels based on the date within the stay
+        if ($d === $row['start_date']) {
+            $curr_row['event_type_name'] = 'Guest Check-in';
+            $curr_row['office_type_name'] = 'BSU Hostel Accommodation';
+        } elseif ($d === $row['end_date']) {
+            $curr_row['event_type_name'] = 'Guest Checkout';
+            $curr_row['office_type_name'] = 'BSU Hostel Accommodation';
+        } else {
+            $curr_row['event_type_name'] = 'Stay';
+            $curr_row['office_type_name'] = 'BSU Hostel Accommodation';
+        }
+        
+        $curr_row['start_datetime'] = $d . ' ' . $row['check_in_time'];
+        $curr_row['end_datetime'] = $d . ' ' . $row['check_out_time'];
+        
+        $curr_row['venues'] = [$v_info];
         $events_by_date[$d][$rid] = $curr_row;
         
         $iter->modify('+1 day');
     }
 }
 
-// Flatten the associative reservation IDs back to simple lists for display logic
+// 3. Flatten and Sort: Convert associative maps to lists and prioritize Guest Rooms
 foreach($events_by_date as $d => $events_map){
     $events_by_date[$d] = array_values($events_map);
-    // Deduplicate venues in each event (since same reservations might have multiple venues)
-    foreach($events_by_date[$d] as &$ev){
-        $temp_venues = [];
-        $vids = [];
-        foreach($ev['venues'] as $v){
-            if(!in_array($v['id'], $vids)){
-                $temp_venues[] = $v;
-                $vids[] = $v['id'];
-            }
-        }
-        $ev['venues'] = $temp_venues;
-    }
+    // Sort to prioritize guest reservations so they appear first in the grid
+    usort($events_by_date[$d], function($a, $b) {
+        $aIsGuest = isset($a['is_guest']) && $a['is_guest'];
+        $bIsGuest = isset($b['is_guest']) && $b['is_guest'];
+        if ($aIsGuest && !$bIsGuest) return -1;
+        if (!$aIsGuest && $bIsGuest) return 1;
+        return 0;
+    });
 }
 
 // Calendar calculations (month_start already defined above)
@@ -637,6 +662,11 @@ $today = date('Y-m-d');
     box-shadow: 0 4px 12px rgba(0,0,0,0.05);
 }
 
+.day-event-card.guest-event {
+    border-left: 5px solid #6a1b9a;
+    background: #fdfaff;
+}
+
 .day-event-title {
     font-size: 1.1rem;
     font-weight: 600;
@@ -1031,11 +1061,26 @@ function showDayEvents(date, formattedDate) {
                 officeInfo += ' - ' + event.external_office_name;
             }
             
+            let timeDisplay = `${startTime} – ${endTime}`;
+            
+            if (event.is_guest) {
+                let checkIn = formatTimeStr(event.check_in_time);
+                let checkOut = formatTimeStr(event.check_out_time);
+                
+                if (event.event_type_name.includes('Check-in')) {
+                    timeDisplay = 'Check-in at ' + checkIn;
+                } else if (event.event_type_name.includes('Checkout')) {
+                    timeDisplay = 'Checkout at ' + checkOut;
+                } else {
+                    timeDisplay = 'In House Stay';
+                }
+            }
+            
             html += `
-                <div class="day-event-card">
+                <div class="day-event-card ${event.is_guest ? 'guest-event' : ''}">
                     <div class="day-event-title">${escapeHtml(event.activity_name)}</div>
                     <div class="day-event-time">
-                        <i class="bi bi-clock-fill"></i> ${startTime} – ${endTime}
+                        <i class="bi bi-clock-fill"></i> ${timeDisplay}
                     </div>
                     <div class="day-event-details">
                         <div class="day-event-detail">
@@ -1046,12 +1091,12 @@ function showDayEvents(date, formattedDate) {
                             <i class="bi bi-briefcase"></i>
                             <span>${escapeHtml(officeInfo)}</span>
                         </div>
-                        ${event.is_guest ? `
+                        ${event.is_guest ? '' : (event.first_name ? `
                         <div class="day-event-detail text-primary fw-bold">
                             <i class="bi bi-person-check"></i>
-                            <span>Guest: ${escapeHtml(event.guest_name || '')}</span>
+                            <span>Contact: ${escapeHtml(event.first_name + ' ' + event.last_name)}</span>
                         </div>
-                        ` : ''}
+                        ` : '')}
                     </div>
                     <div class="day-event-venues">
             `;
@@ -1093,6 +1138,17 @@ function showDayEvents(date, formattedDate) {
 
 function closeDayEventsModal() {
     document.getElementById('dayEventsModal').classList.remove('show');
+}
+
+function formatTimeStr(time24) {
+    if (!time24) return 'N/A';
+    // Handle HH:mm:ss or HH:mm
+    let [h, m] = time24.split(':');
+    h = parseInt(h);
+    let ampm = h >= 12 ? 'PM' : 'AM';
+    h = h % 12;
+    h = h ? h : 12; // the hour '0' should be '12'
+    return h + ':' + m.substring(0,2) + ' ' + ampm;
 }
 
 function escapeHtml(text) {

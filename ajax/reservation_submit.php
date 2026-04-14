@@ -67,7 +67,6 @@ try {
     if (!$last_name) $errors[] = 'Last name is required';
     if (!$first_name) $errors[] = 'First name is required';
     if (!$email) $errors[] = 'Email is required';
-    if (!$contact) $errors[] = 'Contact number is required';
     if (!$office_type_id) $errors[] = 'Office type is required';
     if (!$venue_id) $errors[] = 'Venue is required';
     

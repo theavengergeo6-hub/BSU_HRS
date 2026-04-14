@@ -668,18 +668,16 @@ foreach ($rows as $row):
          FUNCTION ROOM CALENDAR
          ════════════════════════════════════════════════════════════════════ -->
 
-    <?php if ($global_pending_total > 0 || $global_pencil_total > 0): ?>
-    <div class="pending-banner">
+    <div class="pending-banner" id="pendingBanner" style="<?= ($global_pending_total > 0 || $global_pencil_total > 0) ? '' : 'display:none;' ?>">
         <div class="banner-content">
             <div class="banner-icon"><i class="bi bi-bell-fill"></i></div>
             <div class="banner-text">
-                <h3><?= $global_pending_total ?> pending &amp; <?= $global_pencil_total ?> pencil-booked reservation<?= ($global_pending_total+$global_pencil_total)!=1?'s':'' ?> awaiting action</h3>
+                <h3 id="bannerText"><?= $global_pending_total ?> pending &amp; <?= $global_pencil_total ?> pencil-booked reservation<?= ($global_pending_total+$global_pencil_total)!=1?'s':'' ?> awaiting action</h3>
                 <p>Click to review and approve</p>
             </div>
         </div>
         <a href="reservations_pending.php?status=pending" class="btn btn-sm btn-warning fw-semibold">Review Now</a>
     </div>
-    <?php endif; ?>
 
     <!-- Stats -->
     <div class="stats-grid">

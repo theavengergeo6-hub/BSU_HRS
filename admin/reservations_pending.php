@@ -143,6 +143,10 @@ $pencil_count = $conn->query("
     ) as count
 ")->fetch_assoc()['count'];
 $total_count = $pending_count + $pencil_count;
+
+// Get current max IDs for real-time tracking
+$fac_max_id = $conn->query("SELECT MAX(id) as max_id FROM facility_reservations")->fetch_assoc()['max_id'] ?? 0;
+$guest_max_id = $conn->query("SELECT MAX(id) as max_id FROM guest_room_reservations")->fetch_assoc()['max_id'] ?? 0;
 ?>
 
 <style>
@@ -722,14 +726,14 @@ $total_count = $pending_count + $pencil_count;
 
     <!-- Status Tabs -->
     <div class="status-tabs">
-        <div class="status-tab active" onclick="filterReservations('all')">
-            All <span class="count"><?= $total_count ?></span>
+        <div class="status-tab active" data-filter="all" onclick="filterReservations('all')">
+            All <span class="count" id="count-all"><?= $total_count ?></span>
         </div>
-        <div class="status-tab pending-tab" onclick="filterReservations('pending')">
-            Pending <span class="count"><?= $pending_count ?></span>
+        <div class="status-tab pending-tab" data-filter="pending" onclick="filterReservations('pending')">
+            Pending <span class="count" id="count-pending"><?= $pending_count ?></span>
         </div>
-        <div class="status-tab pencil-tab" onclick="filterReservations('pencil')">
-            Pencil Booked <span class="count"><?= $pencil_count ?></span>
+        <div class="status-tab pencil-tab" data-filter="pencil" onclick="filterReservations('pencil')">
+            Pencil Booked <span class="count" id="count-pencil"><?= $pencil_count ?></span>
         </div>
     </div>
 
@@ -771,19 +775,19 @@ $total_count = $pending_count + $pencil_count;
     
     <div class="quick-stats">
         <div class="quick-stat-card">
-            <div class="quick-stat-number"><?= $total_count ?></div>
+            <div class="quick-stat-number" id="stats-total"><?= $total_count ?></div>
             <div class="quick-stat-label">Total to Review</div>
         </div>
         <div class="quick-stat-card">
-            <div class="quick-stat-number"><?= $pending_count ?></div>
+            <div class="quick-stat-number" id="stats-pending"><?= $pending_count ?></div>
             <div class="quick-stat-label">Pending</div>
         </div>
         <div class="quick-stat-card">
-            <div class="quick-stat-number"><?= $pencil_count ?></div>
+            <div class="quick-stat-number" id="stats-pencil"><?= $pencil_count ?></div>
             <div class="quick-stat-label">Pencil Booked</div>
         </div>
         <div class="quick-stat-card">
-            <div class="quick-stat-number"><?= $most_requested ? substr($most_requested['name'], 0, 10) . '...' : 'N/A' ?></div>
+            <div class="quick-stat-number" id="stats-venue"><?= $most_requested ? substr($most_requested['name'], 0, 10) . '...' : 'N/A' ?></div>
             <div class="quick-stat-label">Top Venue</div>
         </div>
     </div>
@@ -1045,12 +1049,80 @@ function viewDetails(id, resType) {
     }
 }
 
-// Real-time updates — reload every 30 seconds
+// Real-time updates — polling every 5 seconds
+let currentFilter = 'all';
+
 function checkForUpdates() {
-    setTimeout(function() {
-        location.reload();
-    }, 30000);
+    fetch(`ajax/check_new_reservations.php?last_fac_id=${window.globalFacMaxId}&last_guest_id=${window.globalGuestMaxId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.has_new) {
+                console.log('New reservations detected! Updating grid...');
+                updateReservationGrid();
+            }
+        })
+        .catch(err => console.error('Polling error:', err))
+        .finally(() => {
+            setTimeout(checkForUpdates, 5000);
+        });
 }
+
+function updateReservationGrid() {
+    const grid = document.getElementById('reservationGrid');
+    if (!grid) {
+        // If grid doesn't exist (empty state), we might need to refresh the whole area
+        location.reload(); 
+        return;
+    }
+
+    fetch('ajax/get_pending_reservations_data.php')
+        .then(response => response.json())
+        .then(data => {
+            // Update counts in tabs
+            document.getElementById('count-all').textContent = data.counts.total;
+            document.getElementById('count-pending').textContent = data.counts.pending;
+            document.getElementById('count-pencil').textContent = data.counts.pencil;
+
+            // Update stats cards
+            document.getElementById('stats-total').textContent = data.counts.total;
+            document.getElementById('stats-pending').textContent = data.counts.pending;
+            document.getElementById('stats-pencil').textContent = data.counts.pencil;
+            document.getElementById('stats-venue').textContent = data.top_venue;
+
+            // Update sidebar badge if it exists
+            const sidebarBadge = document.querySelector('.sidebar-nav a[href="reservations.php"] .badge-count');
+            if (sidebarBadge) {
+                sidebarBadge.textContent = data.counts.pending;
+                if (data.counts.pending > 0) {
+                    sidebarBadge.classList.remove('d-none');
+                } else {
+                    sidebarBadge.classList.add('d-none');
+                }
+            }
+
+            // Update grid HTML
+            grid.innerHTML = data.html;
+
+            // Update max IDs
+            window.globalFacMaxId = data.max_ids.facility;
+            window.globalGuestMaxId = data.max_ids.guest;
+
+            // Re-apply current filter
+            filterReservations(currentFilter);
+            
+            // Show a notification if something new really came in
+            // (Optional: sound alert or toast)
+        })
+        .catch(err => console.error('Update error:', err));
+}
+
+// Update filter function to track current filter
+const originalFilterReservations = filterReservations;
+filterReservations = function(status) {
+    currentFilter = status;
+    originalFilterReservations(status);
+};
+
 checkForUpdates();
 
 // Auto-hide messages after 3 seconds

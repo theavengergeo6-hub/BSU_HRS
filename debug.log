@@ -6990,3 +6990,694 @@ water dispenser
 [2026-03-27 23:06:20] Inserted activity_name: TRAINING
 [2026-03-27 23:06:20] Inserted 1 venue(s) into reservation_venues for reservation ID 55
 [2026-03-27 23:07:10] Confirmation email sent to gomarideguzman@gmail.com
+[2026-03-30 07:26:38] ========== START reservation_submit.php ==========
+[2026-03-30 13:26:38] RAW POST data: Array
+(
+    [reservation_type] => function
+    [last_name] => Bayot
+    [first_name] => Leila
+    [middle_initial] => T
+    [email] => hmsociety@g.batstate-u.edu.ph
+    [contact] => 09287842104
+    [position] => Head, Job Placement Office
+    [office_type_id] => 1
+    [office_id] => 1
+    [event_type_id] => 2
+    [activity_name] => Fruit and Vegetable Carving Seminar & Workshop
+    [participants] => 200
+    [banquet_style_id] => 3
+    [guest_last_name] => 
+    [guest_first_name] => 
+    [guest_middle_initial] => 
+    [guest_dob] => 
+    [guest_address] => 
+    [guest_email] => 
+    [guest_contact] => 
+    [arrival_date] => 
+    [checkin_time] => 
+    [checkout_time] => 
+    [departure_date] => 
+    [adults_count] => 1
+    [kids_count] => 0
+    [guest_room_id] => 
+    [guest_remarks] => 
+    [venue_ids] => Array
+        (
+            [0] => 1
+            [1] => 2
+            [2] => 3
+            [3] => 4
+            [4] => 5
+        )
+
+    [view_board_qty] => 1
+    [additional_instruction] => per batch event...
+    [action] => submit_function
+    [event_type] => Seminar and Lecture
+    [venue_id] => 1
+    [facilities_schedules] => {"venues":[{"id":"1","name":"Function Room A","floor":"2nd Floor"},{"id":"2","name":"Function Room B","floor":"2nd Floor"},{"id":"3","name":"Function Room C","floor":"2nd Floor"},{"id":"4","name":"Function Room D","floor":"2nd Floor"},{"id":"5","name":"Function Room E","floor":"2nd Floor"}],"schedules":{"1":[{"date":"2026-05-07","endDate":"2026-05-09","start":"07:00","end":"17:30"}],"2":[{"date":"2026-05-07","endDate":"2026-05-09","start":"07:00","end":"17:30"}],"3":[{"date":"2026-05-07","endDate":"2026-05-09","start":"07:00","end":"17:30"}],"4":[{"date":"2026-05-07","endDate":"2026-05-09","start":"07:00","end":"17:30"}],"5":[{"date":"2026-05-07","endDate":"2026-05-09","start":"07:00","end":"17:30"}]}}
+    [miscellaneous_items] => {"basic_sound_system":{"speaker":1,"mic":2},"banquet_chairs":{"quantity":190},"rectangular_table":{"quantity":6}}
+    [terms_agreed_by] => Bayot, Leila T.
+    [terms_position] => Head, Job Placement Office
+    [terms_date] => March 30, 2026
+)
+
+[2026-03-30 13:26:38] SPECIFIC CHECK - activity_name: 'Fruit and Vegetable Carving Seminar & Workshop'
+[2026-03-30 13:26:38] SPECIFIC CHECK - event_type_id: '2'
+[2026-03-30 13:26:38] BEFORE CLEAN - activity_name: 'Fruit and Vegetable Carving Seminar & Workshop'
+[2026-03-30 13:26:38] AFTER CLEAN - activity_name: 'Fruit and Vegetable Carving Seminar &amp; Workshop'
+[2026-03-30 13:26:38] event_type_id: 2
+[2026-03-30 13:26:38] FINAL activity_name: 'Fruit and Vegetable Carving Seminar &amp; Workshop'
+[2026-03-30 13:26:38] facilities_schedules decoded: Array
+(
+    [venues] => Array
+        (
+            [0] => Array
+                (
+                    [id] => 1
+                    [name] => Function Room A
+                    [floor] => 2nd Floor
+                )
+
+            [1] => Array
+                (
+                    [id] => 2
+                    [name] => Function Room B
+                    [floor] => 2nd Floor
+                )
+
+            [2] => Array
+                (
+                    [id] => 3
+                    [name] => Function Room C
+                    [floor] => 2nd Floor
+                )
+
+            [3] => Array
+                (
+                    [id] => 4
+                    [name] => Function Room D
+                    [floor] => 2nd Floor
+                )
+
+            [4] => Array
+                (
+                    [id] => 5
+                    [name] => Function Room E
+                    [floor] => 2nd Floor
+                )
+
+        )
+
+    [schedules] => Array
+        (
+            [1] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-05-07
+                            [endDate] => 2026-05-09
+                            [start] => 07:00
+                            [end] => 17:30
+                        )
+
+                )
+
+            [2] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-05-07
+                            [endDate] => 2026-05-09
+                            [start] => 07:00
+                            [end] => 17:30
+                        )
+
+                )
+
+            [3] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-05-07
+                            [endDate] => 2026-05-09
+                            [start] => 07:00
+                            [end] => 17:30
+                        )
+
+                )
+
+            [4] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-05-07
+                            [endDate] => 2026-05-09
+                            [start] => 07:00
+                            [end] => 17:30
+                        )
+
+                )
+
+            [5] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-05-07
+                            [endDate] => 2026-05-09
+                            [start] => 07:00
+                            [end] => 17:30
+                        )
+
+                )
+
+        )
+
+)
+
+[2026-03-30 13:26:38] Times - start_datetime: 2026-05-07 07:00, end_datetime: 2026-05-09 17:30
+[2026-03-30 13:26:38] Conflict check passed for all venues
+[2026-03-30 13:26:38] Terms info captured: Bayot, Leila T. | Head, Job Placement Office
+[2026-03-30 13:26:38] SQL: INSERT INTO facility_reservations (
+        booking_no, reservation_no, last_name, first_name, middle_initial, 
+        email, contact_number, office_type_id, office_id, external_office_name, 
+        activity_name, event_type_id, venue_id, venue_setup_id, banquet_style_id,
+        start_datetime, end_datetime, participants_count, miscellaneous_items, 
+        additional_instruction
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+[2026-03-30 13:26:38] Success! Inserted ID: 56
+[2026-03-30 13:26:38] Inserted activity_name: Fruit and Vegetable Carving Seminar &amp; Workshop
+[2026-03-30 13:26:38] Inserted 5 venue(s) into reservation_venues for reservation ID 56
+[2026-03-30 13:27:04] Confirmation email sent to hmsociety@g.batstate-u.edu.ph
+[2026-03-30 07:54:02] ========== START reservation_submit.php ==========
+[2026-03-30 13:54:02] RAW POST data: Array
+(
+    [reservation_type] => function
+    [last_name] => TOLENTINO 
+    [first_name] => JONA MARIE
+    [middle_initial] => 
+    [email] => jonamarietolentino1128@gmail.com
+    [contact] => 09483320398
+    [position] => Student Program Leader
+    [office_type_id] => 1
+    [office_id] => 1
+    [event_type_id] => 5
+    [activity_name] => Asian Cuisine Culminating "Filipino Cuisine"
+    [participants] => 100
+    [banquet_style_id] => 11
+    [guest_last_name] => 
+    [guest_first_name] => 
+    [guest_middle_initial] => 
+    [guest_dob] => 
+    [guest_address] => 
+    [guest_email] => 
+    [guest_contact] => 
+    [arrival_date] => 
+    [checkin_time] => 
+    [checkout_time] => 
+    [departure_date] => 
+    [adults_count] => 1
+    [kids_count] => 0
+    [guest_room_id] => 
+    [guest_remarks] => 
+    [venue_ids] => Array
+        (
+            [0] => 1
+            [1] => 2
+            [2] => 3
+            [3] => 4
+            [4] => 5
+        )
+
+    [view_board_qty] => 1
+    [additional_instruction] => Dispenser- 1
+    [action] => submit_function
+    [event_type] => Programs and Special Events
+    [venue_id] => 1
+    [facilities_schedules] => {"venues":[{"id":"1","name":"Function Room A","floor":"2nd Floor"},{"id":"2","name":"Function Room B","floor":"2nd Floor"},{"id":"3","name":"Function Room C","floor":"2nd Floor"},{"id":"4","name":"Function Room D","floor":"2nd Floor"},{"id":"5","name":"Function Room E","floor":"2nd Floor"}],"schedules":{"1":[{"date":"2026-05-04","endDate":"2026-05-04","start":"07:00","end":"17:00"}],"2":[{"date":"2026-05-04","endDate":"2026-05-04","start":"07:00","end":"17:00"}],"3":[{"date":"2026-05-04","endDate":"2026-05-04","start":"07:00","end":"17:00"}],"4":[{"date":"2026-05-04","endDate":"2026-05-04","start":"07:00","end":"17:30"}],"5":[{"date":"2026-05-04","endDate":"2026-05-04","start":"07:00","end":"17:00"}]}}
+    [miscellaneous_items] => {"basic_sound_system":{"speaker":2,"mic":2},"round_table":{"quantity":15},"banquet_chairs":{"quantity":100},"view_board":{"requested":true},"rectangular_table":{"quantity":4}}
+    [terms_agreed_by] => TOLENTINO , JONA MARIE
+    [terms_position] => Student Program Leader
+    [terms_date] => March 30, 2026
+)
+
+[2026-03-30 13:54:02] SPECIFIC CHECK - activity_name: 'Asian Cuisine Culminating "Filipino Cuisine"'
+[2026-03-30 13:54:02] SPECIFIC CHECK - event_type_id: '5'
+[2026-03-30 13:54:02] BEFORE CLEAN - activity_name: 'Asian Cuisine Culminating "Filipino Cuisine"'
+[2026-03-30 13:54:02] AFTER CLEAN - activity_name: 'Asian Cuisine Culminating &quot;Filipino Cuisine&quot;'
+[2026-03-30 13:54:02] event_type_id: 5
+[2026-03-30 13:54:02] FINAL activity_name: 'Asian Cuisine Culminating &quot;Filipino Cuisine&quot;'
+[2026-03-30 13:54:02] facilities_schedules decoded: Array
+(
+    [venues] => Array
+        (
+            [0] => Array
+                (
+                    [id] => 1
+                    [name] => Function Room A
+                    [floor] => 2nd Floor
+                )
+
+            [1] => Array
+                (
+                    [id] => 2
+                    [name] => Function Room B
+                    [floor] => 2nd Floor
+                )
+
+            [2] => Array
+                (
+                    [id] => 3
+                    [name] => Function Room C
+                    [floor] => 2nd Floor
+                )
+
+            [3] => Array
+                (
+                    [id] => 4
+                    [name] => Function Room D
+                    [floor] => 2nd Floor
+                )
+
+            [4] => Array
+                (
+                    [id] => 5
+                    [name] => Function Room E
+                    [floor] => 2nd Floor
+                )
+
+        )
+
+    [schedules] => Array
+        (
+            [1] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-05-04
+                            [endDate] => 2026-05-04
+                            [start] => 07:00
+                            [end] => 17:00
+                        )
+
+                )
+
+            [2] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-05-04
+                            [endDate] => 2026-05-04
+                            [start] => 07:00
+                            [end] => 17:00
+                        )
+
+                )
+
+            [3] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-05-04
+                            [endDate] => 2026-05-04
+                            [start] => 07:00
+                            [end] => 17:00
+                        )
+
+                )
+
+            [4] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-05-04
+                            [endDate] => 2026-05-04
+                            [start] => 07:00
+                            [end] => 17:30
+                        )
+
+                )
+
+            [5] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-05-04
+                            [endDate] => 2026-05-04
+                            [start] => 07:00
+                            [end] => 17:00
+                        )
+
+                )
+
+        )
+
+)
+
+[2026-03-30 13:54:02] Times - start_datetime: 2026-05-04 07:00, end_datetime: 2026-05-04 17:00
+[2026-03-30 13:54:02] Conflict check passed for all venues
+[2026-03-30 13:54:02] Terms info captured: TOLENTINO , JONA MARIE | Student Program Leader
+[2026-03-30 13:54:02] SQL: INSERT INTO facility_reservations (
+        booking_no, reservation_no, last_name, first_name, middle_initial, 
+        email, contact_number, office_type_id, office_id, external_office_name, 
+        activity_name, event_type_id, venue_id, venue_setup_id, banquet_style_id,
+        start_datetime, end_datetime, participants_count, miscellaneous_items, 
+        additional_instruction
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+[2026-03-30 13:54:02] Success! Inserted ID: 57
+[2026-03-30 13:54:02] Inserted activity_name: Asian Cuisine Culminating &quot;Filipino Cuisine&quot;
+[2026-03-30 13:54:02] Inserted 5 venue(s) into reservation_venues for reservation ID 57
+[2026-03-30 13:54:27] Confirmation email sent to jonamarietolentino1128@gmail.com
+[2026-03-30 08:06:45] ========== START reservation_submit.php ==========
+[2026-03-30 14:06:45] RAW POST data: Array
+(
+    [reservation_type] => function
+    [last_name] => Tolentino
+    [first_name] => Jona Marie
+    [middle_initial] => 
+    [email] => janamarietolentino1128@gmail.com
+    [contact] => 09483320398
+    [position] => Student Program Leader
+    [office_type_id] => 1
+    [office_id] => 1
+    [event_type_id] => 5
+    [activity_name] => Asian Cuisine Culminating "Filipino Cuisine"
+    [participants] => 100
+    [banquet_style_id] => 11
+    [guest_last_name] => 
+    [guest_first_name] => 
+    [guest_middle_initial] => 
+    [guest_dob] => 
+    [guest_address] => 
+    [guest_email] => 
+    [guest_contact] => 
+    [arrival_date] => 
+    [checkin_time] => 
+    [checkout_time] => 
+    [departure_date] => 
+    [adults_count] => 1
+    [kids_count] => 0
+    [guest_room_id] => 
+    [guest_remarks] => 
+    [venue_ids] => Array
+        (
+            [0] => 1
+            [1] => 2
+            [2] => 3
+            [3] => 4
+            [4] => 5
+        )
+
+    [view_board_qty] => 1
+    [additional_instruction] => Dispenser-1
+    [action] => submit_function
+    [event_type] => Programs and Special Events
+    [venue_id] => 1
+    [facilities_schedules] => {"venues":[{"id":"1","name":"Function Room A","floor":"2nd Floor"},{"id":"2","name":"Function Room B","floor":"2nd Floor"},{"id":"3","name":"Function Room C","floor":"2nd Floor"},{"id":"4","name":"Function Room D","floor":"2nd Floor"},{"id":"5","name":"Function Room E","floor":"2nd Floor"}],"schedules":{"1":[{"date":"2026-05-02","endDate":"2026-05-04","start":"07:00","end":"17:00"}],"2":[{"date":"2026-05-02","endDate":"2026-05-04","start":"07:00","end":"17:00"}],"3":[{"date":"2026-05-02","endDate":"2026-05-04","start":"07:00","end":"17:00"}],"4":[{"date":"2026-05-02","endDate":"2026-05-04","start":"07:00","end":"17:00"}],"5":[{"date":"2026-05-02","endDate":"2026-05-04","start":"07:00","end":"17:00"}]}}
+    [miscellaneous_items] => {"basic_sound_system":{"speaker":2,"mic":2},"round_table":{"quantity":15},"banquet_chairs":{"quantity":100},"view_board":{"requested":true},"rectangular_table":{"quantity":4}}
+    [terms_agreed_by] => Tolentino, Jona Marie
+    [terms_position] => Student Program Leader
+    [terms_date] => March 30, 2026
+)
+
+[2026-03-30 14:06:45] SPECIFIC CHECK - activity_name: 'Asian Cuisine Culminating "Filipino Cuisine"'
+[2026-03-30 14:06:45] SPECIFIC CHECK - event_type_id: '5'
+[2026-03-30 14:06:45] BEFORE CLEAN - activity_name: 'Asian Cuisine Culminating "Filipino Cuisine"'
+[2026-03-30 14:06:45] AFTER CLEAN - activity_name: 'Asian Cuisine Culminating &quot;Filipino Cuisine&quot;'
+[2026-03-30 14:06:45] event_type_id: 5
+[2026-03-30 14:06:45] FINAL activity_name: 'Asian Cuisine Culminating &quot;Filipino Cuisine&quot;'
+[2026-03-30 14:06:45] facilities_schedules decoded: Array
+(
+    [venues] => Array
+        (
+            [0] => Array
+                (
+                    [id] => 1
+                    [name] => Function Room A
+                    [floor] => 2nd Floor
+                )
+
+            [1] => Array
+                (
+                    [id] => 2
+                    [name] => Function Room B
+                    [floor] => 2nd Floor
+                )
+
+            [2] => Array
+                (
+                    [id] => 3
+                    [name] => Function Room C
+                    [floor] => 2nd Floor
+                )
+
+            [3] => Array
+                (
+                    [id] => 4
+                    [name] => Function Room D
+                    [floor] => 2nd Floor
+                )
+
+            [4] => Array
+                (
+                    [id] => 5
+                    [name] => Function Room E
+                    [floor] => 2nd Floor
+                )
+
+        )
+
+    [schedules] => Array
+        (
+            [1] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-05-02
+                            [endDate] => 2026-05-04
+                            [start] => 07:00
+                            [end] => 17:00
+                        )
+
+                )
+
+            [2] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-05-02
+                            [endDate] => 2026-05-04
+                            [start] => 07:00
+                            [end] => 17:00
+                        )
+
+                )
+
+            [3] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-05-02
+                            [endDate] => 2026-05-04
+                            [start] => 07:00
+                            [end] => 17:00
+                        )
+
+                )
+
+            [4] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-05-02
+                            [endDate] => 2026-05-04
+                            [start] => 07:00
+                            [end] => 17:00
+                        )
+
+                )
+
+            [5] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-05-02
+                            [endDate] => 2026-05-04
+                            [start] => 07:00
+                            [end] => 17:00
+                        )
+
+                )
+
+        )
+
+)
+
+[2026-03-30 14:06:45] Times - start_datetime: 2026-05-02 07:00, end_datetime: 2026-05-04 17:00
+[2026-03-30 14:06:45] Conflict check passed for all venues
+[2026-03-30 14:06:45] Terms info captured: Tolentino, Jona Marie | Student Program Leader
+[2026-03-30 14:06:45] SQL: INSERT INTO facility_reservations (
+        booking_no, reservation_no, last_name, first_name, middle_initial, 
+        email, contact_number, office_type_id, office_id, external_office_name, 
+        activity_name, event_type_id, venue_id, venue_setup_id, banquet_style_id,
+        start_datetime, end_datetime, participants_count, miscellaneous_items, 
+        additional_instruction
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+[2026-03-30 14:06:45] Success! Inserted ID: 58
+[2026-03-30 14:06:45] Inserted activity_name: Asian Cuisine Culminating &quot;Filipino Cuisine&quot;
+[2026-03-30 14:06:45] Inserted 5 venue(s) into reservation_venues for reservation ID 58
+[2026-03-30 14:07:03] Confirmation email sent to janamarietolentino1128@gmail.com
+[2026-03-31 04:37:12] ========== START reservation_submit.php ==========
+[2026-03-31 10:37:12] RAW POST data: Array
+(
+    [reservation_type] => function
+    [last_name] => qweqwe
+    [first_name] => qweqwe
+    [middle_initial] => Q
+    [email] => geomarc789@gmail.com
+    [contact] => 
+    [position] => Student Program Leader
+    [office_type_id] => 2
+    [office_id] => 22
+    [event_type_id] => 2
+    [activity_name] => ewqe
+    [participants] => 1
+    [banquet_style_id] => 14
+    [guest_last_name] => 
+    [guest_first_name] => 
+    [guest_middle_initial] => 
+    [guest_dob] => 
+    [guest_address] => 
+    [guest_email] => 
+    [guest_contact] => 
+    [arrival_date] => 
+    [checkin_time] => 
+    [checkout_time] => 
+    [departure_date] => 
+    [adults_count] => 1
+    [kids_count] => 0
+    [guest_room_id] => 
+    [guest_remarks] => 
+    [venue_ids] => Array
+        (
+            [0] => 3
+        )
+
+    [view_board_qty] => 1
+    [additional_instruction] => 
+    [action] => submit_function
+    [event_type] => Seminar and Lecture
+    [venue_id] => 3
+    [facilities_schedules] => {"venues":[{"id":"3","name":"Function Room C","floor":"2nd Floor"}],"schedules":{"3":[{"date":"2026-03-31","endDate":"2026-03-31","start":"14:30","end":"22:00"}]}}
+    [miscellaneous_items] => {"basic_sound_system":{"speaker":0,"mic":0}}
+    [terms_agreed_by] => qweqwe, qweqwe Q.
+    [terms_position] => Student Program Leader
+    [terms_date] => March 31, 2026
+)
+
+[2026-03-31 10:37:12] SPECIFIC CHECK - activity_name: 'ewqe'
+[2026-03-31 10:37:12] SPECIFIC CHECK - event_type_id: '2'
+[2026-03-31 10:37:12] BEFORE CLEAN - activity_name: 'ewqe'
+[2026-03-31 10:37:12] AFTER CLEAN - activity_name: 'ewqe'
+[2026-03-31 10:37:12] event_type_id: 2
+[2026-03-31 10:37:12] FINAL activity_name: 'ewqe'
+[2026-03-31 10:37:12] ERROR: Contact number is required
+[2026-03-31 04:42:47] ========== START reservation_submit.php ==========
+[2026-03-31 10:42:47] RAW POST data: Array
+(
+    [reservation_type] => function
+    [last_name] => qweqwe
+    [first_name] => qweqwe
+    [middle_initial] => Q
+    [email] => geomarc789@gmail.com
+    [contact] => 
+    [position] => Student Program Leader
+    [office_type_id] => 2
+    [office_id] => 22
+    [event_type_id] => 2
+    [activity_name] => ewqe
+    [participants] => 1
+    [banquet_style_id] => 14
+    [guest_last_name] => 
+    [guest_first_name] => 
+    [guest_middle_initial] => 
+    [guest_dob] => 
+    [guest_address] => 
+    [guest_email] => 
+    [guest_contact] => 
+    [arrival_date] => 
+    [checkin_time] => 
+    [checkout_time] => 
+    [departure_date] => 
+    [adults_count] => 1
+    [kids_count] => 0
+    [guest_room_id] => 
+    [guest_remarks] => 
+    [venue_ids] => Array
+        (
+            [0] => 3
+        )
+
+    [view_board_qty] => 1
+    [additional_instruction] => 
+    [action] => submit_function
+    [event_type] => Seminar and Lecture
+    [venue_id] => 3
+    [facilities_schedules] => {"venues":[{"id":"3","name":"Function Room C","floor":"2nd Floor"}],"schedules":{"3":[{"date":"2026-03-31","endDate":"2026-03-31","start":"14:30","end":"22:00"}]}}
+    [miscellaneous_items] => {}
+    [terms_agreed_by] => qweqwe, qweqwe Q.
+    [terms_position] => Student Program Leader
+    [terms_date] => March 31, 2026
+)
+
+[2026-03-31 10:42:47] SPECIFIC CHECK - activity_name: 'ewqe'
+[2026-03-31 10:42:47] SPECIFIC CHECK - event_type_id: '2'
+[2026-03-31 10:42:47] BEFORE CLEAN - activity_name: 'ewqe'
+[2026-03-31 10:42:47] AFTER CLEAN - activity_name: 'ewqe'
+[2026-03-31 10:42:47] event_type_id: 2
+[2026-03-31 10:42:47] FINAL activity_name: 'ewqe'
+[2026-03-31 10:42:47] facilities_schedules decoded: Array
+(
+    [venues] => Array
+        (
+            [0] => Array
+                (
+                    [id] => 3
+                    [name] => Function Room C
+                    [floor] => 2nd Floor
+                )
+
+        )
+
+    [schedules] => Array
+        (
+            [3] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-03-31
+                            [endDate] => 2026-03-31
+                            [start] => 14:30
+                            [end] => 22:00
+                        )
+
+                )
+
+        )
+
+)
+
+[2026-03-31 10:42:47] Times - start_datetime: 2026-03-31 14:30, end_datetime: 2026-03-31 22:00
+[2026-03-31 10:42:47] Conflict check passed for all venues
+[2026-03-31 10:42:47] Terms info captured: qweqwe, qweqwe Q. | Student Program Leader
+[2026-03-31 10:42:47] SQL: INSERT INTO facility_reservations (
+        booking_no, reservation_no, last_name, first_name, middle_initial, 
+        email, contact_number, office_type_id, office_id, external_office_name, 
+        activity_name, event_type_id, venue_id, venue_setup_id, banquet_style_id,
+        start_datetime, end_datetime, participants_count, miscellaneous_items, 
+        additional_instruction
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+[2026-03-31 10:42:47] Success! Inserted ID: 59
+[2026-03-31 10:42:47] Inserted activity_name: ewqe
+[2026-03-31 10:42:47] Inserted 1 venue(s) into reservation_venues for reservation ID 59
+[2026-03-31 10:43:17] Confirmation email sent to geomarc789@gmail.com

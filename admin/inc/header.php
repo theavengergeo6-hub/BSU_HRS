@@ -15,6 +15,10 @@ $admin = getAdminInfo($conn);
 $pending_fac = $conn->query("SELECT COUNT(*) as count FROM facility_reservations WHERE status = 'pending'")->fetch_assoc()['count'] ?? 0;
 $pending_guest = $conn->query("SELECT COUNT(*) as count FROM guest_room_reservations WHERE status = 'pending' AND deleted = 0")->fetch_assoc()['count'] ?? 0;
 $pending_count = (int)$pending_fac + (int)$pending_guest;
+
+// Get current max IDs for real-time tracking
+$fac_max_id = $conn->query("SELECT MAX(id) as max_id FROM facility_reservations")->fetch_assoc()['max_id'] ?? 0;
+$guest_max_id = $conn->query("SELECT MAX(id) as max_id FROM guest_room_reservations")->fetch_assoc()['max_id'] ?? 0;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -398,6 +402,10 @@ $pending_count = (int)$pending_fac + (int)$pending_guest;
             }
         }
     </style>
+    <script>
+        const BASE_URL = '<?= BASE_URL ?>';
+    </script>
+    <script src="<?= BASE_URL ?>admin/assets/js/real_time.js"></script>
 </head>
 <body>
     <!-- Sidebar Overlay (for mobile) -->
@@ -470,3 +478,9 @@ $pending_count = (int)$pending_fac + (int)$pending_guest;
                 </div>
             </div>
             <div class="content-area">
+            <script>
+                // Initialize real-time updates with current IDs from PHP
+                document.addEventListener('DOMContentLoaded', function() {
+                    initGlobalRealTime(<?= (int)$fac_max_id ?>, <?= (int)$guest_max_id ?>);
+                });
+            </script>
