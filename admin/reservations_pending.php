@@ -258,7 +258,7 @@ $guest_max_id = $conn->query("SELECT MAX(id) as max_id FROM guest_room_reservati
 /* Reservation Cards */
 .reservation-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: 1.5rem;
     margin-top: 1.5rem;
 }
@@ -272,6 +272,9 @@ $guest_max_id = $conn->query("SELECT MAX(id) as max_id FROM guest_room_reservati
     border: 1px solid #f0f0f0;
     animation: fadeInUp 0.5s ease;
     animation-fill-mode: both;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
 }
 
 .reservation-card.pending-card {
@@ -324,6 +327,7 @@ $guest_max_id = $conn->query("SELECT MAX(id) as max_id FROM guest_room_reservati
 
 .reservation-body {
     padding: 1.25rem;
+    flex: 1;
 }
 
 .reservation-detail {
@@ -538,6 +542,12 @@ $guest_max_id = $conn->query("SELECT MAX(id) as max_id FROM guest_room_reservati
 }
 
 /* Responsive */
+@media (max-width: 1100px) {
+    .reservation-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
 @media (max-width: 768px) {
     .reservation-grid {
         grid-template-columns: 1fr;
@@ -812,7 +822,6 @@ $guest_max_id = $conn->query("SELECT MAX(id) as max_id FROM guest_room_reservati
     <!-- Reservations Grid -->
     <?php if ($total_count > 0): ?>
         <div class="reservation-grid" id="reservationGrid">
-            <div class="reservations-container">
             <?php 
             $aggregated = [];
             $ordered_keys = [];

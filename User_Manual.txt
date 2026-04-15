@@ -1,0 +1,951 @@
+
+================================================================================
+      USER MANUAL
+      BSU HOSPITALITY & VENUE RESERVATION SYSTEM (HVRS)
+      BatStateU ARASOF-Nasugbu
+================================================================================
+
+  Version  : 2.0
+  Date     : April 2026
+  Prepared : BSU Hostel Administration
+
+================================================================================
+TABLE OF CONTENTS
+================================================================================
+
+  PART A — FOR CLIENTS (GUESTS & REQUESTERS)
+  -------------------------------------------
+  A1.  System Overview
+  A2.  Browsing the Website
+  A3.  Checking Room & Venue Availability (Calendar)
+  A4.  Making a Reservation (7-Step Process)
+       Step 0 : Select Facility Type
+       Step 1 : Personal / Organizational Information
+       Step 2 : Select Rooms or Function Rooms
+       Step 3 : Set the Schedule
+       Step 4 : Review Terms & Conditions
+       Step 5 : Extra / Miscellaneous Items
+       Step 6 : Summary & Submission
+  A5.  What Happens After Submission
+  A6.  Email Notifications You Will Receive
+  A7.  Frequently Asked Questions (Client)
+
+  PART B — FOR ADMINISTRATORS (STAFF)
+  ------------------------------------
+  B1.  Admin Portal Overview
+  B2.  Logging In to the Admin Panel
+  B3.  Dashboard & Sidebar Navigation
+  B4.  Reservations Calendar (Function & Guest Rooms)
+  B5.  Pending & Pencil-Booked Reservations
+       B5a. Understanding the Status Tabs
+       B5b. Reviewing a Reservation Card
+       B5c. Approving a Reservation
+       B5d. Pencil-Booking a Reservation
+       B5e. Denying / Cancelling a Reservation
+  B6.  Full Reservation Details Page
+  B7.  Generating & Downloading PDF Forms
+  B8.  Guest Reservations Management
+  B9.  Cancelled Events
+  B10. Reports & Analytics
+  B11. Room & Venue Management
+  B12. Admin Settings
+  B13. Real-Time Notifications
+  B14. Key Reminders & Best Practices
+
+================================================================================
+PART A — FOR CLIENTS (GUESTS & REQUESTERS)
+================================================================================
+
+────────────────────────────────────────────────────────────────────────────────
+A1. SYSTEM OVERVIEW
+────────────────────────────────────────────────────────────────────────────────
+
+The BSU Hospitality & Venue Reservation System (HVRS) is an online platform
+that lets individuals and organizations reserve two types of facilities at
+BatStateU ARASOF-Nasugbu:
+
+  1. FUNCTION ROOMS  — Venues such as Function Room A, B, C, D, and E,
+                       designed for seminars, meetings, training sessions,
+                       and similar events.
+
+  2. GUEST ROOMS     — Accommodation rooms and dormitory spaces for overnight
+                       or multi-night stays.
+
+KEY FEATURES FOR CLIENTS:
+  • No account/login required — reservations are open to everyone.
+  • Real-time availability calendar before you book.
+  • Guided 7-step reservation form that collects all needed information.
+  • Automatic email confirmation sent to your inbox upon submission.
+  • Email updates each time the admin changes your reservation status.
+  • Transparent pricing shown before you submit.
+
+────────────────────────────────────────────────────────────────────────────────
+A2. BROWSING THE WEBSITE
+────────────────────────────────────────────────────────────────────────────────
+
+Open your web browser and navigate to the BSU Hostel website. The homepage
+features:
+
+  • A rotating banner (carousel) highlighting available facilities.
+  • An "About Us" section with the hostel's mission and vision.
+  • A FAQ (Frequently Asked Questions) accordion for common inquiries.
+  • A navigation bar at the top with links to all main pages.
+
+MAIN NAVIGATION LINKS:
+  ┌─────────────────┬──────────────────────────────────────────────────────┐
+  │ Link            │ Purpose                                              │
+  ├─────────────────┼──────────────────────────────────────────────────────┤
+  │ Home            │ Return to the main landing page                      │
+  │ Rooms           │ Browse available function rooms and guest rooms       │
+  │ Calendar        │ See date-by-date availability of all facilities      │
+  │ Reserve Now     │ Start the reservation form                           │
+  │ About Us        │ Information about the hostel                         │
+  └─────────────────┴──────────────────────────────────────────────────────┘
+
+────────────────────────────────────────────────────────────────────────────────
+A3. CHECKING ROOM & VENUE AVAILABILITY (CALENDAR)
+────────────────────────────────────────────────────────────────────────────────
+
+Before making a reservation, always check the calendar to confirm your
+preferred dates are free.
+
+HOW TO USE THE CALENDAR:
+  1. Click "Calendar" in the navigation menu.
+  2. The calendar displays the current month by default.
+  3. Use the LEFT ( < ) and RIGHT ( > ) arrows to navigate between months.
+     You can also use the month/year dropdown selectors for quick navigation.
+  4. Each date cell shows colored dots or badges:
+       • GREEN dot  = Confirmed/Approved booking on that day
+       • YELLOW dot = Pending booking (waiting for approval)
+       • PURPLE dot = Pencil-booked (tentatively held) date
+  5. Click on any date cell to see detailed event information for that day,
+     including the event name, time, venue, and requester.
+  6. Use the filter checkboxes to show/hide Approved, Pending, or
+     Pencil-booked events.
+
+TIP: If a date you want is completely free (no dots), it is available.
+     If a date shows events, still proceed — different rooms may be free.
+
+────────────────────────────────────────────────────────────────────────────────
+A4. MAKING A RESERVATION (7-STEP PROCESS)
+────────────────────────────────────────────────────────────────────────────────
+
+Click "Reserve Now" or "Book Now" from any page to open the reservation form.
+The form consists of 7 steps. You must complete each step before proceeding
+to the next. You can go back to a previous step at any time.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+STEP 0 — SELECT FACILITY TYPE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Choose what type of facility you need:
+
+  ┌──────────────────────┬────────────────────────────────────────────────┐
+  │ Option               │ Best for                                       │
+  ├──────────────────────┼────────────────────────────────────────────────┤
+  │ Function Room        │ Seminars, meetings, training, events,          │
+  │                      │ symposiums, workshops                          │
+  ├──────────────────────┼────────────────────────────────────────────────┤
+  │ Guest Room /         │ Overnight stays, accommodation for visiting    │
+  │ Accommodation        │ guests, faculty, students, or groups           │
+  └──────────────────────┴────────────────────────────────────────────────┘
+
+Your selection determines what fields appear in the following steps.
+Click "Next" to continue.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+STEP 1 — PERSONAL / ORGANIZATIONAL INFORMATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Fill in the contact details for the primary person responsible for this
+reservation.
+
+  FOR FUNCTION ROOM BOOKINGS, you will provide:
+  ┌─────────────────────────┬──────────────────────────────────────────────┐
+  │ Field                   │ Notes                                        │
+  ├─────────────────────────┼──────────────────────────────────────────────┤
+  │ Last Name               │ Required                                     │
+  │ First Name              │ Required                                     │
+  │ Middle Initial          │ Optional                                     │
+  │ Email Address           │ Required — all notifications sent here       │
+  │ Contact Number          │ Required                                     │
+  │ Organization Type       │ Select: College / Office / Student Org /     │
+  │                         │         External                             │
+  │ Specific Office / College│ Dropdown appears based on type selected     │
+  │ Position / Designation  │ Optional (for non-student requests)          │
+  │ Activity / Event Name   │ Name of your event (e.g., "General Assembly")│
+  │ Event Type              │ Select from list (seminar, meeting, etc.)    │
+  │ Number of Participants  │ Expected headcount                           │
+  │ Additional Instructions │ Any special requests or notes to admin       │
+  └─────────────────────────┴──────────────────────────────────────────────┘
+
+  FOR GUEST ROOM BOOKINGS, you will provide:
+  ┌─────────────────────────┬──────────────────────────────────────────────┐
+  │ Field                   │ Notes                                        │
+  ├─────────────────────────┼──────────────────────────────────────────────┤
+  │ Guest Name              │ Full name of the main guest                  │
+  │ Email Address           │ Required — where your confirmation is sent   │
+  │ Contact Number          │ Required                                     │
+  │ Number of Adults        │ Required                                     │
+  │ Number of Children      │ Optional (may be 0)                          │
+  │ Additional Guest Info   │ Names of other guests (for multi-guest rooms)│
+  │ Special Requests        │ Any specific needs (e.g., dietary, location) │
+  └─────────────────────────┴──────────────────────────────────────────────┘
+
+Click "Next" to proceed.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+STEP 2 — SELECT ROOMS OR FUNCTION ROOMS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  FOR FUNCTION ROOMS:
+    You will see a list of available function rooms, each showing:
+      • Room name and floor location
+      • Capacity (maximum participants)
+      • Half-day rate, Whole-day rate, Extension rate
+      • Sound system fee (if applicable)
+
+    You may select MULTIPLE function rooms for the same event.
+    Tick the checkbox next to each room you want.
+
+  FOR GUEST ROOMS:
+    You will see cards for each available room:
+      • Guest Room 1, 2, 3, 4 (private rooms)
+      • Dormitory (shared bunk-bed accommodation)
+    Each card shows capacity, price per night, and whether an extra
+    bed is available. Select the room that fits your group size.
+
+Click "Next" to continue.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+STEP 3 — SET THE SCHEDULE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  FOR FUNCTION ROOMS:
+    A schedule card appears for each room you selected. For each room:
+      1. Click the DATE field and pick a date from the date picker.
+      2. Set the START TIME using the time picker.
+      3. Set the END TIME. The system calculates the duration automatically.
+      4. Click "+ Add Schedule" to add that date/time block for that room.
+      5. You can add MULTIPLE schedule entries per room (e.g., multi-day events).
+      6. To remove a schedule entry, click the red "×" button next to it.
+
+    IMPORTANT: Check that your chosen dates are free on the calendar (Step A3)
+    before setting your schedule here.
+
+  FOR GUEST ROOMS:
+    Two date fields appear:
+      • Check-in Date  — the date you arrive (standard check-in: 2:00 PM)
+      • Check-out Date — the date you leave  (standard check-out: 12:00 PM)
+
+    The system automatically calculates the number of nights and total cost.
+    If an extra bed is needed, a checkbox will appear to add one.
+
+Click "Next" to proceed.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+STEP 4 — REVIEW TERMS & CONDITIONS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+The system displays the Terms & Conditions that apply to your specific
+organization type (College, Office, Student Org, or External client).
+
+  1. READ the terms carefully. You can scroll within the terms box.
+  2. Fill in the SIGNATURE / NAME fields as required.
+  3. Tick the checkbox: "I have read and agree to the Terms & Conditions."
+  4. The "Next" button remains disabled until you agree to the terms.
+
+NOTE: Submitting means you agree to all stated policies including payment
+terms, cancellation rules, and usage guidelines.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+STEP 5 — EXTRA / MISCELLANEOUS ITEMS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+(This step applies primarily to Function Room reservations.)
+
+Here you can request additional items or services to support your event.
+Examples include:
+
+  • Sound System / Microphones
+  • Projector / LCD / Whiteboard
+  • Extension Cords
+  • Tables, Chairs (extra quantities)
+  • Water jugs or cups
+  • Other equipment available at the hostel
+
+HOW TO ADD ITEMS:
+  1. Tick the main checkbox next to the item category to enable it.
+  2. If the item has sub-options (e.g., number of microphones, type), 
+     input the quantity in the number field that appears.
+  3. Each item shows a limit badge indicating the available stock.
+  4. Do not exceed the shown limits.
+
+This step is OPTIONAL — you may click "Next" without selecting anything
+if you do not need extra items.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+STEP 6 — SUMMARY & SUBMISSION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+A complete summary of your reservation is shown. Review every detail:
+
+  • Your contact information
+  • Selected room(s) or venue(s)
+  • Date(s) and time(s) of the reservation
+  • Number of participants / guests
+  • Extra items requested
+  • Applicable rates and total estimated cost
+  • Terms agreed to
+
+BEFORE SUBMITTING:
+  • Double-check all spelling, especially your email address, so you
+    receive your confirmation.
+  • Verify the dates and times are what you intended.
+  • Make sure the room(s) selected match your needs.
+
+HOW TO SUBMIT:
+  1. Review the summary carefully.
+  2. Click the "Submit Reservation" button.
+  3. Wait a moment — do NOT refresh or close the page.
+  4. A success message will appear with your BOOKING NUMBER.
+  5. A confirmation email will be sent to the address you provided.
+
+  IMPORTANT: Write down or screenshot your Booking Number. You will need
+  it to follow up on your reservation status with the admin office.
+
+────────────────────────────────────────────────────────────────────────────────
+A5. WHAT HAPPENS AFTER SUBMISSION
+────────────────────────────────────────────────────────────────────────────────
+
+After you submit your reservation, the following process takes place:
+
+  STEP 1 — SUBMISSION
+    Your reservation is saved in the system with status: PENDING.
+    A confirmation email is automatically sent to your email address.
+
+  STEP 2 — ADMIN REVIEW
+    The hostel administrator reviews your request. This is done through
+    their Admin Panel.
+
+  STEP 3 — STATUS UPDATE
+    The admin will change your status to one of the following:
+
+    ┌─────────────────┬──────────────────────────────────────────────────────┐
+    │ Status          │ What It Means                                        │
+    ├─────────────────┼──────────────────────────────────────────────────────┤
+    │ PENDING         │ Your request has been received and is being reviewed  │
+    ├─────────────────┼──────────────────────────────────────────────────────┤
+    │ PENCIL BOOKED   │ Your date has been tentatively held. This is a       │
+    │                 │ soft reservation — not yet fully confirmed.          │
+    │                 │ Further communication with admin may be needed.      │
+    ├─────────────────┼──────────────────────────────────────────────────────┤
+    │ APPROVED /      │ Your reservation is CONFIRMED. Prepare for your     │
+    │ CONFIRMED       │ event/stay as scheduled.                            │
+    ├─────────────────┼──────────────────────────────────────────────────────┤
+    │ DENIED /        │ Your request was not approved. The admin may        │
+    │ CANCELLED       │ have included a reason in the notification email.   │
+    └─────────────────┴──────────────────────────────────────────────────────┘
+
+  STEP 4 — EMAIL NOTIFICATION
+    Every time your status changes, you will receive an automatic email
+    informing you of the update.
+
+────────────────────────────────────────────────────────────────────────────────
+A6. EMAIL NOTIFICATIONS YOU WILL RECEIVE
+────────────────────────────────────────────────────────────────────────────────
+
+You will receive emails at these key moments:
+
+  EMAIL 1 — Upon successful form submission
+    Subject: "Reservation Confirmation — Booking No. [YOUR_BOOKING_NO]"
+    Content: Confirmation that your request was received, your booking
+             number, and what to expect next.
+
+  EMAIL 2 — When admin updates your status
+    Subject: "Reservation Status Update — [NEW STATUS]"
+    Content: Your booking number, event/room info, and the new status
+             (Approved / Pencil Booked / Denied / Cancelled). The email
+             may also include admin remarks or notes.
+
+IMPORTANT: Check your spam/junk folder if you do not see the emails.
+           Add hostel.nasugbu@g.batstate-u.edu.ph to your contacts.
+
+────────────────────────────────────────────────────────────────────────────────
+A7. FREQUENTLY ASKED QUESTIONS (CLIENT)
+────────────────────────────────────────────────────────────────────────────────
+
+Q: Do I need to create an account to reserve?
+A: NO. The system is open to all. You only need to fill in your contact
+   details in the reservation form.
+
+Q: Can I reserve multiple function rooms for one event?
+A: YES. In Step 2, you may select multiple rooms. Each room will have its
+   own schedule entry in Step 3.
+
+Q: What is "Pencil Booking"?
+A: A pencil booking is a tentative hold on your preferred date. It means
+   the admin has noted your request but has not yet fully confirmed it.
+   You may need to reach out to admin to progress to full approval.
+
+Q: How do I know if my reservation is confirmed?
+A: You will receive an email notification whenever your status changes.
+   Look for the "APPROVED" or "CONFIRMED" status email.
+
+Q: What is the check-in and check-out time for guest rooms?
+A: Standard check-in is at 2:00 PM. Standard check-out is at 12:00 PM
+   (noon). Contact the admin for special arrangements.
+
+Q: Can I cancel my reservation?
+A: Contact the hostel admin directly to request a cancellation. Refer to
+   the Terms & Conditions you accepted during booking for the cancellation
+   policy.
+
+Q: Who do I contact for questions?
+A: Email: hostel.nasugbu@g.batstate-u.edu.ph
+
+
+================================================================================
+PART B — FOR ADMINISTRATORS (STAFF)
+================================================================================
+
+────────────────────────────────────────────────────────────────────────────────
+B1. ADMIN PORTAL OVERVIEW
+────────────────────────────────────────────────────────────────────────────────
+
+The Admin Panel is the management interface used by hostel staff to:
+
+  • View and manage all incoming reservations
+  • Approve, pencil-book, or deny requests
+  • Track room availability via the calendar
+  • View detailed reservation records and print PDF forms
+  • Generate reports and analytics
+  • Manage room/venue listings and settings
+  • Receive real-time alerts when new reservations arrive
+
+────────────────────────────────────────────────────────────────────────────────
+B2. LOGGING IN TO THE ADMIN PANEL
+────────────────────────────────────────────────────────────────────────────────
+
+  1. Open your browser and go to:
+       [Base URL]/admin/login.php
+  2. Enter your ADMIN USERNAME and PASSWORD.
+  3. Click "Login."
+  4. If credentials are correct, you will be redirected to the Dashboard.
+  5. If login fails, double-check your username and password. Contact your
+     system administrator if you cannot access your account.
+
+SECURITY REMINDER:
+  • Do NOT share your admin credentials with anyone.
+  • Always click "Logout" when leaving the computer, especially on
+    shared or public devices.
+  • The admin panel is not accessible without a valid login session.
+
+────────────────────────────────────────────────────────────────────────────────
+B3. DASHBOARD & SIDEBAR NAVIGATION
+────────────────────────────────────────────────────────────────────────────────
+
+After logging in, you will see the main admin layout, which consists of:
+
+  LEFT SIDEBAR — Navigation Menu
+  ┌─────────────────────┬────────────────────────────────────────────────────┐
+  │ Menu Item           │ Function                                           │
+  ├─────────────────────┼────────────────────────────────────────────────────┤
+  │ Dashboard           │ Overview and quick stats                           │
+  │ Reservations        │ Monthly calendar with all bookings (has badge for  │
+  │                     │ pending count); leads to calendar and pending view  │
+  │ Rooms               │ Manage function room and guest room listings        │
+  │ Cancelled Events    │ Archive of all cancelled or denied reservations     │
+  │ Settings            │ Change admin password, site info, email config      │
+  │ Logout              │ End your admin session safely                      │
+  └─────────────────────┴────────────────────────────────────────────────────┘
+
+  TOP BAR (Right Side)
+    • Shows the current username and role.
+    • Contains a quick Logout button.
+
+  REAL-TIME BADGE
+    The "Reservations" sidebar link shows a red badge number. This count
+    updates automatically every 30 seconds to show the total number of
+    new PENDING reservations (function rooms + guest rooms combined.)
+
+  MOBILE ACCESS
+    On smaller screens (tablets/phones), the sidebar is hidden by default.
+    Tap the hamburger (☰) icon at the top left to open it.
+
+────────────────────────────────────────────────────────────────────────────────
+B4. RESERVATIONS CALENDAR (FUNCTION & GUEST ROOMS)
+────────────────────────────────────────────────────────────────────────────────
+
+Navigate to: Sidebar → Reservations
+
+The Reservations page shows a full monthly calendar with two views:
+
+  TAB 1: FUNCTION ROOMS
+    Displays all function room bookings for the selected month.
+
+  TAB 2: GUEST ROOMS
+    Displays all guest room reservations for the selected month.
+
+Switch between tabs by clicking the buttons at the top of the page.
+
+HOW TO NAVIGATE THE CALENDAR:
+  1. Use the LEFT/RIGHT arrow buttons to move between months.
+  2. Use the month and year dropdown selectors for quick jumps.
+  3. Color-coded dots on each date cell indicate:
+       • GREEN (Approved/Confirmed)
+       • YELLOW (Pending)
+       • PURPLE (Pencil Booked)
+  4. Click on any date cell to open a POP-UP MODAL showing all events
+     for that specific day.
+
+EVENT MODAL (POP-UP):
+  Each event card in the modal shows:
+    • Event/activity name
+    • Status badge (Approved / Pending / Pencil Booked)
+    • Time (start — end)
+    • Venue(s) / Room(s) — multiple rooms shown as a comma-separated list
+    • Requester name
+    • Number of participants
+    • Office or organization
+    • A "View Details →" link to see the full record
+
+FILTER CHECKBOXES:
+  Use the filter bar above the calendar to show/hide events by status:
+    ☑ Approved   ☑ Pending   ☑ Pencil Booked
+  Uncheck any category to temporarily hide those events.
+
+SEARCH BAR:
+  Type an event name or requester name in the search box to quickly find
+  a specific reservation. Results appear as a dropdown list of matches.
+  Click a result to go directly to that reservation's detail page.
+
+STATS CARDS (above the calendar):
+  Four summary cards show totals for the current month:
+    • Total Reservations This Month
+    • Approved
+    • Pencil Booked
+    • Pending
+
+PENDING ALERT BANNER:
+  If there are any pending or pencil-booked reservations waiting for
+  action, a yellow alert banner appears at the top with a "Review Now"
+  button that takes you directly to the pending reservations list.
+
+────────────────────────────────────────────────────────────────────────────────
+B5. PENDING & PENCIL-BOOKED RESERVATIONS
+────────────────────────────────────────────────────────────────────────────────
+
+Navigate to: Calendar page → "Review Now" banner button
+         or: Calendar page → click "Pending" tab badge
+
+This page shows all reservations that need your attention, displayed as
+cards in a 3-column grid, ordered from oldest to newest.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+B5a. UNDERSTANDING THE STATUS TABS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+At the top of the page are three filter tabs:
+
+  ┌──────────────────┬───────────────────────────────────────────────────────┐
+  │ Tab              │ Shows                                                 │
+  ├──────────────────┼───────────────────────────────────────────────────────┤
+  │ All              │ Both Pending AND Pencil-Booked reservations           │
+  │ Pending          │ Only reservations awaiting first review               │
+  │ Pencil Booked    │ Only reservations in tentative/soft-hold state        │
+  └──────────────────┴───────────────────────────────────────────────────────┘
+
+Each tab displays a badge number showing how many items are in that category.
+
+QUICK STATS ROW (below the tabs):
+  Mini-stat cards provide at-a-glance information:
+    • Total Pending count
+    • Total Pencil-Booked count
+    • Oldest pending date (the earliest booking you haven't acted on)
+    • Most-requested venue (the room with the most pending requests)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+B5b. REVIEWING A RESERVATION CARD
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Each reservation card shows:
+  • Event/Activity name  (Card header, in BSU Red)
+  • Status badge         (PENDING or PENCIL BOOKED)
+  • Booking type icon    (Function Room or Guest Room)
+  • Requester name
+  • Venue / Room name(s)
+  • Schedule             (Date, start time — end time)
+  • Number of participants/guests
+  • Date submitted (created date)
+
+At the bottom of each card are action buttons:
+
+  ┌──────────────────┬───────────────────────────────────────────────────────┐
+  │ Button           │ Color  │ Action                                       │
+  ├──────────────────┼────────┼───────────────────────────────────────────────┤
+  │ ✔ Approve        │ Green  │ Fully confirm/approve the reservation         │
+  │ ✏ Pencil Book    │ Purple │ Tentatively hold the date (soft reservation)  │
+  │ ✘ Deny           │ Red    │ Reject/cancel the reservation                 │
+  │ 👁 View          │ BSU Red│ Open the full reservation detail page         │
+  └──────────────────┴────────┴───────────────────────────────────────────────┘
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+B5c. APPROVING A RESERVATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  1. Locate the reservation card you want to approve.
+  2. BEFORE approving, check the calendar to ensure no double-booking
+     exists for that room on that date/time.
+  3. Click the GREEN "Approve" (✔) button.
+  4. A confirmation dialog/modal will appear asking:
+       "Are you sure you want to approve this reservation?"
+     The modal shows the reservation name to confirm the right record.
+  5. Click "Yes, Confirm" to proceed, or "Cancel" to close without action.
+  6. The card disappears from the pending list.
+  7. The system automatically changes status to:
+       • "approved"   for Function Room reservations
+       • "confirmed"  for Guest Room reservations
+  8. An email notification is automatically sent to the requester.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+B5d. PENCIL-BOOKING A RESERVATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+"Pencil Booking" is used when you want to tentatively hold a date for a
+client, without giving full confirmation yet. Common use cases:
+
+  • The client needs to finalize payment or documentation first.
+  • You want to block the date while coordinating with other departments.
+  • There is a scheduling conflict that needs resolution.
+
+  1. Click the PURPLE "Pencil" (✏) button on the reservation card.
+  2. A confirmation modal appears.
+  3. Click "Yes, Confirm" to pencil-book the reservation.
+  4. The system sets the status to "pencil_booked."
+  5. The card moves from "Pending" to the "Pencil Booked" tab.
+  6. An email is automatically sent to the requester notifying them.
+
+NOTE: Pencil-booked reservations still appear on the calendar with a
+      PURPLE dot, so staff can see the tentative hold.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+B5e. DENYING / CANCELLING A RESERVATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  1. Click the RED "Deny" (✘) button on the reservation card.
+  2. A confirmation modal appears.
+  3. Click "Yes, Confirm" to deny/cancel the reservation.
+  4. The system changes the status to:
+       • "denied"    for Function Room reservations
+       • "cancelled" for Guest Room reservations
+  5. The reservation moves to the Cancelled Events archive.
+  6. An email is automatically sent to the requester.
+
+BEST PRACTICE: Before denying, consider adding a remark (via the detail
+page) explaining the reason, so the requester receives a clear explanation.
+
+────────────────────────────────────────────────────────────────────────────────
+B6. FULL RESERVATION DETAILS PAGE
+────────────────────────────────────────────────────────────────────────────────
+
+Click the "View" button on any reservation card, or click "View Details →"
+in any calendar event modal to open the full detail page.
+
+THE DETAIL PAGE SHOWS:
+
+  TOP BAR (Booking Hero):
+    • Booking Number (e.g., HRS-2026-0012)
+    • Reservation Number
+    • Current Status badge (color-coded)
+    • Date the form was submitted
+
+  MAIN CONTENT (Left Column):
+    ┌──────────────────────────────────────────────────────────────────────┐
+    │ Card 1: Main Contact Person                                          │
+    │   • Full name, email, contact number, office/organization            │
+    ├──────────────────────────────────────────────────────────────────────┤
+    │ Card 2: Event Details                                                │
+    │   • Activity name, event type, number of participants, duration      │
+    │   • Banquet style (if applicable), venue setup type                  │
+    ├──────────────────────────────────────────────────────────────────────┤
+    │ Card 3: Venue(s) & Schedule                                          │
+    │   • All booked rooms listed with their individual schedules          │
+    │   • Date, start time — end time for each venue entry                 │
+    │   • Total number of venues and duration stats                        │
+    ├──────────────────────────────────────────────────────────────────────┤
+    │ Card 4: Miscellaneous Items (if any)                                 │
+    │   • List of all extra items requested with quantities                │
+    ├──────────────────────────────────────────────────────────────────────┤
+    │ Card 5: Additional Instructions                                      │
+    │   • Any notes the requester submitted                                │
+    └──────────────────────────────────────────────────────────────────────┘
+
+  RIGHT SIDEBAR (Admin Actions):
+    ┌──────────────────────────────────────────────────────────────────────┐
+    │ Card: Update Status                                                  │
+    │   • A dropdown to change the status:                                 │
+    │     Pending / Pencil Booked / Approved / Cancelled                   │
+    │   • A text area to enter ADMIN REMARKS (a note to the requester)     │
+    │   • "Update Status" button to save the change                        │
+    │                                                                      │
+    │   NOTE: Changing status here ALSO triggers an automatic email to the │
+    │   requester, including your admin remarks as part of the message.    │
+    ├──────────────────────────────────────────────────────────────────────┤
+    │ Card: Remarks History                                                │
+    │   • A timestamped log of all previous admin remarks and status       │
+    │     changes for this reservation.                                    │
+    └──────────────────────────────────────────────────────────────────────┘
+
+────────────────────────────────────────────────────────────────────────────────
+B7. GENERATING & DOWNLOADING PDF FORMS
+────────────────────────────────────────────────────────────────────────────────
+
+On the Reservation Details page, two buttons appear at the top right:
+
+  [ 📄 View PDF Form    ]  — Opens the printable PDF in a new browser tab.
+  [ ⬇ Download PDF     ]  — Downloads the PDF directly to your device.
+
+The PDF form is an official document that includes:
+  • Booking number, requester information, event details
+  • Venue(s) and schedule
+  • Miscellaneous items requested
+  • Signature lines (for official use)
+
+USE CASE: Print the PDF for physical filing, for obtaining signatures from
+department heads, or for record-keeping purposes.
+
+This feature is available for BOTH Function Room and Guest Room reservations
+(function_room_pdf.php and guest_reservation_pdf.php respectively).
+
+────────────────────────────────────────────────────────────────────────────────
+B8. GUEST RESERVATIONS MANAGEMENT
+────────────────────────────────────────────────────────────────────────────────
+
+Navigate to: Sidebar → Reservations → Guest Rooms tab
+
+Guest room reservations have a slightly different status flow than function
+rooms:
+
+  ┌────────────────┬─────────────────────────────────────────────────────────┐
+  │ Status         │ Description                                             │
+  ├────────────────┼─────────────────────────────────────────────────────────┤
+  │ Pending        │ Received, waiting for admin action                      │
+  │ Pencil Booked  │ Date tentatively held, not yet fully confirmed          │
+  │ Confirmed      │ Fully approved — guest should arrive on check-in date   │
+  │ Checked In     │ Guest has arrived and is currently staying              │
+  │ Checked Out    │ Guest has departed; stay is completed                   │
+  │ Cancelled      │ Reservation was cancelled/denied                        │
+  └────────────────┴─────────────────────────────────────────────────────────┘
+
+The calendar shows guest room bookings day-by-day, with dot markers for:
+  • CHECK-IN day (green/yellow depending on status)
+  • STAY days (blue)
+  • CHECK-OUT day (red/orange)
+
+Click any date to see all guest bookings for that day in the pop-up modal,
+including room name, guest name, and check-in/out dates.
+
+PDF Download is also available for guest room reservations via the
+"View PDF" button on the individual guest reservation detail page.
+
+────────────────────────────────────────────────────────────────────────────────
+B9. CANCELLED EVENTS
+────────────────────────────────────────────────────────────────────────────────
+
+Navigate to: Sidebar → Cancelled Events
+
+This page is an archive of all reservations that have been:
+  • Denied (function rooms)
+  • Cancelled (guest rooms or cancelled function rooms)
+
+The list shows:
+  • Booking number, requester name, event/room, date, and reason (if any).
+
+Use this page to:
+  • Review historical denial/cancellation records
+  • Verify if a reservation was properly closed out
+  • Reference past decisions when similar requests come in
+
+Cancelled events do NOT appear on the main calendar.
+
+────────────────────────────────────────────────────────────────────────────────
+B10. REPORTS & ANALYTICS
+────────────────────────────────────────────────────────────────────────────────
+
+Navigate to: Sidebar → (from Dashboard or direct URL) → reports.php
+
+The Reports page provides a comprehensive view of system activity for a
+selected month and year.
+
+  FILTER:
+    Select the Month and Year at the top, then click "Apply."
+
+  FUNCTION ROOM SECTION:
+    ┌─────────────────────────────────────────────────────────────────────┐
+    │ KPI Cards:                                                          │
+    │   • Total Bookings this month                                       │
+    │   • Pending count                                                   │
+    │   • Approved count                                                  │
+    │   • Cancelled/Denied count                                          │
+    │   • Total Participants (approved events only)                       │
+    ├─────────────────────────────────────────────────────────────────────┤
+    │ Daily Bar Chart:                                                    │
+    │   • Horizontal bar chart of bookings per day of the month           │
+    ├─────────────────────────────────────────────────────────────────────┤
+    │ Event Type Breakdown:                                               │
+    │   • Bar chart showing which event types are most common             │
+    ├─────────────────────────────────────────────────────────────────────┤
+    │ Venue Utilization:                                                  │
+    │   • Shows which function rooms are most booked with percentage      │
+    ├─────────────────────────────────────────────────────────────────────┤
+    │ Recent Function Room Reservations Table:                            │
+    │   • Latest 8 function room bookings with booking no., name,        │
+    │     activity, date, status, and View link                           │
+    └─────────────────────────────────────────────────────────────────────┘
+
+  GUEST ROOM SECTION:
+    ┌─────────────────────────────────────────────────────────────────────┐
+    │ KPI Cards:                                                          │
+    │   • Total Bookings                                                  │
+    │   • Revenue (₱) from confirmed/stayed bookings                     │
+    │   • Total Guests                                                    │
+    │   • Pending count                                                   │
+    │   • Checked Out (completed stays)                                   │
+    ├─────────────────────────────────────────────────────────────────────┤
+    │ Daily Bar Chart: Bookings per day                                   │
+    ├─────────────────────────────────────────────────────────────────────┤
+    │ Revenue by Room: Bar chart per room                                 │
+    ├─────────────────────────────────────────────────────────────────────┤
+    │ Guest Room Status Breakdown: Visual donut chart                     │
+    ├─────────────────────────────────────────────────────────────────────┤
+    │ Recent Guest Room Reservations Table                                │
+    └─────────────────────────────────────────────────────────────────────┘
+
+  CSV EXPORT:
+    Click "Export Function CSV" or "Export Guest CSV" to download raw data
+    as a spreadsheet for offline analysis or reporting to management.
+
+────────────────────────────────────────────────────────────────────────────────
+B11. ROOM & VENUE MANAGEMENT
+────────────────────────────────────────────────────────────────────────────────
+
+Navigate to: Sidebar → Rooms
+
+From this page, administrators can:
+
+  • VIEW all current function rooms and guest rooms
+  • ADD new rooms (or mark existing rooms as active/inactive)
+  • EDIT room details such as name, capacity, rates, and description
+  • TOGGLE a room's availability (disable a room from appearing in the
+    reservation form while it is under maintenance or unavailable)
+
+FUNCTION ROOMS — Key fields to manage:
+  • Room name, floor level, capacity
+  • Half-day rate, Whole-day rate, Extension rate (per additional hour)
+  • Sound system fee
+  • Description
+
+GUEST ROOMS — Key fields to manage:
+  • Room name, floor level, maximum guests
+  • Price per night
+  • Whether an extra bed is available and its price
+  • Description / amenities
+
+IMPORTANT: Only rooms marked as "active" (is_active = 1) appear in the
+client-facing reservation form. Deactivate a room if it should temporarily
+not be available for booking.
+
+────────────────────────────────────────────────────────────────────────────────
+B12. ADMIN SETTINGS
+────────────────────────────────────────────────────────────────────────────────
+
+Navigate to: Sidebar → Settings
+
+This page allows you to configure system-level options:
+
+  ADMIN ACCOUNT:
+    • Change your admin username
+    • Change your admin password
+      (Always use a strong password — 8+ characters, mix of letters & numbers)
+
+  SITE INFORMATION:
+    • Update the hostel name, contact details, and address shown on the site
+
+  EMAIL CONFIGURATION:
+    • View or update the SMTP settings used to send automatic emails
+      (host, port, username, password)
+    • Verify email is working correctly to ensure clients receive notifications
+
+  If you need to set up email for the first time, refer to the separate
+  INSTALL-EMAIL.md file located in the project root directory.
+
+────────────────────────────────────────────────────────────────────────────────
+B13. REAL-TIME NOTIFICATIONS
+────────────────────────────────────────────────────────────────────────────────
+
+The admin panel includes a real-time monitoring system that automatically
+checks for new reservations every 30 seconds.
+
+HOW IT WORKS:
+  • When the system detects a new reservation (higher ID than last known),
+    it updates the pending badge count in the sidebar immediately.
+  • A desktop/browser notification may appear alerting: 
+    "New reservation received!"
+  • The pending count in the sidebar badge updates without needing
+    to refresh the page.
+
+You do NOT need to manually refresh the page to see new bookings.
+The system handles this in the background via the real_time.js script.
+
+────────────────────────────────────────────────────────────────────────────────
+B14. KEY REMINDERS & BEST PRACTICES
+────────────────────────────────────────────────────────────────────────────────
+
+  DOUBLE-BOOKING PREVENTION
+    ✦ ALWAYS open the Reservations Calendar before approving a request.
+    ✦ Check the specific date and room against existing approved/pencil
+      bookings before confirming a new one.
+    ✦ One function room can only be used by one event at any given time.
+
+  COMMUNICATION
+    ✦ Use the "Admin Remarks" field to communicate directly with requesters
+      when changing status — especially when denying a request, always
+      include a brief explanation.
+    ✦ Clients receive your remarks in their email notification.
+
+  PENCIL BOOKING USAGE
+    ✦ Use pencil booking when a date needs to be held but cannot yet be
+      fully confirmed (e.g., awaiting payment or document submission).
+    ✦ Follow up with clients in a timely manner to either confirm or release
+      pencil-booked dates.
+
+  EMAIL SYSTEM
+    ✦ Ensure the email configuration is set up and tested (Settings page).
+    ✦ All status update emails are sent automatically — staff do NOT need
+      to manually email clients when updating a reservation status.
+    ✦ If email fails to send, the status still updates in the system.
+      Check debug.log for email errors if needed.
+
+  PDF FORMS
+    ✦ Print or download PDF forms for approved reservations and keep
+      physical copies as required by your office's filing procedures.
+
+  REPORT EXPORTS
+    ✦ Export monthly CSVs from the Reports page for official use,
+      budget reporting, or submission to management.
+
+  MOBILE ACCESS
+    ✦ The admin panel is responsive and accessible via smartphones/tablets.
+    ✦ You can approve or deny reservations on-the-go using a mobile browser.
+    ✦ Tap the ☰ menu icon to open the navigation sidebar on mobile.
+
+  LOGOUT
+    ✦ Always log out when you are done, especially on shared computers.
+
+================================================================================
+  END OF USER MANUAL
+  Generated for BatStateU ARASOF-Nasugbu Hostel
+  BSU Hospitality & Venue Reservation System (HVRS) — Version 2.0
+  For support: hostel.nasugbu@g.batstate-u.edu.ph
+================================================================================
