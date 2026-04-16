@@ -1029,12 +1029,7 @@ foreach ($ordered_ids as $rid):
         </div>
     </div>
 
-    <!-- Quick link to list view -->
-    <div style="margin-bottom:1rem;text-align:right;">
-        <a href="guest_reservations.php" class="btn btn-sm btn-outline-secondary">
-            <i class="bi bi-list-ul me-1"></i>View List
-        </a>
-    </div>
+
 
     <!-- Calendar -->
     <div class="calendar-wrapper" id="calendar-top">

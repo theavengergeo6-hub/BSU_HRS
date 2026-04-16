@@ -10,7 +10,8 @@ $next_week = date('Y-m-d', strtotime('+5 days'));
 $today_fac = $conn->query("
     SELECT COUNT(*) as count 
     FROM facility_reservations 
-    WHERE DATE(start_datetime) = '$today' 
+    WHERE DATE(start_datetime) <= '$today' 
+      AND DATE(end_datetime) >= '$today'
       AND status IN ('approved', 'pencil_booked')
 ")->fetch_assoc()['count'] ?? 0;
 $today_guest = $conn->query("
@@ -52,16 +53,38 @@ $pencil_guest = $conn->query("
 $pencil_count = (int)$pencil_fac + (int)$pencil_guest;
 
 
-// Upcoming events (next 5 days)
+// Upcoming events (next 5 days) - Unified Function + Guest
 $upcoming = $conn->query("
-    SELECT r.*, v.name as venue_name,
-           CONCAT(r.last_name, ', ', r.first_name) as requester
-    FROM facility_reservations r
-    JOIN venues v ON r.venue_id = v.id
-    WHERE DATE(r.start_datetime) BETWEEN '$today' AND '$next_week'
-    AND r.status IN ('approved', 'pencil_booked')
-    ORDER BY r.start_datetime ASC
-    LIMIT 5
+    SELECT * FROM (
+        SELECT 
+            r.id, r.activity_name, r.start_datetime, r.end_datetime, r.status,
+            v.name as venue_name,
+            'function' as res_type
+        FROM facility_reservations r
+        JOIN venues v ON r.venue_id = v.id
+        WHERE r.status IN ('approved', 'pencil_booked')
+          AND DATE(r.start_datetime) <= '$next_week' 
+          AND DATE(r.end_datetime) >= '$today'
+        
+        UNION ALL
+        
+        SELECT
+            gr.id, 
+            CONCAT('Guest: ', gr.guest_name) as activity_name,
+            CONCAT(gr.check_in_date, ' ', gr.check_in_time) as start_datetime,
+            CONCAT(gr.check_out_date, ' ', gr.check_out_time) as end_datetime,
+            gr.status,
+            g.room_name as venue_name,
+            'guest' as res_type
+        FROM guest_room_reservations gr
+        JOIN guest_rooms g ON gr.guest_room_id = g.id
+        WHERE gr.deleted = 0
+          AND gr.status IN ('confirmed', 'checked_in', 'pencil_booked')
+          AND gr.check_in_date <= '$next_week'
+          AND gr.check_out_date >= '$today'
+    ) AS all_upcoming
+    ORDER BY start_datetime ASC
+    LIMIT 8
 ");
 
 $upcoming_count = $upcoming->num_rows;
@@ -729,10 +752,21 @@ $guest_preview = $conn->query("
                 <ul class="upcoming-list">
                     <?php while ($row = $upcoming->fetch_assoc()): 
                         $date = strtotime($row['start_datetime']);
-                        $status_class = $row['status'] == 'pencil_booked' ? 'status-pencil-small' : 'status-approved-small';
-                        $status_text = $row['status'] == 'pencil_booked' ? 'PENCIL' : 'APPROVED';
+                        $isGuest = ($row['res_type'] === 'guest');
+                        $isPencil = ($row['status'] === 'pencil_booked');
+                        
+                        $status_class = $isPencil ? 'status-pencil-small' : 'status-approved-small';
+                        $status_text = $isPencil ? 'PENCIL' : ($isGuest ? 'CONFIRMED' : 'APPROVED');
+                        
+                        if ($isGuest && $row['status'] === 'checked_in') {
+                            $status_text = 'STAYING';
+                        }
+
+                        $detailUrl = $isGuest
+                            ? 'guest_reservation_details.php?id=' . (int)$row['id']
+                            : 'reservation_details.php?id=' . (int)$row['id'];
                     ?>
-                    <li class="upcoming-item">
+                    <li class="upcoming-item" style="cursor: pointer;" onclick="window.location.href='<?= $detailUrl ?>'">
                         <div class="upcoming-date">
                             <div class="day"><?= date('d', $date) ?></div>
                             <div class="month"><?= date('M', $date) ?></div>
@@ -744,7 +778,9 @@ $guest_preview = $conn->query("
                                 <span class="status-badge-small <?= $status_class ?>"><?= $status_text ?></span>
                             </div>
                             <div class="upcoming-venue">
-                                <i class="bi bi-building"></i> <?= htmlspecialchars(substr($row['venue_name'], 0, 15)) ?>
+                                <i class="bi <?= $isGuest ? 'bi-door-open' : 'bi-building' ?>"></i> 
+                                <?= htmlspecialchars(substr($row['venue_name'], 0, 15)) ?>
+                                <?= strlen($row['venue_name']) > 15 ? '...' : '' ?>
                             </div>
                         </div>
                         <div class="upcoming-time">
@@ -782,15 +818,15 @@ $guest_preview = $conn->query("
                 </div>
             </div>
             <div style="display:flex;gap:.5rem;flex-wrap:wrap;">
-                <a href="guest_reservations.php?status=pending" style="flex:1;min-width:120px;text-align:center;padding:.5rem;background:#fff3cd;color:#856404;border-radius:8px;text-decoration:none;font-size:.82rem;font-weight:600;">
+                <a href="reservations.php?view=guest" style="flex:1;min-width:120px;text-align:center;padding:.5rem;background:#fff3cd;color:#856404;border-radius:8px;text-decoration:none;font-size:.82rem;font-weight:600;">
                     <i class="bi bi-hourglass-split d-block mb-1"></i>
                     <?= $guest_pending ?> Pending
                 </a>
-                <a href="guest_reservations.php?status=confirmed" style="flex:1;min-width:120px;text-align:center;padding:.5rem;background:#d4edda;color:#155724;border-radius:8px;text-decoration:none;font-size:.82rem;font-weight:600;">
+                <a href="reservations.php?view=guest" style="flex:1;min-width:120px;text-align:center;padding:.5rem;background:#d4edda;color:#155724;border-radius:8px;text-decoration:none;font-size:.82rem;font-weight:600;">
                     <i class="bi bi-check-circle d-block mb-1"></i>
                     <?= $guest_confirmed ?> Confirmed
                 </a>
-                <a href="guest_reservations.php?status=cancelled" style="flex:1;min-width:120px;text-align:center;padding:.5rem;background:#f8d7da;color:#721c24;border-radius:8px;text-decoration:none;font-size:.82rem;font-weight:600;">
+                <a href="reservations.php?view=guest" style="flex:1;min-width:120px;text-align:center;padding:.5rem;background:#f8d7da;color:#721c24;border-radius:8px;text-decoration:none;font-size:.82rem;font-weight:600;">
                     <i class="bi bi-x-circle d-block mb-1"></i>
                     <?= $guest_cancelled ?> Cancelled
                 </a>
@@ -804,7 +840,7 @@ $guest_preview = $conn->query("
         <div class="dashboard-card" style="grid-column: span 2;">
             <div class="card-header" style="border-bottom: 2px solid var(--bsu-red);">
                 <h3><i class="bi bi-person-badge" style="color: var(--bsu-red);"></i> Recent Guest Bookings</h3>
-                <a href="guest_reservations.php">View All Guest Reservations <i class="bi bi-arrow-right"></i></a>
+                <a href="reservations.php?view=guest">View All Guest Reservations <i class="bi bi-arrow-right"></i></a>
             </div>
             <?php if ($guest_preview && $guest_preview->num_rows > 0): ?>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">

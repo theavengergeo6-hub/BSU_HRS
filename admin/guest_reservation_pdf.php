@@ -15,7 +15,7 @@ require_once __DIR__ . '/GuestRoomPDF.php';
 
 $id = (int)($_GET['id'] ?? 0);
 if (!$id) {
-    header('Location: guest_reservations.php');
+    header('Location: reservations.php?view=guest');
     exit;
 }
 
@@ -37,7 +37,7 @@ $result = $stmt->get_result();
 
 if ($result->num_rows === 0) {
     $_SESSION['error_message'] = 'Reservation not found.';
-    header('Location: guest_reservations.php');
+    header('Location: reservations.php?view=guest');
     exit;
 }
 

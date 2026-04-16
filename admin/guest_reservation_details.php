@@ -4,7 +4,7 @@ requireAdminLogin();
 
 $id = (int)($_GET['id'] ?? 0);
 if (!$id) {
-    redirect('guest_reservations.php');
+    redirect('reservations.php?view=guest');
 }
 
 // Handle status update
@@ -112,7 +112,7 @@ $result = $stmt->get_result();
 
 if ($result->num_rows === 0) {
     $_SESSION['error_message'] = "Reservation not found.";
-    redirect('guest_reservations.php');
+    redirect('reservations.php?view=guest');
 }
 
 $reservation = $result->fetch_assoc();
@@ -392,8 +392,8 @@ $total_nights = (strtotime($reservation['departure_date']) - strtotime($reservat
             <a href="guest_reservation_pdf.php?id=<?= (int)$reservation['id'] ?>&download=1" class="btn-back" title="Download PDF file">
                 <i class="bi bi-file-earmark-arrow-down"></i> Download PDF
             </a>
-            <a href="guest_reservations.php" class="btn-back">
-                <i class="bi bi-arrow-left"></i> Back to Guest Reservations
+            <a href="reservations.php?view=guest" class="btn-back">
+                <i class="bi bi-arrow-left"></i> Back to Reservations
             </a>
         </div>
     </div>
