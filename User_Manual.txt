@@ -832,29 +832,70 @@ B11. ROOM & VENUE MANAGEMENT
 
 Navigate to: Sidebar → Rooms
 
-From this page, administrators can:
+The Rooms page allows you to manage how facilities are presented to the public
+and set their booking rules. It is divided into two sections: Showcase Photo
+Manager (at the top) and Room Pricing / Settings (inside each room card).
 
-  • VIEW all current function rooms and guest rooms
-  • ADD new rooms (or mark existing rooms as active/inactive)
-  • EDIT room details such as name, capacity, rates, and description
-  • TOGGLE a room's availability (disable a room from appearing in the
-    reservation form while it is under maintenance or unavailable)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+B11a. SHOWCASE PHOTO MANAGER (Public Website)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-FUNCTION ROOMS — Key fields to manage:
-  • Room name, floor level, capacity
-  • Half-day rate, Whole-day rate, Extension rate (per additional hour)
-  • Sound system fee
-  • Description
+This section controls the images and availability shown on the public "Rooms" 
+page. Each room can have up to 5 high-quality photos.
 
-GUEST ROOMS — Key fields to manage:
-  • Room name, floor level, maximum guests
-  • Price per night
-  • Whether an extra bed is available and its price
-  • Description / amenities
+1. TOGGLE AVAILABILITY
+   • Each Guest Room has an "Available for Booking" ON/OFF switch.
+   • ON: The room is visible and bookable by clients.
+   • OFF: The room is hidden from the public website (useful for 
+     maintenance or special closures).
 
-IMPORTANT: Only rooms marked as "active" (is_active = 1) appear in the
-client-facing reservation form. Deactivate a room if it should temporarily
-not be available for booking.
+2. UPLOADING & CROPPING PHOTOS
+   • Click the "Click or drag a photo here" zone on any room card.
+   • Once a photo is selected, a CROP MODAL will automatically open.
+   • Use the tool to crop/zoom your photo to the best fit (16:9 recommended).
+   • Click "Use this crop" to save. The photo is now live on the website.
+
+3. SETTING THE PRIMARY (SHOWCASE) PHOTO
+   • The photo with the STAR (⭐) icon is the "Showcase Photo."
+   • This is the first image visitors see in the advertisement.
+   • To change it: Hover over any thumbnail in the room's strip and click
+     the STAR icon, or click "Replace" on the main image to swap it.
+
+4. DELETING PHOTOS
+   • Hover over a thumbnail in the strip and click the RED TRASH icon (🗑).
+   • Note: If you delete the primary photo, the next available photo will
+     automatically become the new showcase image.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+B11b. ROOM PRICING & SETTINGS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Click the "Room settings (price & capacity)" button at the bottom of any 
+room card to open the settings panel.
+
+  FOR FUNCTION ROOMS:
+  ┌─────────────────────────┬──────────────────────────────────────────────┐
+  │ Field                   │ Notes                                        │
+  ├─────────────────────────┼──────────────────────────────────────────────┤
+  │ Half Day Rate           │ Base price for a 4-hour reservation          │
+  │ Whole Day Rate          │ Base price for an 8-hour reservation          │
+  │ Extension Rate          │ Price per hour for time exceeding the block  │
+  │ Sound System Fee        │ Fixed fee if audio equipment is used         │
+  │ Capacity                │ Maximum number of participants allowed       │
+  └─────────────────────────┴──────────────────────────────────────────────┘
+
+  FOR GUEST ROOMS:
+  ┌─────────────────────────┬──────────────────────────────────────────────┐
+  │ Field                   │ Notes                                        │
+  ├─────────────────────────┼──────────────────────────────────────────────┤
+  │ Nightly Rate            │ Standard price per night                     │
+  │ Capacity                │ How many guests the room can accommodate     │
+  │ Extra Bed Available     │ Tick if an extra bed can be added            │
+  │ Extra Bed Price         │ Nightly price specifically for the extra bed │
+  └─────────────────────────┴──────────────────────────────────────────────┘
+
+IMPORTANT: Click "Save Settings" after making any changes. These updates 
+take effect immediately for all new reservations.
 
 ────────────────────────────────────────────────────────────────────────────────
 B12. ADMIN SETTINGS
@@ -862,23 +903,53 @@ B12. ADMIN SETTINGS
 
 Navigate to: Sidebar → Settings
 
-This page allows you to configure system-level options:
+The Settings page is used to manage your administrator account and ensure the
+security of the reservation system.
 
-  ADMIN ACCOUNT:
-    • Change your admin username
-    • Change your admin password
-      (Always use a strong password — 8+ characters, mix of letters & numbers)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+B12a. CHANGING YOUR ADMIN PASSWORD
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-  SITE INFORMATION:
-    • Update the hostel name, contact details, and address shown on the site
+For security purposes, it is recommended to change your password regularly. 
 
-  EMAIL CONFIGURATION:
-    • View or update the SMTP settings used to send automatic emails
-      (host, port, username, password)
-    • Verify email is working correctly to ensure clients receive notifications
+HOW TO CHANGE PASSWORD:
+  1. Go to the "Settings" page from the sidebar menu.
+  2. Locate the "Change Password" box.
+  3. Enter your CURRENT PASSWORD in the first field.
+  4. Enter your NEW PASSWORD in the second field.
+     • Requirement: Minimum 8 characters long.
+     • Best Practice: Use a combination of letters, numbers, and symbols.
+  5. Re-type the new password in the "Confirm New Password" field.
+  6. Click the "Update Password" button.
+     • If successful, you will see a green "Password updated successfully" 
+       alert.
+     • If there is an error (e.g., mismatch or short password), a red alert
+       will inform you of the issue.
 
-  If you need to set up email for the first time, refer to the separate
-  INSTALL-EMAIL.md file located in the project root directory.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+B12b. SECURITY INFORMATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+On the right side of the Settings page, you can view your Security Information:
+  • Current Role: Confirms you are logged in as an "Administrator."
+  • Last Login: Displays a timestamp of when you last accessed the system.
+    (Check this periodically to ensure no unauthorized access has occurred.)
+
+TIP: If you forget your admin password and cannot log in, contact your IT
+administrator to reset the password directly in the database.
+
+────────────────────────────────────────────────────────────────────────────────
+B13. EMAIL & SYSTEM CONFIGURATION
+────────────────────────────────────────────────────────────────────────────────
+
+Some advanced settings, such as Email SMTP configuration, are managed through
+internal system files or a separate developer dashboard.
+
+  If you need to set up or verify the email notification system:
+  1. Refer to the separate INSTALL-EMAIL.md file in the root folder.
+  2. The admin panel typically handles only account-level changes.
+  3. For hostel name or contact updates, please consult your system 
+     representative or update the database configuration table.
 
 ────────────────────────────────────────────────────────────────────────────────
 B13. REAL-TIME NOTIFICATIONS

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 26, 2026 at 06:46 AM
+-- Generation Time: May 19, 2026 at 10:40 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -50,7 +50,9 @@ INSERT INTO `admin_logs` (`id`, `admin_id`, `action`, `details`, `ip_address`, `
 (7, 7, 'Reservation pencil', 'Reservation ID: 36 (Function)', '::1', '2026-03-23 05:39:48'),
 (8, 7, 'Reservation pencil', 'Reservation ID: 36 (Function)', '::1', '2026-03-23 05:40:25'),
 (9, 7, 'Reservation approve', 'Reservation ID: 36 (Function)', '::1', '2026-03-23 05:41:55'),
-(10, 7, 'change_password', 'Updated own password', '::1', '2026-03-24 02:42:18');
+(10, 7, 'change_password', 'Updated own password', '::1', '2026-03-24 02:42:18'),
+(11, 7, 'Reservation deny', 'Reservation ID: 55 (Function)', '::1', '2026-03-27 15:10:54'),
+(12, 7, 'Reservation deny', 'Reservation ID: 55 (Function)', '::1', '2026-03-27 15:11:31');
 
 -- --------------------------------------------------------
 
@@ -176,7 +178,7 @@ CREATE TABLE `admin_users` (
 --
 
 INSERT INTO `admin_users` (`id`, `username`, `password`, `email`, `role`, `last_login`, `created_at`) VALUES
-(7, 'admin', '$2y$10$ChSpOeeHGPztHlmDTneukeznYNMy3vcibzl6.GwK.eXFvviSZU2YO', 'admin@bsu.edu.ph', 'super_admin', '2026-03-26 13:04:35', '2026-02-25 03:44:02');
+(7, 'admin', '$2y$10$ChSpOeeHGPztHlmDTneukeznYNMy3vcibzl6.GwK.eXFvviSZU2YO', 'admin@bsu.edu.ph', 'super_admin', '2026-04-16 13:14:09', '2026-02-25 03:44:02');
 
 -- --------------------------------------------------------
 
@@ -227,7 +229,7 @@ CREATE TABLE `booking_sequences` (
 --
 
 INSERT INTO `booking_sequences` (`id`, `type`, `year`, `month`, `last_number`, `created_at`, `updated_at`) VALUES
-(1, 'guest', 2026, 3, 6, '2026-03-06 07:17:27', '2026-03-24 07:53:13'),
+(1, 'guest', 2026, 3, 7, '2026-03-06 07:17:27', '2026-03-27 15:29:49'),
 (2, 'function', 2026, 3, 0, '2026-03-06 07:17:27', '2026-03-06 07:17:27');
 
 -- --------------------------------------------------------
@@ -329,7 +331,7 @@ CREATE TABLE `contact_details` (
 --
 
 INSERT INTO `contact_details` (`sr_no`, `address`, `gmap`, `pn1`, `pn2`, `email`, `fb`, `iframe`, `facebook_url`, `phone2`, `email2`) VALUES
-(1, '3J8G MFC, Nasugbu, Batangas', 'https://maps.app.goo.gl/kdGkPGPSZvNGX2ur9', 908754767, '4355566', 'hostel.nasugbu@g.batstate-u.edu.ph', 'https://web.facebook.com', 'https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d247691.37575470193!2d120.626131!3d14.066679!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x33bd96a403666c7d:0x397173d7eb8f7cf9!2sBatangas State University, Nasugbu Campus!5e0!3m2!1sen!2sph!4v1725632299713!5m2!1sen!2sph', NULL, NULL, NULL);
+(1, 'R. Martinez St. Barangay Bucana, Nasugbu, Batangas', 'https://maps.app.goo.gl/kdGkPGPSZvNGX2ur9', 908754767, '4355566', 'hostel.nasugbu@g.batstate-u.edu.ph', 'https://web.facebook.com', 'https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d247691.37575470193!2d120.626131!3d14.066679!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x33bd96a403666c7d:0x397173d7eb8f7cf9!2sBatangas State University, Nasugbu Campus!5e0!3m2!1sen!2sph!4v1725632299713!5m2!1sen!2sph', NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -440,7 +442,15 @@ INSERT INTO `facility_reservations` (`id`, `booking_no`, `reservation_no`, `last
 (49, 'FAC-20260325-977', 'RES-20260325-163', 'Noche', 'Kevin John', 'R', 1, 7, '', 'Grade 9 - First Aid Seminar', 2, 4, 1, 3, '2026-03-31 07:00:00', '2026-03-31 12:00:00', 70, '23-74589@g.batstate-u.edu.ph', '0928784210', '{\"basic_sound_system\":{\"speaker\":1,\"mic\":2},\"banquet_chairs\":{\"quantity\":70},\"view_board\":{\"requested\":true},\"rectangular_table\":{\"quantity\":3},\"_terms_agreed_by\":\"Noche, Kevin John  R.\",\"_terms_position\":\"Laboratory School Teacher\",\"_terms_date\":\"March 25, 2026\"}', 'water dispenser', 'approved', '\n--- 2026-03-25 16:52:12 (Approved) ---\nSigned Docs', '2026-03-25 08:51:32', '2026-03-25 08:52:12'),
 (50, 'FAC-20260325-932', 'RES-20260325-726', 'Zambal', 'Vivian', 'G', 1, 1, '', 'Raising Flag 2026', 2, 1, 1, 3, '2026-05-05 08:00:00', '2026-05-05 12:00:00', 100, 'joshuacullo360@gmail.com', '09977951800', '{\"basic_sound_system\":{\"speaker\":2,\"mic\":2},\"banquet_chairs\":{\"quantity\":100},\"view_board\":{\"requested\":true},\"rectangular_table\":{\"quantity\":3},\"_terms_agreed_by\":\"Zambal, Vivian G.\",\"_terms_position\":\"FM Sub, ORG President\",\"_terms_date\":\"March 25, 2026\"}', '1-Dispenser', 'pending', NULL, '2026-03-25 09:08:26', '2026-03-25 09:08:26'),
 (51, 'FAC-20260325-122', 'RES-20260325-410', 'Capadosa', 'Arabella, Juliana', 'D', 1, 6, '', 'SALITAN 2: Writing with precision and purpose', 2, 4, 1, 14, '2026-04-07 12:00:00', '2026-04-07 17:00:00', 60, 'alfemorganization@g.batstate-u.edu.ph', '0957461935', '{\"basic_sound_system\":{\"speaker\":1,\"mic\":2},\"banquet_chairs\":{\"quantity\":60},\"view_board\":{\"requested\":true},\"rectangular_table\":{\"quantity\":8},\"_terms_agreed_by\":\"Capadosa, Arabella, Juliana D.\",\"_terms_position\":\"ALFEM VPEA\",\"_terms_date\":\"March 25, 2026\"}', '1-Dispenser', 'pending', NULL, '2026-03-25 09:21:48', '2026-03-25 09:21:48'),
-(52, 'FAC-20260325-859', 'RES-20260325-618', 'Perea', 'Maria Mariel', 'D', 2, 17, '', 'G2L LEX- Design Thinking', 5, 1, 1, 11, '2026-04-08 08:00:00', '2026-04-09 21:00:00', 50, 'joshuacullo360@gmail.com', '09914159175', '{\"basic_sound_system\":{\"speaker\":2,\"mic\":2},\"round_table\":{\"quantity\":6},\"banquet_chairs\":{\"quantity\":50},\"view_board\":{\"requested\":true},\"_terms_agreed_by\":\"Perea, Maria Mariel  D.\",\"_terms_position\":\"Head, External Affairs\",\"_terms_date\":\"March 25, 2026\"}', 'Borrow Coffee maker, spoon, fork, cup, etc table cloths', 'pending', NULL, '2026-03-25 09:44:31', '2026-03-25 09:44:31');
+(52, 'FAC-20260325-859', 'RES-20260325-618', 'Perea', 'Maria Mariel', 'D', 2, 17, '', 'G2L LEX- Design Thinking', 5, 1, 1, 11, '2026-04-08 08:00:00', '2026-04-09 21:00:00', 50, 'joshuacullo360@gmail.com', '09914159175', '{\"basic_sound_system\":{\"speaker\":2,\"mic\":2},\"round_table\":{\"quantity\":6},\"banquet_chairs\":{\"quantity\":50},\"view_board\":{\"requested\":true},\"_terms_agreed_by\":\"Perea, Maria Mariel  D.\",\"_terms_position\":\"Head, External Affairs\",\"_terms_date\":\"March 25, 2026\"}', 'Borrow Coffee maker, spoon, fork, cup, etc table cloths', 'pending', NULL, '2026-03-25 09:44:31', '2026-03-25 09:44:31'),
+(53, 'FAC-20260326-892', 'RES-20260326-599', 'Taehyung', 'Kim', 'V', 4, NULL, 'Los Angeles Lakers', 'Arirang Release', 3, 1, 1, 11, '2026-03-27 07:00:00', '2026-03-27 12:00:00', 60, 'geomarc789@gmail.com', '0975222454', '{\"basic_sound_system\":{\"speaker\":2,\"mic\":1},\"round_table\":{\"quantity\":6},\"banquet_chairs\":{\"quantity\":60},\"view_board\":{\"requested\":true},\"_client_type\":\"External\",\"_terms_agreed_by\":\"Taehyung, Kim V.\",\"_terms_position\":\"BTS Member\",\"_terms_date\":\"March 26, 2026\"}', '', 'cancelled', '\n--- 2026-03-26 14:35:54 (Cancelled) ---\nCancel that', '2026-03-26 06:10:49', '2026-03-26 06:35:54'),
+(54, 'FAC-20260326-775', 'RES-20260326-535', 'Sermania', 'Rafael', 'D', 2, 22, '', 'HEALTH FORUM ON COMMON DISEASE', 1, 1, 1, 3, '2026-04-07 09:00:00', '2026-04-07 11:30:00', 85, 'healthservices.nasugbu@g.batstate-u.edu.ph', '09914159175', '{\"basic_sound_system\":{\"speaker\":1,\"mic\":2},\"banquet_chairs\":{\"quantity\":85},\"view_board\":{\"requested\":true},\"_terms_agreed_by\":\"Sermania, Rafael D.\",\"_terms_position\":\"MAN, RN, RM, LPT\",\"_terms_date\":\"March 26, 2026\"}', 'Podium and mic stand', 'pending', NULL, '2026-03-26 08:03:43', '2026-03-26 08:03:43'),
+(55, 'FAC-20260327-953', 'RES-20260327-681', 'de guzman', 'gomari', 'C', 4, NULL, 'SDO - CALACA CITY', 'TRAINING', 1, 1, 1, 3, '2026-03-28 18:00:00', '2026-03-28 22:00:00', 67, 'gomarideguzman@gmail.com', '09666443170', '{\"basic_sound_system\":{\"speaker\":1,\"mic\":2},\"rectangular_table\":{\"quantity\":10},\"_client_type\":\"External\",\"_terms_agreed_by\":\"de guzman, gomari C.\",\"_terms_position\":\"INFORMATION TECHNOLOGY OFFICER\",\"_terms_date\":\"March 27, 2026\"}', 'LAGYAN NG FLOWER PETALS ANG RED CARPET', 'denied', NULL, '2026-03-27 15:06:20', '2026-03-27 15:10:54'),
+(56, 'FAC-20260330-807', 'RES-20260330-227', 'Bayot', 'Leila', 'T', 1, 1, '', 'Fruit and Vegetable Carving Seminar &amp; Workshop', 2, 1, 1, 3, '2026-05-07 07:00:00', '2026-05-09 17:30:00', 200, 'hmsociety@g.batstate-u.edu.ph', '09287842104', '{\"basic_sound_system\":{\"speaker\":1,\"mic\":2},\"banquet_chairs\":{\"quantity\":190},\"rectangular_table\":{\"quantity\":6},\"_terms_agreed_by\":\"Bayot, Leila T.\",\"_terms_position\":\"Head, Job Placement Office\",\"_terms_date\":\"March 30, 2026\"}', 'per batch event...', 'pending', NULL, '2026-03-30 05:26:38', '2026-03-30 05:26:38'),
+(57, 'FAC-20260330-184', 'RES-20260330-279', 'TOLENTINO', 'JONA MARIE', '', 1, 1, '', 'Asian Cuisine Culminating &quot;Filipino Cuisine&quot;', 5, 1, 1, 11, '2026-05-04 07:00:00', '2026-05-04 17:00:00', 100, 'jonamarietolentino1128@gmail.com', '09483320398', '{\"basic_sound_system\":{\"speaker\":2,\"mic\":2},\"round_table\":{\"quantity\":15},\"banquet_chairs\":{\"quantity\":100},\"view_board\":{\"requested\":true},\"rectangular_table\":{\"quantity\":4},\"_terms_agreed_by\":\"TOLENTINO , JONA MARIE\",\"_terms_position\":\"Student Program Leader\",\"_terms_date\":\"March 30, 2026\"}', 'Dispenser- 1', 'cancelled', '\n--- 2026-03-30 13:57:03 (Cancelled) ---\nWrong details', '2026-03-30 05:54:02', '2026-03-30 05:57:03'),
+(58, 'FAC-20260330-527', 'RES-20260330-799', 'Tolentino', 'Jona Marie', '', 1, 1, '', 'Asian Cuisine Culminating &quot;Filipino Cuisine&quot;', 5, 1, 1, 11, '2026-05-02 07:00:00', '2026-05-04 17:00:00', 100, 'janamarietolentino1128@gmail.com', '09483320398', '{\"basic_sound_system\":{\"speaker\":2,\"mic\":2},\"round_table\":{\"quantity\":15},\"banquet_chairs\":{\"quantity\":100},\"view_board\":{\"requested\":true},\"rectangular_table\":{\"quantity\":4},\"_terms_agreed_by\":\"Tolentino, Jona Marie\",\"_terms_position\":\"Student Program Leader\",\"_terms_date\":\"March 30, 2026\"}', 'Dispenser-1', 'pending', NULL, '2026-03-30 06:06:45', '2026-03-30 06:06:45'),
+(59, 'FAC-20260331-456', 'RES-20260331-655', 'qweqwe', 'qweqwe', 'Q', 2, 22, '', 'ewqe', 2, 3, 1, 14, '2026-03-31 14:30:00', '2026-03-31 22:00:00', 1, 'geomarc789@gmail.com', '', '{\"_terms_agreed_by\":\"qweqwe, qweqwe Q.\",\"_terms_position\":\"Student Program Leader\",\"_terms_date\":\"March 31, 2026\"}', '', 'cancelled', '\n--- 2026-03-31 10:44:23 (Cancelled) ---\nFor Testing Only', '2026-03-31 02:42:47', '2026-03-31 02:44:23'),
+(60, 'FAC-20260414-947', 'RES-20260414-422', 'De Guzman', 'Geo Mar', 'C', 3, 71, '', 'JPAMA Seminar', 2, 1, 1, 14, '2026-06-16 07:00:00', '2026-06-16 17:00:00', 75, 'geomarc789@gmail.com', '09087547440', '{\"basic_sound_system\":{\"speaker\":2,\"mic\":2},\"round_table\":{\"quantity\":5},\"banquet_chairs\":{\"quantity\":75},\"view_board\":{\"requested\":true},\"_terms_agreed_by\":\"De Guzman, Geo Mar C.\",\"_terms_position\":\"GYMShark Ambassador\",\"_terms_date\":\"April 14, 2026\"}', 'with water dispenser', 'approved', '\n--- 2026-04-14 13:47:20 (Approved) ---\nsubmitted required papers', '2026-04-14 05:31:37', '2026-04-14 05:47:20');
 
 -- --------------------------------------------------------
 
@@ -461,9 +471,9 @@ CREATE TABLE `faq` (
 --
 
 INSERT INTO `faq` (`id`, `question`, `answer`, `sort_order`, `created_at`) VALUES
-(1, 'Who may request to use the Hostel Function Rooms?', 'The Hostel may be requested for use by BatStateU units, extension project teams, partner agencies, LGUs, NGOs, and other approved organizations, subject to availability and compliance with university policies.', 1, '2026-02-23 00:34:37'),
+(1, 'Who may request to use the Hostel Function Rooms?', 'The Hostel may be requested for use by BatStateU units, extension project teams, partner agencies, and other approved organizations, subject to availability and compliance with university policies.', 1, '2026-02-23 00:34:37'),
 (2, 'Are Extension Services activities prioritized in the schedule?', 'Yes. Extension Services activities and university-sanctioned programs are given priority in scheduling, subject to advance booking and approval.', 2, '2026-02-23 00:34:37'),
-(3, 'How can we submit a request or make inquiries?', 'You may submit a request or inquiry through the Reservation page, by contacting the office directly, or via the contact details provided on this website.', 3, '2026-02-23 00:34:37'),
+(3, 'How can we submit a request or make inquiries?', 'You may submit a request or inquiry through the Reservation page, or via the contact details provided on this website.', 3, '2026-02-23 00:34:37'),
 (4, 'What general rules must users observe during facility use?', 'Users must comply with university policies, maintain cleanliness, and use the facility only for the approved purpose and within the reserved time slot.', 4, '2026-02-23 00:34:37');
 
 -- --------------------------------------------------------
@@ -909,17 +919,17 @@ INSERT INTO `guest_room_availability` (`id`, `guest_room_id`, `date`, `is_availa
 (124, 3, '2026-03-30', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
 (125, 5, '2026-03-30', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
 (126, 1, '2026-03-31', 0, 1, 1, 0, NULL, '2026-03-24 03:18:27'),
-(127, 2, '2026-03-31', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(127, 2, '2026-03-31', 0, 1, 2, 0, NULL, '2026-03-27 15:35:35'),
 (128, 4, '2026-03-31', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
 (129, 3, '2026-03-31', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
 (130, 5, '2026-03-31', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
 (131, 1, '2026-04-01', 0, 1, 1, 0, NULL, '2026-03-24 03:18:27'),
-(132, 2, '2026-04-01', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(132, 2, '2026-04-01', 0, 1, 2, 0, NULL, '2026-03-27 15:35:35'),
 (133, 4, '2026-04-01', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
 (134, 3, '2026-04-01', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
 (135, 5, '2026-04-01', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
 (136, 1, '2026-04-02', 0, 1, 3, 0, NULL, '2026-03-24 07:53:54'),
-(137, 2, '2026-04-02', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
+(137, 2, '2026-04-02', 0, 1, 2, 0, NULL, '2026-03-27 15:35:35'),
 (138, 4, '2026-04-02', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
 (139, 3, '2026-04-02', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
 (140, 5, '2026-04-02', 1, 1, 0, 0, NULL, '2026-03-06 07:07:05'),
@@ -1309,7 +1319,8 @@ CREATE TABLE `guest_room_reservations` (
 INSERT INTO `guest_room_reservations` (`id`, `booking_no`, `user_id`, `guest_name`, `guest_email`, `guest_contact`, `guest_address`, `guest_dob`, `guest_id_type`, `guest_id_number`, `purpose_of_stay`, `check_in_date`, `check_out_date`, `check_in_time`, `check_out_time`, `adults_count`, `children_count`, `total_guests`, `guest_room_id`, `extra_bed_requested`, `extra_beds_count`, `room_price_per_night`, `extra_bed_price_per_night`, `subtotal`, `discount_amount`, `total_amount`, `other_guests`, `status`, `payment_status`, `payment_method`, `payment_date`, `amount_paid`, `special_requests`, `admin_remarks`, `terms_accepted`, `terms_accepted_by`, `terms_accepted_at`, `digital_signature`, `data_privacy_consent`, `created_by`, `created_at`, `updated_at`, `deleted`) VALUES
 (9, 'GBK-202603-0004', NULL, 'Dela Vega, Irish R.', 'delavega.emerishjem15@gmail.com', '09287842104', 'Brgy. Dyap Nasugbu, Batangas', '1998-05-15', NULL, NULL, NULL, '2026-03-26', '2026-03-27', '23:00:00', '12:00:00', 4, 1, 5, 2, 0, 0, 2500.00, 0.00, 2500.00, 0.00, 2500.00, '[{\"name\":\"ariana mendoza \",\"dob\":\"1998-09-03\",\"age\":\"27\"},{\"name\":\"Alena Pasaque\",\"dob\":\"1999-01-12\",\"age\":\"27\"},{\"name\":\"Sexy Semacio\",\"dob\":\"1998-03-27\",\"age\":\"27\"}]', 'checked_out', 'unpaid', NULL, NULL, 0.00, 'with water dispenser and guestroom aminities', '\n--- 2026-03-23 14:14:42 (Pencil booked) ---\nall documents was submitted already, ready for approval\n--- 2026-03-24 10:19:34 (Confirmed) ---\napproved stay\n--- 2026-03-24 11:19:10 (Checked in) ---\nChecked in 11:00am\n--- 2026-03-24 11:20:13 (Checked out) ---\nChecked out 11am', 1, 'IRISH R. DELA VEGA', '2026-03-23 14:10:33', 'data:image/png;base64,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YsSItOp3vOMdaVmBAAEC1RZQHwECBAhULiCBq9xQDTkXKL/3FrvRshy3D15uuummMHLkyGR3fD9t8ODBSblaq9dffz1cd911aXV33313qHVS9a53vSttr2fPnmlZgQABAgQIZEhAKAQI/FdAAvdfCD8E2iswa9ascOyxxyanr1+/PsTHK5ONClc7d+5M3nP75z//mdTUu3fvmj06mTRgRYAAAQIECBBoCoFidVICV6zx1Js6CPTo0SM8+uijaUtxUpNKJ/946aWXwrnnnhteeOGFpN5SqVTzRyeThv6zahl7fL/vP7v8R4AAAQIECBAgkFEBCVydB0ZzxRDo379/GDVqVNKZjRs3VjQF/6JFi8LQoUPDpk2bkvr69OmTzEAZE7pkR41XL774YtrCX//617SsQIAAAQIECBAgkD0BCVz2xkREdRZoOfNky3JbYVTjQ9hDhgwJY8eODbt3706aixOjxElMPvaxjyXbB61qstmyrS1bttSkDZUSIECAAAECBAhUR0ACVx1HteRYoOXMky3LbXUpTsFfyYewL7vssrBq1aqkmVKplLxLFz9V0L1792RfvVbxTuLb3/72pLn4ofKkYFVAAV0iQIAAAQIEiiAggSvCKOpDRQItZ55sWW5PpS0/hB3LLd8na+36iRMnhninrXzOPffcE+K+8nY9f7t06RIGDBiQNLl69epQnkQl2WFFgACBKGAhQIAAgcwISOAyMxQCaZRAy8cmW5bbE0+8Cxcfg4znxsTnlltuicVWl5ioLViwIDknJk9z5swJEyZMSLYbtTr66KPTpmfMmJGWFQgQIECAQKUCridAoLoCErjqeqothwItH5tsWW5vV+64444QE7F4/uOPPx6eeeaZWDzscnDyNn/+/DBixIjDnlvPnZ/85CfT5t7znvekZQUCBAgQIECAQAMFNH0YAQncYVDsai6Blo9Ntiy3V6Fv377hBz/4QZLExWn4x48fHzZs2HDI5WeeeWZoeectJm/Dhg075LxG7Gh5B65nz56NCEGbBAgQIECAAAEC7RCQwLUDKTnFqrACLd9be+ONNzrVz4suuihMmTIlufa1114LcTbJXbt2JdtxNWnSpLB27dpYDKVSKWQpeYtBxcQz/loIECBAgAABAgSyLSCBy/b4iK4OAvEj2uVmnn/++XKxw7833XRTGDlyZHLdmjVrwuDBg5Ny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', 1, NULL, '2026-03-23 06:10:33', '2026-03-24 03:20:13', 0),
 (10, 'GBK-202603-0005', NULL, 'De Guzman, Geo Mar C.', 'geomarc789@gmail.com', '09087547440', 'Caybunga, Balayan, Batangas', '2004-06-02', NULL, NULL, NULL, '2026-03-30', '2026-04-05', '11:00:00', '12:00:00', 2, 0, 2, 1, 0, 0, 5000.00, 0.00, 30000.00, 0.00, 30000.00, '[{\"name\":\"Jeremie Azarcon\",\"dob\":\"2006-10-14\",\"age\":\"19\"}]', 'cancelled', 'unpaid', NULL, NULL, 0.00, '', '\n--- 2026-03-24 14:28:03 (Cancelled) ---\nCancelled', 1, 'GEO MAR C. DE GUZMAN', '2026-03-24 11:18:27', '', 1, NULL, '2026-03-24 03:18:27', '2026-03-24 06:28:03', 0),
-(11, 'GBK-202603-0006', NULL, 'De Guzman, Gomari C.', 'geomarc789@gmail.com', '09626970801', 'Caybunga, Balayan, Batangas', '1995-12-13', NULL, NULL, NULL, '2026-04-02', '2026-04-04', '11:00:00', '12:00:00', 1, 0, 1, 1, 0, 0, 5000.00, 0.00, 10000.00, 0.00, 10000.00, '[]', 'confirmed', 'unpaid', NULL, NULL, 0.00, 'Extra Beds Please', '\n--- 2026-03-24 15:53:54 (Confirmed) ---\nsigned submitted requirements', 1, 'GOMARI C. DE GUZMAN', '2026-03-24 15:53:13', '', 1, NULL, '2026-03-24 07:53:13', '2026-03-24 07:53:54', 0);
+(11, 'GBK-202603-0006', NULL, 'De Guzman, Gomari C.', 'geomarc789@gmail.com', '09626970801', 'Caybunga, Balayan, Batangas', '1995-12-13', NULL, NULL, NULL, '2026-04-02', '2026-04-04', '11:00:00', '12:00:00', 1, 0, 1, 1, 0, 0, 5000.00, 0.00, 10000.00, 0.00, 10000.00, '[]', 'confirmed', 'unpaid', NULL, NULL, 0.00, 'Extra Beds Please', '\n--- 2026-03-24 15:53:54 (Confirmed) ---\nsigned submitted requirements', 1, 'GOMARI C. DE GUZMAN', '2026-03-24 15:53:13', '', 1, NULL, '2026-03-24 07:53:13', '2026-03-24 07:53:54', 0),
+(12, 'GBK-202603-0007', NULL, 'De Guzman, Geo Mar C.', 'gomarideguzman@gmail.com', '09666443170', 'Caybunga, Balayan, Batangas', '1995-12-13', NULL, NULL, NULL, '2026-03-31', '2026-04-03', '13:00:00', '09:00:00', 4, 1, 5, 2, 0, 0, 2500.00, 0.00, 7500.00, 0.00, 7500.00, '[]', 'confirmed', 'unpaid', NULL, NULL, 0.00, 'bukas ay may breakfast in bed sa kama', '\n--- 2026-03-27 23:35:35 (Confirmed) ---\nwalang bigas kaya awlang breakfast', 1, 'GEO MAR C. DE GUZMAN', '2026-03-27 23:29:49', '', 1, NULL, '2026-03-27 15:29:49', '2026-03-27 15:35:35', 0);
 
 --
 -- Triggers `guest_room_reservations`
@@ -1792,7 +1803,30 @@ INSERT INTO `reservation_venues` (`id`, `reservation_id`, `venue_id`, `start_dat
 (92, 52, 2, '2026-04-08 08:00:00', '2026-04-09 21:00:00', '2026-03-25 09:44:31'),
 (93, 52, 3, '2026-04-08 08:00:00', '2026-04-09 21:00:00', '2026-03-25 09:44:31'),
 (94, 52, 4, '2026-04-08 08:00:00', '2026-04-09 21:00:00', '2026-03-25 09:44:31'),
-(95, 52, 5, '2026-04-08 08:00:00', '2026-04-09 21:00:00', '2026-03-25 09:44:31');
+(95, 52, 5, '2026-04-08 08:00:00', '2026-04-09 21:00:00', '2026-03-25 09:44:31'),
+(96, 53, 1, '2026-03-27 07:00:00', '2026-03-27 12:00:00', '2026-03-26 06:10:49'),
+(97, 53, 2, '2026-03-27 07:00:00', '2026-03-27 12:00:00', '2026-03-26 06:10:49'),
+(98, 54, 1, '2026-04-07 09:00:00', '2026-04-07 11:30:00', '2026-03-26 08:03:43'),
+(99, 54, 2, '2026-04-07 09:00:00', '2026-04-07 11:30:00', '2026-03-26 08:03:43'),
+(100, 55, 1, '2026-03-28 18:00:00', '2026-03-28 22:00:00', '2026-03-27 15:06:20'),
+(101, 56, 1, '2026-05-07 07:00:00', '2026-05-09 17:30:00', '2026-03-30 05:26:38'),
+(102, 56, 2, '2026-05-07 07:00:00', '2026-05-09 17:30:00', '2026-03-30 05:26:38'),
+(103, 56, 3, '2026-05-07 07:00:00', '2026-05-09 17:30:00', '2026-03-30 05:26:38'),
+(104, 56, 4, '2026-05-07 07:00:00', '2026-05-09 17:30:00', '2026-03-30 05:26:38'),
+(105, 56, 5, '2026-05-07 07:00:00', '2026-05-09 17:30:00', '2026-03-30 05:26:38'),
+(106, 57, 1, '2026-05-04 07:00:00', '2026-05-04 17:00:00', '2026-03-30 05:54:02'),
+(107, 57, 2, '2026-05-04 07:00:00', '2026-05-04 17:00:00', '2026-03-30 05:54:02'),
+(108, 57, 3, '2026-05-04 07:00:00', '2026-05-04 17:00:00', '2026-03-30 05:54:02'),
+(109, 57, 4, '2026-05-04 07:00:00', '2026-05-04 17:30:00', '2026-03-30 05:54:02'),
+(110, 57, 5, '2026-05-04 07:00:00', '2026-05-04 17:00:00', '2026-03-30 05:54:02'),
+(111, 58, 1, '2026-05-02 07:00:00', '2026-05-04 17:00:00', '2026-03-30 06:06:45'),
+(112, 58, 2, '2026-05-02 07:00:00', '2026-05-04 17:00:00', '2026-03-30 06:06:45'),
+(113, 58, 3, '2026-05-02 07:00:00', '2026-05-04 17:00:00', '2026-03-30 06:06:45'),
+(114, 58, 4, '2026-05-02 07:00:00', '2026-05-04 17:00:00', '2026-03-30 06:06:45'),
+(115, 58, 5, '2026-05-02 07:00:00', '2026-05-04 17:00:00', '2026-03-30 06:06:45'),
+(116, 59, 3, '2026-03-31 14:30:00', '2026-03-31 22:00:00', '2026-03-31 02:42:47'),
+(117, 60, 1, '2026-06-16 07:00:00', '2026-06-16 17:00:00', '2026-04-14 05:31:37'),
+(118, 60, 2, '2026-06-16 07:00:00', '2026-06-16 17:00:00', '2026-04-14 05:31:37');
 
 -- --------------------------------------------------------
 
@@ -2410,7 +2444,7 @@ ALTER TABLE `venue_setups`
 -- AUTO_INCREMENT for table `admin_logs`
 --
 ALTER TABLE `admin_logs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `admin_notifications`
@@ -2434,7 +2468,7 @@ ALTER TABLE `banquet`
 -- AUTO_INCREMENT for table `booking_sequences`
 --
 ALTER TABLE `booking_sequences`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `carousel_slides`
@@ -2470,7 +2504,7 @@ ALTER TABLE `facilities`
 -- AUTO_INCREMENT for table `facility_reservations`
 --
 ALTER TABLE `facility_reservations`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=53;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=61;
 
 --
 -- AUTO_INCREMENT for table `faq`
@@ -2542,7 +2576,7 @@ ALTER TABLE `guest_rooms`
 -- AUTO_INCREMENT for table `guest_room_availability`
 --
 ALTER TABLE `guest_room_availability`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=775;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=778;
 
 --
 -- AUTO_INCREMENT for table `guest_room_images`
@@ -2554,7 +2588,7 @@ ALTER TABLE `guest_room_images`
 -- AUTO_INCREMENT for table `guest_room_reservations`
 --
 ALTER TABLE `guest_room_reservations`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `messages`
@@ -2596,7 +2630,7 @@ ALTER TABLE `request`
 -- AUTO_INCREMENT for table `reservation_venues`
 --
 ALTER TABLE `reservation_venues`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=96;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=119;
 
 --
 -- AUTO_INCREMENT for table `settings`
