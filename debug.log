@@ -7800,3 +7800,273 @@ water dispenser
 [2026-04-14 13:31:37] Inserted activity_name: JPAMA Seminar
 [2026-04-14 13:31:37] Inserted 2 venue(s) into reservation_venues for reservation ID 60
 [2026-04-14 13:32:03] Confirmation email sent to geomarc789@gmail.com
+[2026-05-25 10:45:36] ========== START reservation_submit.php ==========
+[2026-05-25 16:45:36] RAW POST data: Array
+(
+    [reservation_type] => function
+    [last_name] => De Guzman
+    [first_name] => Geo Mar 
+    [middle_initial] => C
+    [email] => theavengergeo6@gmail.com
+    [contact] => 09087547440
+    [position] => 
+    [office_type_id] => 1
+    [office_id] => 6
+    [event_type_id] => 2
+    [activity_name] => HILO
+    [participants] => 60
+    [banquet_style_id] => 14
+    [guest_last_name] => 
+    [guest_first_name] => 
+    [guest_middle_initial] => 
+    [guest_dob] => 
+    [guest_address] => 
+    [guest_email] => 
+    [guest_contact] => 
+    [arrival_date] => 
+    [checkin_time] => 
+    [checkout_time] => 
+    [departure_date] => 
+    [adults_count] => 1
+    [kids_count] => 0
+    [guest_room_id] => 
+    [guest_remarks] => 
+    [venue_ids] => Array
+        (
+            [0] => 1
+            [1] => 2
+        )
+
+    [view_board_qty] => 1
+    [additional_instruction] => 
+    [action] => submit_function
+    [event_type] => Seminar and Lecture
+    [venue_id] => 1
+    [facilities_schedules] => {"venues":[{"id":"1","name":"Function Room A","floor":"2nd Floor"},{"id":"2","name":"Function Room B","floor":"2nd Floor"}],"schedules":{"1":[{"date":"2026-07-22","endDate":"2026-07-22","start":"13:00","end":"18:00"},{"date":"2026-07-24","endDate":"2026-07-24","start":"13:00","end":"18:00"}],"2":[{"date":"2026-07-22","endDate":"2026-07-22","start":"13:00","end":"18:00"},{"date":"2026-07-24","endDate":"2026-07-24","start":"13:00","end":"18:00"}]}}
+    [miscellaneous_items] => {"basic_sound_system":{"speaker":2,"mic":2},"banquet_chairs":{"quantity":60}}
+    [terms_agreed_by] => De Guzman, Geo Mar  C.
+    [terms_position] => 
+    [terms_date] => May 25, 2026
+)
+
+[2026-05-25 16:45:36] SPECIFIC CHECK - activity_name: 'HILO'
+[2026-05-25 16:45:36] SPECIFIC CHECK - event_type_id: '2'
+[2026-05-25 16:45:36] BEFORE CLEAN - activity_name: 'HILO'
+[2026-05-25 16:45:36] AFTER CLEAN - activity_name: 'HILO'
+[2026-05-25 16:45:36] event_type_id: 2
+[2026-05-25 16:45:36] FINAL activity_name: 'HILO'
+[2026-05-25 16:45:36] facilities_schedules decoded: Array
+(
+    [venues] => Array
+        (
+            [0] => Array
+                (
+                    [id] => 1
+                    [name] => Function Room A
+                    [floor] => 2nd Floor
+                )
+
+            [1] => Array
+                (
+                    [id] => 2
+                    [name] => Function Room B
+                    [floor] => 2nd Floor
+                )
+
+        )
+
+    [schedules] => Array
+        (
+            [1] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-07-22
+                            [endDate] => 2026-07-22
+                            [start] => 13:00
+                            [end] => 18:00
+                        )
+
+                    [1] => Array
+                        (
+                            [date] => 2026-07-24
+                            [endDate] => 2026-07-24
+                            [start] => 13:00
+                            [end] => 18:00
+                        )
+
+                )
+
+            [2] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-07-22
+                            [endDate] => 2026-07-22
+                            [start] => 13:00
+                            [end] => 18:00
+                        )
+
+                    [1] => Array
+                        (
+                            [date] => 2026-07-24
+                            [endDate] => 2026-07-24
+                            [start] => 13:00
+                            [end] => 18:00
+                        )
+
+                )
+
+        )
+
+)
+
+[2026-05-25 16:45:36] Times - start_datetime: 2026-07-22 13:00, end_datetime: 2026-07-22 18:00
+[2026-05-25 16:45:36] Conflict check passed for all venues
+[2026-05-25 16:45:36] Terms info captured: De Guzman, Geo Mar  C. | 
+[2026-05-25 16:45:36] SQL: INSERT INTO facility_reservations (
+        booking_no, reservation_no, last_name, first_name, middle_initial, 
+        email, contact_number, office_type_id, office_id, external_office_name, 
+        activity_name, event_type_id, venue_id, venue_setup_id, banquet_style_id,
+        start_datetime, end_datetime, participants_count, miscellaneous_items, 
+        additional_instruction
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+[2026-05-25 16:45:36] Success! Inserted ID: 61
+[2026-05-25 16:45:36] Inserted activity_name: HILO
+[2026-05-25 16:45:36] Inserted 2 venue(s) into reservation_venues for reservation ID 61
+[2026-05-25 16:45:56] Confirmation email sent to theavengergeo6@gmail.com
+[2026-05-25 11:43:52] ========== START reservation_submit.php ==========
+[2026-05-25 17:43:52] RAW POST data: Array
+(
+    [reservation_type] => function
+    [last_name] => De Guzman
+    [first_name] => Geo Mar 
+    [middle_initial] => 
+    [email] => theavengergeo62@gmail.com
+    [contact] => 09087547440
+    [position] => 
+    [office_type_id] => 1
+    [office_id] => 3
+    [event_type_id] => 2
+    [activity_name] => ccje
+    [participants] => 60
+    [banquet_style_id] => 
+    [guest_last_name] => 
+    [guest_first_name] => 
+    [guest_middle_initial] => 
+    [guest_dob] => 
+    [guest_address] => 
+    [guest_email] => 
+    [guest_contact] => 
+    [arrival_date] => 
+    [checkin_time] => 
+    [checkout_time] => 
+    [departure_date] => 
+    [adults_count] => 1
+    [kids_count] => 0
+    [guest_room_id] => 
+    [guest_remarks] => 
+    [venue_ids] => Array
+        (
+            [0] => 4
+            [1] => 5
+        )
+
+    [view_board_qty] => 1
+    [additional_instruction] => 
+    [action] => submit_function
+    [event_type] => Seminar and Lecture
+    [venue_id] => 4
+    [facilities_schedules] => {"venues":[{"id":"4","name":"Function Room D","floor":"2nd Floor"},{"id":"5","name":"Function Room E","floor":"2nd Floor"}],"schedules":{"4":[{"date":"2026-06-27","endDate":"2026-06-27","start":"07:00","end":"12:00"},{"date":"2026-06-29","endDate":"2026-06-29","start":"07:00","end":"12:00"}],"5":[{"date":"2026-06-27","endDate":"2026-06-27","start":"07:00","end":"12:00"},{"date":"2026-06-29","endDate":"2026-06-29","start":"07:00","end":"12:00"}]}}
+    [miscellaneous_items] => {"basic_sound_system":{"speaker":2,"mic":0},"view_board":{"requested":true}}
+    [terms_agreed_by] => De Guzman, Geo Mar
+    [terms_position] => 
+    [terms_date] => May 25, 2026
+)
+
+[2026-05-25 17:43:52] SPECIFIC CHECK - activity_name: 'ccje'
+[2026-05-25 17:43:52] SPECIFIC CHECK - event_type_id: '2'
+[2026-05-25 17:43:52] BEFORE CLEAN - activity_name: 'ccje'
+[2026-05-25 17:43:52] AFTER CLEAN - activity_name: 'ccje'
+[2026-05-25 17:43:52] event_type_id: 2
+[2026-05-25 17:43:52] FINAL activity_name: 'ccje'
+[2026-05-25 17:43:52] facilities_schedules decoded: Array
+(
+    [venues] => Array
+        (
+            [0] => Array
+                (
+                    [id] => 4
+                    [name] => Function Room D
+                    [floor] => 2nd Floor
+                )
+
+            [1] => Array
+                (
+                    [id] => 5
+                    [name] => Function Room E
+                    [floor] => 2nd Floor
+                )
+
+        )
+
+    [schedules] => Array
+        (
+            [4] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-06-27
+                            [endDate] => 2026-06-27
+                            [start] => 07:00
+                            [end] => 12:00
+                        )
+
+                    [1] => Array
+                        (
+                            [date] => 2026-06-29
+                            [endDate] => 2026-06-29
+                            [start] => 07:00
+                            [end] => 12:00
+                        )
+
+                )
+
+            [5] => Array
+                (
+                    [0] => Array
+                        (
+                            [date] => 2026-06-27
+                            [endDate] => 2026-06-27
+                            [start] => 07:00
+                            [end] => 12:00
+                        )
+
+                    [1] => Array
+                        (
+                            [date] => 2026-06-29
+                            [endDate] => 2026-06-29
+                            [start] => 07:00
+                            [end] => 12:00
+                        )
+
+                )
+
+        )
+
+)
+
+[2026-05-25 17:43:52] Times - start_datetime: 2026-06-27 07:00, end_datetime: 2026-06-27 12:00
+[2026-05-25 17:43:52] Conflict check passed for all venues
+[2026-05-25 17:43:52] Terms info captured: De Guzman, Geo Mar | 
+[2026-05-25 17:43:52] SQL: INSERT INTO facility_reservations (
+        booking_no, reservation_no, last_name, first_name, middle_initial, 
+        email, contact_number, office_type_id, office_id, external_office_name, 
+        activity_name, event_type_id, venue_id, venue_setup_id, banquet_style_id,
+        start_datetime, end_datetime, participants_count, miscellaneous_items, 
+        additional_instruction
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+[2026-05-25 17:43:52] Success! Inserted ID: 62
+[2026-05-25 17:43:52] Inserted activity_name: ccje
+[2026-05-25 17:43:52] Inserted 4 venue(s) into reservation_venues for reservation ID 62
+[2026-05-25 17:44:12] Confirmation email sent to theavengergeo62@gmail.com

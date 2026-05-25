@@ -4,7 +4,12 @@
  * BSU Hostel Management System
  */
 
-define('BASE_URL', 'http://localhost/BSU_HRS/');
+$protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https://" : "http://";
+$base_url = $protocol . $_SERVER['HTTP_HOST'] . '/';
+if ($_SERVER['HTTP_HOST'] === 'localhost' || $_SERVER['HTTP_HOST'] === '127.0.0.1') {
+    $base_url .= 'BSU_HRS/';
+}
+define('BASE_URL', $base_url);
 define('UPLOAD_PATH', __DIR__ . '/../images/uploads/');
 define('ROOM_IMAGES_PATH', UPLOAD_PATH . 'rooms/');
 define('PROFILE_PATH', UPLOAD_PATH . 'profiles/');

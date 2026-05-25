@@ -183,19 +183,39 @@ try {
 
         // Get this venue's schedule from the JSON
         $v_schedules = $schedules[$check_vid] ?? [];
-        $v_start_date = !empty($v_schedules) ? $v_schedules[0]['date'] : date('Y-m-d', strtotime($start_datetime));
-        $v_end_date   = !empty($v_schedules) ? ($v_schedules[0]['endDate'] ?? $v_start_date) : date('Y-m-d', strtotime($end_datetime));
-        $v_start_time = !empty($v_schedules) ? $v_schedules[0]['start'] : date('H:i:s', strtotime($start_datetime));
-        $v_end_time   = !empty($v_schedules) ? $v_schedules[0]['end'] : date('H:i:s', strtotime($end_datetime));
+        if (!empty($v_schedules)) {
+            foreach ($v_schedules as $sched) {
+                $v_start_date = $sched['date'];
+                $v_end_date   = $sched['endDate'] ?? $sched['date'];
+                $v_start_time = $sched['start'];
+                $v_end_time   = $sched['end'];
 
-        $conflict_stmt->bind_param("issss", $check_vid, $v_end_date, $v_start_date, $v_end_time, $v_start_time);
-        $conflict_stmt->execute();
-        $conflict_result = $conflict_stmt->get_result()->fetch_assoc();
+                $conflict_stmt->bind_param("issss", $check_vid, $v_end_date, $v_start_date, $v_end_time, $v_start_time);
+                $conflict_stmt->execute();
+                $conflict_result = $conflict_stmt->get_result()->fetch_assoc();
 
-        if (isset($conflict_result['conflict']) && (int)$conflict_result['conflict'] > 0) {
-            $venue_name_q = $conn->query("SELECT name FROM venues WHERE id = $check_vid");
-            $venue_name   = $venue_name_q ? $venue_name_q->fetch_assoc()['name'] : "Venue #$check_vid";
-            throw new Exception("$venue_name is already booked for the selected time (or within the 1-hour cleaning buffer) on those dates. Please choose a different time.");
+                if (isset($conflict_result['conflict']) && (int)$conflict_result['conflict'] > 0) {
+                    $venue_name_q = $conn->query("SELECT name FROM venues WHERE id = $check_vid");
+                    $venue_name   = $venue_name_q ? $venue_name_q->fetch_assoc()['name'] : "Venue #$check_vid";
+                    $display_date = date("M j, Y", strtotime($v_start_date));
+                    throw new Exception("$venue_name is already booked for the selected time (or within the 1-hour cleaning buffer) on $display_date. Please choose a different time.");
+                }
+            }
+        } else {
+            $v_start_date = date('Y-m-d', strtotime($start_datetime));
+            $v_end_date   = date('Y-m-d', strtotime($end_datetime));
+            $v_start_time = date('H:i:s', strtotime($start_datetime));
+            $v_end_time   = date('H:i:s', strtotime($end_datetime));
+
+            $conflict_stmt->bind_param("issss", $check_vid, $v_end_date, $v_start_date, $v_end_time, $v_start_time);
+            $conflict_stmt->execute();
+            $conflict_result = $conflict_stmt->get_result()->fetch_assoc();
+
+            if (isset($conflict_result['conflict']) && (int)$conflict_result['conflict'] > 0) {
+                $venue_name_q = $conn->query("SELECT name FROM venues WHERE id = $check_vid");
+                $venue_name   = $venue_name_q ? $venue_name_q->fetch_assoc()['name'] : "Venue #$check_vid";
+                throw new Exception("$venue_name is already booked for the selected time (or within the 1-hour cleaning buffer) on those dates. Please choose a different time.");
+            }
         }
     }
     $conflict_stmt->close();
@@ -296,17 +316,31 @@ try {
         $vid = (int)$vid;
         if (!$vid) continue;
 
-        // Get this venue's specific schedule from the JSON, fall back to main schedule
+        // Get this venue's specific schedules from the JSON, fall back to main schedule
         $v_schedules = $schedules[$vid] ?? [];
-        $v_start = !empty($v_schedules) ? $v_schedules[0]['date'] . ' ' . $v_schedules[0]['start'] : $start_datetime;
-        $v_end_date = !empty($v_schedules) ? ($v_schedules[0]['endDate'] ?? $v_schedules[0]['date']) : null;
-        $v_end   = !empty($v_schedules) ? $v_end_date . ' ' . $v_schedules[0]['end']   : $end_datetime;
+        if (!empty($v_schedules)) {
+            foreach ($v_schedules as $sched) {
+                $v_start = $sched['date'] . ' ' . $sched['start'];
+                $v_end_date = $sched['endDate'] ?? $sched['date'];
+                $v_end   = $v_end_date . ' ' . $sched['end'];
 
-        $venue_insert_stmt->bind_param("iiss", $insert_id, $vid, $v_start, $v_end);
-        if (!$venue_insert_stmt->execute()) {
-            write_log("Warning: Failed to insert venue $vid into reservation_venues: " . $venue_insert_stmt->error);
+                $venue_insert_stmt->bind_param("iiss", $insert_id, $vid, $v_start, $v_end);
+                if (!$venue_insert_stmt->execute()) {
+                    write_log("Warning: Failed to insert venue $vid into reservation_venues: " . $venue_insert_stmt->error);
+                } else {
+                    $venues_inserted++;
+                }
+            }
         } else {
-            $venues_inserted++;
+            $v_start = $start_datetime;
+            $v_end   = $end_datetime;
+
+            $venue_insert_stmt->bind_param("iiss", $insert_id, $vid, $v_start, $v_end);
+            if (!$venue_insert_stmt->execute()) {
+                write_log("Warning: Failed to insert venue $vid into reservation_venues: " . $venue_insert_stmt->error);
+            } else {
+                $venues_inserted++;
+            }
         }
     }
     $venue_insert_stmt->close();
@@ -329,7 +363,7 @@ try {
         ")->fetch_assoc();
         if ($res_row) {
             $venue_names_q = $conn->query("
-                SELECT v.name FROM reservation_venues rv
+                SELECT DISTINCT v.name FROM reservation_venues rv
                 JOIN venues v ON rv.venue_id = v.id
                 WHERE rv.reservation_id = $insert_id ORDER BY v.name
             ");
@@ -338,6 +372,19 @@ try {
                 $venue_names[] = $vn['name'];
             }
             $res_row['venue_names'] = implode(', ', $venue_names);
+
+            $schedules_q = $conn->query("
+                SELECT rv.start_datetime, rv.end_datetime
+                FROM reservation_venues rv
+                WHERE rv.reservation_id = $insert_id
+                ORDER BY rv.start_datetime ASC
+            ");
+            $res_row['schedules'] = [];
+            if ($schedules_q) {
+                while ($sch = $schedules_q->fetch_assoc()) {
+                    $res_row['schedules'][] = $sch;
+                }
+            }
             $res_row['office_display'] = ($res_row['office_type_name'] ?? '') === 'External'
                 ? ($res_row['external_office_name'] ?? '')
                 : trim(($res_row['office_type_name'] ?? '') . ' - ' . ($res_row['office_name'] ?? ''));

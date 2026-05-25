@@ -7,7 +7,7 @@ if (!isAdminLoggedIn()) {
     redirect('index.php');
 }
 
-$id = (int)($_GET['id'] ?? 0);
+$id = (int) ($_GET['id'] ?? 0);
 if (!$id) {
     redirect('reservations.php');
 }
@@ -15,7 +15,7 @@ if (!$id) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $new_status = $_POST['status'] ?? '';
     $admin_remarks = clean($_POST['admin_remarks'] ?? '');
-    $reservation_id = (int)($_POST['reservation_id'] ?? 0);
+    $reservation_id = (int) ($_POST['reservation_id'] ?? 0);
 
     if ($reservation_id === $id && in_array($new_status, ['pending', 'pencil_booked', 'approved', 'cancelled'])) {
         $remark_entry = "\n--- " . date("Y-m-d H:i:s") . " (" . ucfirst(str_replace('_', ' ', $new_status)) . ") ---\n" . $admin_remarks;
@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $update_stmt->bind_param("ssi", $new_status, $remark_entry, $id);
         if ($update_stmt->execute()) {
             $_SESSION['success_message'] = "Reservation status updated successfully!";
-            
+
             // --- Send Email Notification ---
             try {
                 // Fetch basic info for the email
@@ -31,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $info_stmt->bind_param("i", $id);
                 $info_stmt->execute();
                 $info_res = $info_stmt->get_result();
-                
+
                 if ($info_res && $info_res->num_rows > 0) {
                     $info = $info_res->fetch_assoc();
                     require_once __DIR__ . '/../inc/EmailSender.php';
@@ -123,23 +123,32 @@ if (empty($all_venues)) {
     $fb_stmt->close();
 }
 
-function getStatusBadgeClass($status) {
+function getStatusBadgeClass($status)
+{
     switch (strtolower($status)) {
-        case 'pending':       return 'status-pending';
-        case 'pencil_booked': return 'status-pencil';
-        case 'approved':      return 'status-approved';
-        case 'cancelled':     return 'status-cancelled';
-        case 'denied':        return 'status-denied';
-        case 'completed':     return 'status-completed';
-        default:              return 'status-default';
+        case 'pending':
+            return 'status-pending';
+        case 'pencil_booked':
+            return 'status-pencil';
+        case 'approved':
+            return 'status-approved';
+        case 'cancelled':
+            return 'status-cancelled';
+        case 'denied':
+            return 'status-denied';
+        case 'completed':
+            return 'status-completed';
+        default:
+            return 'status-default';
     }
 }
 
 $start = new DateTime($reservation['start_datetime']);
-$end   = new DateTime($reservation['end_datetime']);
+$end = new DateTime($reservation['end_datetime']);
 $interval = $start->diff($end);
 $duration_hours = $interval->h + ($interval->days * 24);
-if ($interval->i > 0) $duration_hours += $interval->i / 60;
+if ($interval->i > 0)
+    $duration_hours += $interval->i / 60;
 $duration_text = round($duration_hours, 1) . " hours";
 
 $page_title = "Reservation Details - " . htmlspecialchars($reservation['booking_no']);
@@ -147,540 +156,661 @@ include 'inc/header.php';
 ?>
 
 <style>
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
-
-:root {
-    --red:        #b71c1c;
-    --red-dark:   #8b0000;
-    --red-muted:  rgba(183,28,28,0.08);
-    --bg:         #f4f5f7;
-    --surface:    #ffffff;
-    --border:     #e8eaed;
-    --text-main:  #1a1f2e;
-    --text-sub:   #6b7280;
-    --text-label: #9ca3af;
-    --radius-lg:  14px;
-    --radius-md:  10px;
-    --radius-sm:  6px;
-    --shadow-sm:  0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
-    --shadow-md:  0 4px 16px rgba(0,0,0,0.07), 0 1px 4px rgba(0,0,0,0.04);
-    --transition: 0.18s ease;
-}
-
-*, *::before, *::after { box-sizing: border-box; }
-
-body {
-    background: var(--bg);
-    font-family: 'DM Sans', sans-serif;
-    color: var(--text-main);
-}
-
-.content-area {
-    padding: 1.25rem 1.25rem;
-    /* No max-width — the admin shell already constrains the available width */
-    box-sizing: border-box;
-    width: 100%;
-    overflow-x: hidden;
-}
-
-/* ── Page header ── */
-.page-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 1.5rem;
-    gap: 1rem;
-    flex-wrap: wrap;
-}
-
-.page-title {
-    font-size: 1.2rem;
-    font-weight: 700;
-    color: var(--text-main);
-    margin: 0;
-    letter-spacing: -0.3px;
-    flex-shrink: 1;
-    min-width: 0;
-}
-
-.page-title span { color: var(--red); }
-
-.btn-back {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    padding: 0.55rem 1.1rem;
-    background: var(--surface);
-    color: var(--text-sub);
-    border: 1px solid var(--border);
-    border-radius: 50px;
-    font-size: 0.85rem;
-    font-weight: 500;
-    text-decoration: none;
-    transition: var(--transition);
-}
-.btn-back:hover {
-    border-color: var(--red);
-    color: var(--red);
-    background: var(--red-muted);
-}
-
-/* ── Booking hero bar ── */
-.booking-hero {
-    background: linear-gradient(120deg, var(--red) 0%, var(--red-dark) 100%);
-    border-radius: var(--radius-lg);
-    padding: 1rem 1.25rem;
-    margin-bottom: 1.25rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.75rem;
-    flex-wrap: wrap;
-    box-shadow: 0 6px 24px rgba(183,28,28,0.22);
-    min-width: 0;
-    overflow: hidden;
-}
-
-.booking-hero-left { display: flex; flex-direction: column; gap: 0.2rem; min-width: 0; flex: 1 1 auto; }
-
-.booking-no {
-    font-family: 'DM Mono', monospace;
-    font-size: 1.15rem;
-    font-weight: 500;
-    color: #fff;
-    letter-spacing: 0.3px;
-    line-height: 1.2;
-    word-break: break-all;
-    min-width: 0;
-}
-
-.booking-meta {
-    font-size: 0.8rem;
-    color: rgba(255,255,255,0.72);
-    letter-spacing: 0.2px;
-}
-
-.booking-hero-right {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 0.35rem;
-    flex-shrink: 0;
-}
-
-.status-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
-    padding: 0.35rem 0.9rem;
-    border-radius: 50px;
-    font-size: 0.78rem;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-}
-.status-pill::before {
-    content: '';
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: currentColor;
-    opacity: 0.7;
-}
-.status-pending   { background: #fff3cd; color: #92600a; }
-.status-pencil    { background: #ede9fe; color: #5b21b6; }
-.status-approved  { background: #dcfce7; color: #166534; }
-.status-cancelled,
-.status-denied    { background: #fee2e2; color: #991b1b; }
-.status-completed { background: #dbeafe; color: #1d4ed8; }
-.status-default   { background: #f3f4f6; color: #374151; }
-
-.submitted-on {
-    font-size: 0.75rem;
-    color: rgba(255,255,255,0.6);
-}
-
-/* ── Layout: left main + right sidebar ── */
-.rd-layout {
-    display: grid;
-    grid-template-columns: 1fr minmax(0, 280px);
-    gap: 1.25rem;
-    align-items: start;
-    width: 100%;
-    min-width: 0;
-}
-
-.rd-main { display: flex; flex-direction: column; gap: 1.25rem; min-width: 0; }
-.rd-sidebar { display: flex; flex-direction: column; gap: 1.25rem; min-width: 0; }
-
-/* ── Cards ── */
-.rd-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-    box-shadow: var(--shadow-sm);
-    transition: box-shadow var(--transition), border-color var(--transition);
-}
-.rd-card:hover {
-    box-shadow: var(--shadow-md);
-    border-color: #d1d5db;
-}
-
-.rd-card-header {
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-    padding: 0.9rem 1.25rem;
-    border-bottom: 1px solid var(--border);
-    background: #fafafa;
-}
-
-.rd-card-header .ch-icon {
-    width: 30px; height: 30px;
-    display: flex; align-items: center; justify-content: center;
-    background: var(--red-muted);
-    color: var(--red);
-    border-radius: var(--radius-sm);
-    font-size: 0.9rem;
-    flex-shrink: 0;
-}
-
-.rd-card-header .ch-title {
-    font-size: 0.82rem;
-    font-weight: 700;
-    color: var(--text-main);
-    text-transform: uppercase;
-    letter-spacing: 0.6px;
-}
-
-.rd-card-body { padding: 1.25rem; }
-
-/* ── Field rows ── */
-.field-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0;
-}
-
-.field-item {
-    padding: 0.75rem 0;
-    border-bottom: 1px solid #f3f4f6;
-}
-
-.field-item:nth-child(odd) { padding-right: 1.5rem; }
-.field-item:nth-child(even) { padding-left: 1.5rem; border-left: 1px solid #f3f4f6; }
-
-.field-item.full {
-    grid-column: 1 / -1;
-    padding-right: 0;
-    padding-left: 0;
-    border-left: none;
-}
-
-.field-item:last-child,
-.field-item:nth-last-child(2):nth-child(odd) { border-bottom: none; }
-
-.f-label {
-    font-size: 0.68rem;
-    font-weight: 600;
-    color: var(--text-label);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 0.2rem;
-    display: flex;
-    align-items: center;
-    gap: 0.3rem;
-}
-
-.f-label i { font-size: 0.75rem; color: var(--red); }
-
-.f-value {
-    font-size: 0.9rem;
-    font-weight: 500;
-    color: var(--text-main);
-    line-height: 1.4;
-    word-break: break-word;
-    overflow-wrap: break-word;
-    min-width: 0;
-}
-
-.f-value.muted { color: var(--text-sub); font-style: italic; font-weight: 400; }
-
-/* ── Venues ── */
-.venue-date-group {
-    margin-bottom: 0.75rem;
-}
-
-.venue-date-group:last-child { margin-bottom: 0; }
-
-.vdg-date {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
-    font-size: 0.75rem;
-    font-weight: 700;
-    color: var(--red);
-    text-transform: uppercase;
-    letter-spacing: 0.4px;
-    background: var(--red-muted);
-    padding: 0.25rem 0.65rem;
-    border-radius: 50px;
-    margin-bottom: 0.6rem;
-}
-
-.venue-row {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 0.6rem 0.9rem;
-    background: #f9fafb;
-    border-radius: var(--radius-md);
-    border: 1px solid var(--border);
-    margin-bottom: 0.4rem;
-}
-.venue-row:last-child { margin-bottom: 0; }
-
-.vr-name {
-    font-size: 0.88rem;
-    font-weight: 600;
-    color: var(--text-main);
-}
-
-.vr-floor {
-    font-size: 0.73rem;
-    color: var(--text-sub);
-    font-weight: 400;
-}
-
-.vr-time {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.78rem;
-    font-weight: 500;
-    color: var(--red);
-    white-space: nowrap;
-    background: white;
-    border: 1px solid #fecaca;
-    padding: 0.25rem 0.6rem;
-    border-radius: var(--radius-sm);
-}
-
-.venue-stats {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.75rem;
-    margin-top: 1rem;
-    padding-top: 1rem;
-    border-top: 1px solid var(--border);
-}
-
-.vstat {
-    text-align: center;
-    background: #f9fafb;
-    border-radius: var(--radius-md);
-    padding: 0.7rem;
-    border: 1px solid var(--border);
-}
-
-.vstat-num {
-    font-size: 1.6rem;
-    font-weight: 700;
-    color: var(--red);
-    line-height: 1.1;
-}
-
-.vstat-label {
-    font-size: 0.68rem;
-    color: var(--text-label);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-top: 0.15rem;
-}
-
-/* ── Misc items ── */
-.misc-chip-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
-
-.misc-chip {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0.55rem 0.85rem;
-    background: #f9fafb;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-md);
-    font-size: 0.85rem;
-}
-
-.mc-label {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-weight: 600;
-    color: var(--text-main);
-}
-
-.mc-label i { color: var(--red); font-size: 0.85rem; }
-
-.mc-value {
-    font-size: 0.8rem;
-    color: var(--text-sub);
-    background: white;
-    border: 1px solid var(--border);
-    padding: 0.2rem 0.6rem;
-    border-radius: 50px;
-}
-
-/* ── Sidebar cards ── */
-/* Admin actions */
-.rd-card-header.header-action .ch-icon {
-    background: #fff3f3;
-}
-
-.form-field { margin-bottom: 1rem; }
-
-.form-field:last-of-type { margin-bottom: 0; }
-
-.fl-label {
-    font-size: 0.72rem;
-    font-weight: 700;
-    color: var(--text-sub);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 0.35rem;
-    display: block;
-}
-
-.fl-select, .fl-textarea {
-    width: 100%;
-    border: 1.5px solid var(--border);
-    border-radius: var(--radius-md);
-    padding: 0.6rem 0.8rem;
-    font-size: 0.875rem;
-    font-family: 'DM Sans', sans-serif;
-    color: var(--text-main);
-    background: white;
-    transition: border-color var(--transition);
-    outline: none;
-}
-
-.fl-select:focus, .fl-textarea:focus {
-    border-color: var(--red);
-    box-shadow: 0 0 0 3px rgba(183,28,28,0.08);
-}
-
-.fl-textarea { resize: vertical; min-height: 80px; }
-
-.current-status-tag {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.3rem;
-    font-size: 0.72rem;
-    color: var(--text-sub);
-    margin-top: 0.3rem;
-}
-
-.current-status-tag strong { color: var(--text-main); }
-
-.btn-update {
-    width: 100%;
-    background: linear-gradient(135deg, var(--red), var(--red-dark));
-    color: white;
-    border: none;
-    padding: 0.7rem 1rem;
-    border-radius: var(--radius-md);
-    font-size: 0.875rem;
-    font-weight: 600;
-    font-family: 'DM Sans', sans-serif;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.4rem;
-    transition: all var(--transition);
-    margin-top: 1rem;
-    box-shadow: 0 3px 10px rgba(183,28,28,0.25);
-}
-
-.btn-update:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 18px rgba(183,28,28,0.35);
-}
-
-.btn-update:active { transform: translateY(0); }
-
-/* Remarks history */
-.remark-entry {
-    padding: 0.75rem;
-    background: #f9fafb;
-    border-radius: var(--radius-md);
-    border: 1px solid var(--border);
-    margin-bottom: 0.6rem;
-    font-size: 0.82rem;
-    line-height: 1.55;
-}
-.remark-entry:last-child { margin-bottom: 0; }
-
-.remark-header {
-    font-size: 0.7rem;
-    font-weight: 700;
-    color: var(--red);
-    text-transform: uppercase;
-    letter-spacing: 0.4px;
-    margin-bottom: 0.35rem;
-    display: flex;
-    align-items: center;
-    gap: 0.3rem;
-}
-
-.remark-text {
-    color: var(--text-sub);
-    white-space: pre-wrap;
-}
-
-/* Instructions */
-.instructions-text {
-    font-size: 0.875rem;
-    line-height: 1.6;
-    color: var(--text-sub);
-    background: #f9fafb;
-    border-radius: var(--radius-md);
-    padding: 0.85rem 1rem;
-    border: 1px solid var(--border);
-    white-space: pre-wrap;
-}
-
-/* Banquet thumbnail */
-.banquet-preview {
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-}
-.banquet-thumb {
-    width: 36px; height: 36px;
-    object-fit: cover;
-    border-radius: var(--radius-sm);
-    border: 1px solid var(--border);
-    flex-shrink: 0;
-}
-
-/* Responsive */
-@media (max-width: 1200px) {
-    .rd-layout { grid-template-columns: 1fr; }
-    .rd-sidebar { flex-direction: row; flex-wrap: wrap; }
-    .rd-sidebar .rd-card { flex: 1 1 280px; }
-}
-
-@media (max-width: 640px) {
-    .content-area { padding: 1rem; }
-    .field-grid { grid-template-columns: 1fr; }
-    .field-item:nth-child(even) { border-left: none; padding-left: 0; }
-    .booking-no { font-size: 1.1rem; }
-    .rd-sidebar { flex-direction: column; }
-}
+    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
+
+    :root {
+        --red: #b71c1c;
+        --red-dark: #8b0000;
+        --red-muted: rgba(183, 28, 28, 0.08);
+        --bg: #f4f5f7;
+        --surface: #ffffff;
+        --border: #e8eaed;
+        --text-main: #1a1f2e;
+        --text-sub: #6b7280;
+        --text-label: #9ca3af;
+        --radius-lg: 14px;
+        --radius-md: 10px;
+        --radius-sm: 6px;
+        --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+        --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.07), 0 1px 4px rgba(0, 0, 0, 0.04);
+        --transition: 0.18s ease;
+    }
+
+    *,
+    *::before,
+    *::after {
+        box-sizing: border-box;
+    }
+
+    body {
+        background: var(--bg);
+        font-family: 'DM Sans', sans-serif;
+        color: var(--text-main);
+    }
+
+    .content-area {
+        padding: 1.25rem 1.25rem;
+        /* No max-width — the admin shell already constrains the available width */
+        box-sizing: border-box;
+        width: 100%;
+        overflow-x: hidden;
+    }
+
+    /* ── Page header ── */
+    .page-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1.5rem;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .page-title {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: var(--text-main);
+        margin: 0;
+        letter-spacing: -0.3px;
+        flex-shrink: 1;
+        min-width: 0;
+    }
+
+    .page-title span {
+        color: var(--red);
+    }
+
+    .btn-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.55rem 1.1rem;
+        background: var(--surface);
+        color: var(--text-sub);
+        border: 1px solid var(--border);
+        border-radius: 50px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        text-decoration: none;
+        transition: var(--transition);
+    }
+
+    .btn-back:hover {
+        border-color: var(--red);
+        color: var(--red);
+        background: var(--red-muted);
+    }
+
+    /* ── Booking hero bar ── */
+    .booking-hero {
+        background: linear-gradient(120deg, var(--red) 0%, var(--red-dark) 100%);
+        border-radius: var(--radius-lg);
+        padding: 1rem 1.25rem;
+        margin-bottom: 1.25rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+        box-shadow: 0 6px 24px rgba(183, 28, 28, 0.22);
+        min-width: 0;
+        overflow: hidden;
+    }
+
+    .booking-hero-left {
+        display: flex;
+        flex-direction: column;
+        gap: 0.2rem;
+        min-width: 0;
+        flex: 1 1 auto;
+    }
+
+    .booking-no {
+        font-family: 'DM Mono', monospace;
+        font-size: 1.15rem;
+        font-weight: 500;
+        color: #fff;
+        letter-spacing: 0.3px;
+        line-height: 1.2;
+        word-break: break-all;
+        min-width: 0;
+    }
+
+    .booking-meta {
+        font-size: 0.8rem;
+        color: rgba(255, 255, 255, 0.72);
+        letter-spacing: 0.2px;
+    }
+
+    .booking-hero-right {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 0.35rem;
+        flex-shrink: 0;
+    }
+
+    .status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.35rem 0.9rem;
+        border-radius: 50px;
+        font-size: 0.78rem;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+    }
+
+    .status-pill::before {
+        content: '';
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: currentColor;
+        opacity: 0.7;
+    }
+
+    .status-pending {
+        background: #fff3cd;
+        color: #92600a;
+    }
+
+    .status-pencil {
+        background: #ede9fe;
+        color: #5b21b6;
+    }
+
+    .status-approved {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .status-cancelled,
+    .status-denied {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .status-completed {
+        background: #dbeafe;
+        color: #1d4ed8;
+    }
+
+    .status-default {
+        background: #f3f4f6;
+        color: #374151;
+    }
+
+    .submitted-on {
+        font-size: 0.75rem;
+        color: rgba(255, 255, 255, 0.6);
+    }
+
+    /* ── Layout: left main + right sidebar ── */
+    .rd-layout {
+        display: grid;
+        grid-template-columns: 1fr minmax(0, 280px);
+        gap: 1.25rem;
+        align-items: start;
+        width: 100%;
+        min-width: 0;
+    }
+
+    .rd-main {
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
+        min-width: 0;
+    }
+
+    .rd-sidebar {
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
+        min-width: 0;
+    }
+
+    /* ── Cards ── */
+    .rd-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        box-shadow: var(--shadow-sm);
+        transition: box-shadow var(--transition), border-color var(--transition);
+    }
+
+    .rd-card:hover {
+        box-shadow: var(--shadow-md);
+        border-color: #d1d5db;
+    }
+
+    .rd-card-header {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        padding: 0.9rem 1.25rem;
+        border-bottom: 1px solid var(--border);
+        background: #fafafa;
+    }
+
+    .rd-card-header .ch-icon {
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--red-muted);
+        color: var(--red);
+        border-radius: var(--radius-sm);
+        font-size: 0.9rem;
+        flex-shrink: 0;
+    }
+
+    .rd-card-header .ch-title {
+        font-size: 0.82rem;
+        font-weight: 700;
+        color: var(--text-main);
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+    }
+
+    .rd-card-body {
+        padding: 1.25rem;
+    }
+
+    /* ── Field rows ── */
+    .field-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0;
+    }
+
+    .field-item {
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #f3f4f6;
+    }
+
+    .field-item:nth-child(odd) {
+        padding-right: 1.5rem;
+    }
+
+    .field-item:nth-child(even) {
+        padding-left: 1.5rem;
+        border-left: 1px solid #f3f4f6;
+    }
+
+    .field-item.full {
+        grid-column: 1 / -1;
+        padding-right: 0;
+        padding-left: 0;
+        border-left: none;
+    }
+
+    .field-item:last-child,
+    .field-item:nth-last-child(2):nth-child(odd) {
+        border-bottom: none;
+    }
+
+    .f-label {
+        font-size: 0.68rem;
+        font-weight: 600;
+        color: var(--text-label);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.2rem;
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+    }
+
+    .f-label i {
+        font-size: 0.75rem;
+        color: var(--red);
+    }
+
+    .f-value {
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: var(--text-main);
+        line-height: 1.4;
+        word-break: break-word;
+        overflow-wrap: break-word;
+        min-width: 0;
+    }
+
+    .f-value.muted {
+        color: var(--text-sub);
+        font-style: italic;
+        font-weight: 400;
+    }
+
+    /* ── Venues ── */
+    .venue-date-group {
+        margin-bottom: 0.75rem;
+    }
+
+    .venue-date-group:last-child {
+        margin-bottom: 0;
+    }
+
+    .vdg-date {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: var(--red);
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+        background: var(--red-muted);
+        padding: 0.25rem 0.65rem;
+        border-radius: 50px;
+        margin-bottom: 0.6rem;
+    }
+
+    .venue-row {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.6rem 0.9rem;
+        background: #f9fafb;
+        border-radius: var(--radius-md);
+        border: 1px solid var(--border);
+        margin-bottom: 0.4rem;
+    }
+
+    .venue-row:last-child {
+        margin-bottom: 0;
+    }
+
+    .vr-name {
+        font-size: 0.88rem;
+        font-weight: 600;
+        color: var(--text-main);
+    }
+
+    .vr-floor {
+        font-size: 0.73rem;
+        color: var(--text-sub);
+        font-weight: 400;
+    }
+
+    .vr-time {
+        font-family: 'DM Mono', monospace;
+        font-size: 0.78rem;
+        font-weight: 500;
+        color: var(--red);
+        white-space: nowrap;
+        background: white;
+        border: 1px solid #fecaca;
+        padding: 0.25rem 0.6rem;
+        border-radius: var(--radius-sm);
+    }
+
+    .venue-stats {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.75rem;
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--border);
+    }
+
+    .vstat {
+        text-align: center;
+        background: #f9fafb;
+        border-radius: var(--radius-md);
+        padding: 0.7rem;
+        border: 1px solid var(--border);
+    }
+
+    .vstat-num {
+        font-size: 1.6rem;
+        font-weight: 700;
+        color: var(--red);
+        line-height: 1.1;
+    }
+
+    .vstat-label {
+        font-size: 0.68rem;
+        color: var(--text-label);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-top: 0.15rem;
+    }
+
+    /* ── Misc items ── */
+    .misc-chip-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .misc-chip {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.55rem 0.85rem;
+        background: #f9fafb;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        font-size: 0.85rem;
+    }
+
+    .mc-label {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: 600;
+        color: var(--text-main);
+    }
+
+    .mc-label i {
+        color: var(--red);
+        font-size: 0.85rem;
+    }
+
+    .mc-value {
+        font-size: 0.8rem;
+        color: var(--text-sub);
+        background: white;
+        border: 1px solid var(--border);
+        padding: 0.2rem 0.6rem;
+        border-radius: 50px;
+    }
+
+    /* ── Sidebar cards ── */
+    /* Admin actions */
+    .rd-card-header.header-action .ch-icon {
+        background: #fff3f3;
+    }
+
+    .form-field {
+        margin-bottom: 1rem;
+    }
+
+    .form-field:last-of-type {
+        margin-bottom: 0;
+    }
+
+    .fl-label {
+        font-size: 0.72rem;
+        font-weight: 700;
+        color: var(--text-sub);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.35rem;
+        display: block;
+    }
+
+    .fl-select,
+    .fl-textarea {
+        width: 100%;
+        border: 1.5px solid var(--border);
+        border-radius: var(--radius-md);
+        padding: 0.6rem 0.8rem;
+        font-size: 0.875rem;
+        font-family: 'DM Sans', sans-serif;
+        color: var(--text-main);
+        background: white;
+        transition: border-color var(--transition);
+        outline: none;
+    }
+
+    .fl-select:focus,
+    .fl-textarea:focus {
+        border-color: var(--red);
+        box-shadow: 0 0 0 3px rgba(183, 28, 28, 0.08);
+    }
+
+    .fl-textarea {
+        resize: vertical;
+        min-height: 80px;
+    }
+
+    .current-status-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        font-size: 0.72rem;
+        color: var(--text-sub);
+        margin-top: 0.3rem;
+    }
+
+    .current-status-tag strong {
+        color: var(--text-main);
+    }
+
+    .btn-update {
+        width: 100%;
+        background: linear-gradient(135deg, var(--red), var(--red-dark));
+        color: white;
+        border: none;
+        padding: 0.7rem 1rem;
+        border-radius: var(--radius-md);
+        font-size: 0.875rem;
+        font-weight: 600;
+        font-family: 'DM Sans', sans-serif;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.4rem;
+        transition: all var(--transition);
+        margin-top: 1rem;
+        box-shadow: 0 3px 10px rgba(183, 28, 28, 0.25);
+    }
+
+    .btn-update:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 18px rgba(183, 28, 28, 0.35);
+    }
+
+    .btn-update:active {
+        transform: translateY(0);
+    }
+
+    /* Remarks history */
+    .remark-entry {
+        padding: 0.75rem;
+        background: #f9fafb;
+        border-radius: var(--radius-md);
+        border: 1px solid var(--border);
+        margin-bottom: 0.6rem;
+        font-size: 0.82rem;
+        line-height: 1.55;
+    }
+
+    .remark-entry:last-child {
+        margin-bottom: 0;
+    }
+
+    .remark-header {
+        font-size: 0.7rem;
+        font-weight: 700;
+        color: var(--red);
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+        margin-bottom: 0.35rem;
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+    }
+
+    .remark-text {
+        color: var(--text-sub);
+        white-space: pre-wrap;
+    }
+
+    /* Instructions */
+    .instructions-text {
+        font-size: 0.875rem;
+        line-height: 1.6;
+        color: var(--text-sub);
+        background: #f9fafb;
+        border-radius: var(--radius-md);
+        padding: 0.85rem 1rem;
+        border: 1px solid var(--border);
+        white-space: pre-wrap;
+    }
+
+    /* Banquet thumbnail */
+    .banquet-preview {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+    }
+
+    .banquet-thumb {
+        width: 36px;
+        height: 36px;
+        object-fit: cover;
+        border-radius: var(--radius-sm);
+        border: 1px solid var(--border);
+        flex-shrink: 0;
+    }
+
+    /* Responsive */
+    @media (max-width: 1200px) {
+        .rd-layout {
+            grid-template-columns: 1fr;
+        }
+
+        .rd-sidebar {
+            flex-direction: row;
+            flex-wrap: wrap;
+        }
+
+        .rd-sidebar .rd-card {
+            flex: 1 1 280px;
+        }
+    }
+
+    @media (max-width: 640px) {
+        .content-area {
+            padding: 1rem;
+        }
+
+        .field-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .field-item:nth-child(even) {
+            border-left: none;
+            padding-left: 0;
+        }
+
+        .booking-no {
+            font-size: 1.1rem;
+        }
+
+        .rd-sidebar {
+            flex-direction: column;
+        }
+    }
 </style>
 
 <div class="content-area">
@@ -693,15 +823,15 @@ body {
         </h1>
         <div class="d-flex gap-2 flex-wrap align-items-center">
             <a href="function_room_pdf.php?id=<?= $id ?>" target="_blank"
-               style="display:inline-flex;align-items:center;gap:.4rem;padding:.5rem 1rem;background:#fdeae8;color:var(--red);border:1.5px solid #fecaca;border-radius:50px;font-size:.83rem;font-weight:600;text-decoration:none;transition:all .2s;"
-               onmouseover="this.style.background='var(--red)';this.style.color='#fff';"
-               onmouseout="this.style.background='#fdeae8';this.style.color='var(--red)';">
+                style="display:inline-flex;align-items:center;gap:.4rem;padding:.5rem 1rem;background:#fdeae8;color:var(--red);border:1.5px solid #fecaca;border-radius:50px;font-size:.83rem;font-weight:600;text-decoration:none;transition:all .2s;"
+                onmouseover="this.style.background='var(--red)';this.style.color='#fff';"
+                onmouseout="this.style.background='#fdeae8';this.style.color='var(--red)';">
                 <i class="bi bi-file-earmark-pdf"></i> View PDF Form
             </a>
             <a href="function_room_pdf.php?id=<?= $id ?>&download=1"
-               style="display:inline-flex;align-items:center;gap:.4rem;padding:.5rem 1rem;background:#f8f9fa;color:#555;border:1.5px solid #dee2e6;border-radius:50px;font-size:.83rem;font-weight:600;text-decoration:none;transition:all .2s;"
-               onmouseover="this.style.background='#555';this.style.color='#fff';"
-               onmouseout="this.style.background='#f8f9fa';this.style.color='#555';">
+                style="display:inline-flex;align-items:center;gap:.4rem;padding:.5rem 1rem;background:#f8f9fa;color:#555;border:1.5px solid #dee2e6;border-radius:50px;font-size:.83rem;font-weight:600;text-decoration:none;transition:all .2s;"
+                onmouseover="this.style.background='#555';this.style.color='#fff';"
+                onmouseout="this.style.background='#f8f9fa';this.style.color='#555';">
                 <i class="bi bi-download"></i> Download PDF
             </a>
             <a href="reservations.php" class="btn-back">
@@ -747,7 +877,10 @@ body {
                     <div class="field-grid">
                         <div class="field-item">
                             <div class="f-label"><i class="bi bi-person-badge"></i> Contact Name</div>
-                            <div class="f-value"><?= htmlspecialchars($reservation['last_name'] . ', ' . $reservation['first_name'] . ' ' . $reservation['middle_initial']) ?></div>
+                            <div class="f-value">
+                                
+                                <?= htmlspecialchars($reservation['last_name'] . ', ' . $reservation['first_name'] . ' ' . $reservation['middle_initial']) ?>
+                            </div>
                         </div>
                         <div class="field-item">
                             <div class="f-label"><i class="bi bi-building"></i> Office</div>
@@ -757,7 +890,8 @@ body {
                                 if (($reservation['office_type_name'] ?? '') === 'External') {
                                     echo ' — ' . htmlspecialchars($reservation['external_office_name'] ?? '');
                                 } else {
-                                    if (!empty($reservation['office_name'])) echo ' — ' . htmlspecialchars($reservation['office_name']);
+                                    if (!empty($reservation['office_name']))
+                                        echo ' — ' . htmlspecialchars($reservation['office_name']);
                                 }
                                 ?>
                             </div>
@@ -810,17 +944,16 @@ body {
                             <div class="f-label"><i class="bi bi-grid-1x2"></i> Banquet Style</div>
                             <div class="f-value">
                                 <?php if (!empty($reservation['banquet_style_name'])): ?>
-                                    <div class="banquet-preview">
-                                        <?php if (!empty($reservation['banquet_image'])): ?>
-                                            <img src="../assets/images/banquet/<?= htmlspecialchars($reservation['banquet_image']) ?>"
-                                                 alt="<?= htmlspecialchars($reservation['banquet_style_name']) ?>"
-                                                 class="banquet-thumb"
-                                                 onerror="this.style.display='none'">
-                                        <?php endif; ?>
-                                        <span><?= htmlspecialchars($reservation['banquet_style_name']) ?></span>
-                                    </div>
+                                        <div class="banquet-preview">
+                                            <?php if (!empty($reservation['banquet_image'])): ?>
+                                                    <img src="../assets/images/banquet/<?= htmlspecialchars($reservation['banquet_image']) ?>"
+                                                        alt="<?= htmlspecialchars($reservation['banquet_style_name']) ?>"
+                                                        class="banquet-thumb" onerror="this.style.display='none'">
+                                            <?php endif; ?>
+                                            <span><?= htmlspecialchars($reservation['banquet_style_name']) ?></span>
+                                        </div>
                                 <?php else: ?>
-                                    <span class="muted">Not selected</span>
+                                        <span class="muted">Not selected</span>
                                 <?php endif; ?>
                             </div>
                         </div>
@@ -832,25 +965,41 @@ body {
             <div class="rd-card">
                 <div class="rd-card-header">
                     <div class="ch-icon"><i class="bi bi-pin-map"></i></div>
-                    <div class="ch-title">Venues &nbsp;<span style="font-weight:400;color:var(--text-sub)">(<?= count($all_venues) ?>)</span></div>
+                    <div class="ch-title">Venues &nbsp;<span
+                            style="font-weight:400;color:var(--text-sub)">(<?= count($all_venues) ?>)</span></div>
                 </div>
                 <div class="rd-card-body">
                     <?php if (!empty($all_venues)):
-                        $venues_by_date = [];
+                        $unique_venues = [];
+                        $unique_schedules = [];
                         $unique_dates = [];
+
                         foreach ($all_venues as $venue) {
+                            $unique_venues[$venue['id']] = $venue;
+
                             $s_timestamp = strtotime($venue['start_datetime']);
                             $e_timestamp = strtotime($venue['end_datetime']);
                             $sdate = date("Y-m-d", $s_timestamp);
                             $edate = date("Y-m-d", $e_timestamp);
-                            
+
+                            $time_str = date('Y-m-d', $s_timestamp) === date('Y-m-d', $e_timestamp) ?
+                                date("g:i A", $s_timestamp) . ' — ' . date("g:i A", $e_timestamp) :
+                                date("M j, g:i A", $s_timestamp) . ' — ' . date("M j, g:i A", $e_timestamp);
+
                             if ($sdate === $edate) {
                                 $date_header = date("M j, Y", $s_timestamp);
                             } else {
                                 $date_header = date("M j, Y", $s_timestamp) . ' — ' . date("M j, Y", $e_timestamp);
                             }
-                            
-                            $venues_by_date[$date_header][] = $venue;
+
+                            $sched_key = $date_header . '|' . $time_str;
+                            if (!isset($unique_schedules[$sched_key])) {
+                                $unique_schedules[$sched_key] = [
+                                    'date_header' => $date_header,
+                                    'time_str' => $time_str,
+                                    's_timestamp' => $s_timestamp
+                                ];
+                            }
 
                             // Calculate unique days spanned
                             $current = strtotime($sdate);
@@ -860,46 +1009,57 @@ body {
                                 $current = strtotime("+1 day", $current);
                             }
                         }
-                    ?>
-                        <?php foreach ($venues_by_date as $date_key => $dvs): ?>
-                            <div class="venue-date-group">
-                                <div class="vdg-date">
-                                    <i class="bi bi-calendar3"></i><?= $date_key ?>
-                                </div>
-                                <?php foreach ($dvs as $v): ?>
-                                    <div class="venue-row">
-                                        <div>
-                                            <div class="vr-name"><?= htmlspecialchars($v['name']) ?></div>
-                                            <div class="vr-floor"><?= htmlspecialchars($v['floor']) ?></div>
+
+                        // Sort schedules by timestamp
+                        usort($unique_schedules, function ($a, $b) {
+                            return $a['s_timestamp'] <=> $b['s_timestamp'];
+                        });
+                        ?>
+
+                            <div class="mb-4">
+                                <h6 class="text-uppercase text-muted"
+                                    style="font-size: 0.75rem; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 0.75rem;">
+                                    Reserved Venues</h6>
+                                <?php foreach ($unique_venues as $v): ?>
+                                        <div class="venue-row">
+                                            <div>
+                                                <div class="vr-name"><?= htmlspecialchars($v['name']) ?></div>
+                                                <div class="vr-floor"><?= htmlspecialchars($v['floor']) ?></div>
+                                            </div>
+                                            <div class="vr-time" style="border:none; background:transparent;">
+                                                <i class="bi bi-check-circle-fill text-success" style="font-size: 1.1rem;"></i>
+                                            </div>
                                         </div>
-                                        <div class="vr-time">
-                                            <?php 
-                                            $vsdt = strtotime($v['start_datetime']);
-                                            $vedt = strtotime($v['end_datetime']);
-                                            if (date('Y-m-d', $vsdt) === date('Y-m-d', $vedt)) {
-                                                echo date("g:i A", $vsdt) . ' — ' . date("g:i A", $vedt);
-                                            } else {
-                                                echo date("M j, g:i A", $vsdt) . ' — ' . date("M j, g:i A", $vedt);
-                                            }
-                                            ?>
-                                        </div>
-                                    </div>
                                 <?php endforeach; ?>
                             </div>
-                        <?php endforeach; ?>
 
-                        <div class="venue-stats">
-                            <div class="vstat">
-                                <div class="vstat-num"><?= count($all_venues) ?></div>
-                                <div class="vstat-label">Total Venues</div>
+                            <div>
+                                <h6 class="text-uppercase text-muted"
+                                    style="font-size: 0.75rem; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 0.75rem;">
+                                    Event Schedule</h6>
+                                <?php foreach ($unique_schedules as $s): ?>
+                                        <div class="venue-date-group mb-2">
+                                            <div class="vdg-date" style="margin-bottom:0.4rem;">
+                                                <i class="bi bi-calendar3"></i><?= $s['date_header'] ?>
+                                            </div>
+                                            <div class="vr-time d-inline-block ms-2"><?= $s['time_str'] ?></div>
+                                        </div>
+                                <?php endforeach; ?>
                             </div>
-                            <div class="vstat">
-                                <div class="vstat-num"><?= count($unique_dates) ?></div>
-                                <div class="vstat-label">Total Days</div>
+
+                            <div class="venue-stats">
+                                <div class="vstat">
+                                    <div class="vstat-num"><?= count($unique_venues) ?></div>
+                                    <div class="vstat-label">Total Venues</div>
+                                </div>
+                                <div class="vstat">
+                                    <div class="vstat-num"><?= count($unique_dates) ?></div>
+                                    <div class="vstat-label">Total Days</div>
+                                </div>
                             </div>
-                        </div>
                     <?php else: ?>
-                        <p class="text-muted text-center py-3 mb-0"><i class="bi bi-exclamation-circle me-1"></i>No venue information available.</p>
+                            <p class="text-muted text-center py-3 mb-0"><i class="bi bi-exclamation-circle me-1"></i>No venue
+                                information available.</p>
                     <?php endif; ?>
                 </div>
             </div>
@@ -916,94 +1076,108 @@ body {
                     $pricing_client_type = $misc_items['_client_type'] ?? null;
                     $pricing_total_amount = $misc_items['_estimated_total'] ?? null;
                     $pricing_breakdown = $misc_items['_price_breakdown'] ?? null;
-                    
+
                     // Remove internal pricing fields from regular misc items early
                     if (is_array($misc_items)) {
                         unset($misc_items['_client_type'], $misc_items['_estimated_total'], $misc_items['_price_breakdown']);
                     }
 
                     if (json_last_error() === JSON_ERROR_NONE && !empty($misc_items)):
-                    ?>
-                        <div class="misc-chip-list">
-                        <?php foreach ($misc_items as $key => $item):
-                            $label = ucwords(str_replace('_', ' ', $key));
-                            $detail = '';
-                            if (is_array($item)) {
-                                $parts = [];
-                                foreach ($item as $sk => $sv) {
-                                    if (is_array($sv)) continue; // safeguard
-                                    if ($sk === 'requested' && $sv === true) $parts[] = 'Yes';
-                                    else $parts[] = ucfirst($sk) . ': ' . htmlspecialchars($sv);
-                                }
-                                $detail = implode(' · ', $parts);
-                            } else {
-                                $detail = htmlspecialchars($item);
-                            }
                         ?>
-                            <div class="misc-chip">
-                                <div class="mc-label">
-                                    <i class="bi bi-check2-circle"></i>
-                                    <?= htmlspecialchars($label) ?>
-                                </div>
-                                <div class="mc-value"><?= $detail ?></div>
+                            <div class="misc-chip-list">
+                                <?php foreach ($misc_items as $key => $item):
+                                    $label = ucwords(str_replace('_', ' ', $key));
+                                    $detail = '';
+                                    if (is_array($item)) {
+                                        $parts = [];
+                                        foreach ($item as $sk => $sv) {
+                                            if (is_array($sv))
+                                                continue; // safeguard
+                                            if ($sk === 'requested' && $sv === true)
+                                                $parts[] = 'Yes';
+                                            else
+                                                $parts[] = ucfirst($sk) . ': ' . htmlspecialchars($sv);
+                                        }
+                                        $detail = implode(' · ', $parts);
+                                    } else {
+                                        $detail = htmlspecialchars($item);
+                                    }
+                                    ?>
+                                        <div class="misc-chip">
+                                            <div class="mc-label">
+                                                <i class="bi bi-check2-circle"></i>
+                                                <?= htmlspecialchars($label) ?>
+                                            </div>
+                                            <div class="mc-value"><?= $detail ?></div>
+                                        </div>
+                                <?php endforeach; ?>
                             </div>
-                        <?php endforeach; ?>
-                        </div>
                     <?php else: ?>
-                        <p class="text-muted text-center py-3 mb-0">No miscellaneous items requested.</p>
+                            <p class="text-muted text-center py-3 mb-0">No miscellaneous items requested.</p>
                     <?php endif; ?>
                 </div>
             </div>
 
             <!-- Card: Rental Cost Breakdown (External Only) -->
             <?php if ($pricing_client_type === 'External' && $pricing_breakdown): ?>
-            <div class="rd-card" style="border-left: 4px solid var(--red);">
-                <div class="rd-card-header" style="background:#fffcfc;">
-                    <div class="ch-icon"><i class="bi bi-receipt"></i></div>
-                    <div class="ch-title">Rental Cost Breakdown</div>
-                </div>
-                <div class="rd-card-body">
-                    <div style="background: linear-gradient(135deg, #fff5f5, #ffe8e8); border-radius: 10px; padding: 1.25rem;">
-                        <div style="display: flex; flex-direction: column; gap: 0.6rem;">
-                            <?php foreach ($pricing_breakdown as $pb): ?>
-                                <div style="display: flex; justify-content: space-between; font-size: 0.85rem; border-bottom: 1px dashed #f5c6cb; padding-bottom: 0.6rem;">
-                                    <?php if (isset($pb['venue_id'])): 
-                                        $vname = ''; 
-                                        foreach ($all_venues as $v) if ($v['id'] == $pb['venue_id']) { $vname = $v['name']; break; }
-                                    ?>
-                                        <span>
-                                            <strong><?= htmlspecialchars($vname) ?></strong><br>
-                                            <span style="color:var(--text-sub); font-size:0.75rem;">
-                                                <?= date("M j, Y", strtotime($pb['date'])) ?> (<?= $pb['hours'] ?>h, <?= htmlspecialchars($pb['rate_type']) ?>)
-                                            </span>
-                                        </span>
-                                    <?php else: ?>
-                                        <span><strong><?= htmlspecialchars($pb['rate_type']) ?></strong></span>
-                                    <?php endif; ?>
-                                    <strong style="color: var(--text-main);">₱<?= number_format($pb['cost'], 2) ?></strong>
+                    <div class="rd-card" style="border-left: 4px solid var(--red);">
+                        <div class="rd-card-header" style="background:#fffcfc;">
+                            <div class="ch-icon"><i class="bi bi-receipt"></i></div>
+                            <div class="ch-title">Rental Cost Breakdown</div>
+                        </div>
+                        <div class="rd-card-body">
+                            <div
+                                style="background: linear-gradient(135deg, #fff5f5, #ffe8e8); border-radius: 10px; padding: 1.25rem;">
+                                <div style="display: flex; flex-direction: column; gap: 0.6rem;">
+                                    <?php foreach ($pricing_breakdown as $pb): ?>
+                                            <div
+                                                style="display: flex; justify-content: space-between; font-size: 0.85rem; border-bottom: 1px dashed #f5c6cb; padding-bottom: 0.6rem;">
+                                                <?php if (isset($pb['venue_id'])):
+                                                    $vname = '';
+                                                    foreach ($all_venues as $v)
+                                                        if ($v['id'] == $pb['venue_id']) {
+                                                            $vname = $v['name'];
+                                                            break;
+                                                        }
+                                                    ?>
+                                                        <span>
+                                                            <strong><?= htmlspecialchars($vname) ?></strong><br>
+                                                            <span style="color:var(--text-sub); font-size:0.75rem;">
+                                                                <?= date("M j, Y", strtotime($pb['date'])) ?> (<?= $pb['hours'] ?>h,
+                                                                <?= htmlspecialchars($pb['rate_type']) ?>)
+                                                            </span>
+                                                        </span>
+                                                <?php else: ?>
+                                                        <span><strong><?= htmlspecialchars($pb['rate_type']) ?></strong></span>
+                                                <?php endif; ?>
+                                                <strong style="color: var(--text-main);">₱<?= number_format($pb['cost'], 2) ?></strong>
+                                            </div>
+                                    <?php endforeach; ?>
                                 </div>
-                            <?php endforeach; ?>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; margin-top: 1rem; padding-top: 1rem; border-top: 2px solid #f5c6cb;">
-                            <strong style="color: var(--red-dark); font-size: 1rem;">Total Amount</strong>
-                            <strong style="color: var(--red); font-size: 1.2rem;">₱<?= number_format($pricing_total_amount, 2) ?></strong>
+                                <div
+                                    style="display: flex; justify-content: space-between; margin-top: 1rem; padding-top: 1rem; border-top: 2px solid #f5c6cb;">
+                                    <strong style="color: var(--red-dark); font-size: 1rem;">Total Amount</strong>
+                                    <strong
+                                        style="color: var(--red); font-size: 1.2rem;">₱<?= number_format($pricing_total_amount, 2) ?></strong>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </div>
             <?php elseif ($reservation['office_type_name'] !== 'External'): ?>
-            <div class="rd-card" style="border-left: 4px solid #166534;">
-                <div class="rd-card-header" style="background:#f0fdf4;">
-                    <div class="ch-icon" style="background:#dcfce7; color:#166534;"><i class="bi bi-patch-check"></i></div>
-                    <div class="ch-title" style="color:#166534;">Internal Booking</div>
-                </div>
-                <div class="rd-card-body">
-                    <div style="display:flex; align-items:center; gap: 1rem; color:#166534; font-weight:500;">
-                        <i class="bi bi-info-circle fs-4"></i>
-                        <span>This is an internal university reservation. The use of function rooms is <strong style="text-transform:uppercase;">free of charge</strong>.</span>
+                    <div class="rd-card" style="border-left: 4px solid #166534;">
+                        <div class="rd-card-header" style="background:#f0fdf4;">
+                            <div class="ch-icon" style="background:#dcfce7; color:#166534;"><i class="bi bi-patch-check"></i>
+                            </div>
+                            <div class="ch-title" style="color:#166534;">Internal Booking</div>
+                        </div>
+                        <div class="rd-card-body">
+                            <div style="display:flex; align-items:center; gap: 1rem; color:#166534; font-weight:500;">
+                                <i class="bi bi-info-circle fs-4"></i>
+                                <span>This is an internal university reservation. The use of function rooms is <strong
+                                        style="text-transform:uppercase;">free of charge</strong>.</span>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
             <?php endif; ?>
 
             <!-- Card 5: Instructions -->
@@ -1014,11 +1188,11 @@ body {
                 </div>
                 <div class="rd-card-body">
                     <?php if (!empty($reservation['additional_instruction'])): ?>
-                        <div class="instructions-text">
-                            <?= nl2br(htmlspecialchars($reservation['additional_instruction'])) ?>
-                        </div>
+                            <div class="instructions-text">
+                                <?= nl2br(htmlspecialchars($reservation['additional_instruction'])) ?>
+                            </div>
                     <?php else: ?>
-                        <p class="text-muted text-center py-3 mb-0">No additional instructions provided.</p>
+                            <p class="text-muted text-center py-3 mb-0">No additional instructions provided.</p>
                     <?php endif; ?>
                 </div>
             </div>
@@ -1041,10 +1215,13 @@ body {
                         <div class="form-field">
                             <label class="fl-label"><i class="bi bi-tag me-1"></i> Update Status</label>
                             <select class="fl-select status-select" id="status" name="status">
-                                <option value="pending"       <?= $reservation['status'] === 'pending'       ? 'selected' : '' ?>>Pending</option>
+                                <option value="pending" <?= $reservation['status'] === 'pending' ? 'selected' : '' ?>>
+                                    Pending</option>
                                 <option value="pencil_booked" <?= $reservation['status'] === 'pencil_booked' ? 'selected' : '' ?>>Pencil Booked</option>
-                                <option value="approved"      <?= $reservation['status'] === 'approved'      ? 'selected' : '' ?>>Approved</option>
-                                <option value="cancelled"     <?= $reservation['status'] === 'cancelled'     ? 'selected' : '' ?>>Cancelled</option>
+                                <option value="approved" <?= $reservation['status'] === 'approved' ? 'selected' : '' ?>>
+                                    Approved</option>
+                                <option value="cancelled" <?= $reservation['status'] === 'cancelled' ? 'selected' : '' ?>>
+                                    Cancelled</option>
                             </select>
                             <div class="current-status-tag">
                                 <i class="bi bi-info-circle"></i>
@@ -1054,8 +1231,8 @@ body {
 
                         <div class="form-field">
                             <label class="fl-label"><i class="bi bi-chat me-1"></i> Admin Remarks</label>
-                            <textarea class="fl-textarea" id="admin_remarks" name="admin_remarks"
-                                rows="4" placeholder="Add your remarks here..." required></textarea>
+                            <textarea class="fl-textarea" id="admin_remarks" name="admin_remarks" rows="4"
+                                placeholder="Add your remarks here..." required></textarea>
                         </div>
 
                         <button type="submit" class="btn-update">
@@ -1076,30 +1253,31 @@ body {
                         // Parse remark entries by the "--- DATE (Status) ---" separator
                         $raw = trim($reservation['admin_remarks']);
                         $entries = preg_split('/\n(?=---\s)/', $raw);
-                    ?>
-                        <?php foreach (array_reverse($entries) as $entry):
-                            $entry = trim($entry);
-                            if (empty($entry)) continue;
-                            preg_match('/---\s*(.*?)\s*\((.*?)\)\s*---/', $entry, $m);
-                            $timestamp = $m[1] ?? '';
-                            $status_label = $m[2] ?? '';
-                            $remark_body = trim(preg_replace('/---.*?---/', '', $entry));
                         ?>
-                            <div class="remark-entry">
-                                <?php if ($timestamp): ?>
-                                    <div class="remark-header">
-                                        <i class="bi bi-clock"></i>
-                                        <?= htmlspecialchars($timestamp) ?>
-                                        <?php if ($status_label): ?>
-                                            &nbsp;·&nbsp; <?= htmlspecialchars($status_label) ?>
+                            <?php foreach (array_reverse($entries) as $entry):
+                                $entry = trim($entry);
+                                if (empty($entry))
+                                    continue;
+                                preg_match('/---\s*(.*?)\s*\((.*?)\)\s*---/', $entry, $m);
+                                $timestamp = $m[1] ?? '';
+                                $status_label = $m[2] ?? '';
+                                $remark_body = trim(preg_replace('/---.*?---/', '', $entry));
+                                ?>
+                                    <div class="remark-entry">
+                                        <?php if ($timestamp): ?>
+                                                <div class="remark-header">
+                                                    <i class="bi bi-clock"></i>
+                                                    <?= htmlspecialchars($timestamp) ?>
+                                                    <?php if ($status_label): ?>
+                                                            &nbsp;·&nbsp; <?= htmlspecialchars($status_label) ?>
+                                                    <?php endif; ?>
+                                                </div>
                                         <?php endif; ?>
+                                        <div class="remark-text"><?= nl2br(htmlspecialchars($remark_body)) ?></div>
                                     </div>
-                                <?php endif; ?>
-                                <div class="remark-text"><?= nl2br(htmlspecialchars($remark_body)) ?></div>
-                            </div>
-                        <?php endforeach; ?>
+                            <?php endforeach; ?>
                     <?php else: ?>
-                        <p class="text-muted text-center py-3 mb-0">No remarks have been added yet.</p>
+                            <p class="text-muted text-center py-3 mb-0">No remarks have been added yet.</p>
                     <?php endif; ?>
                 </div>
             </div>
@@ -1110,53 +1288,53 @@ body {
 </div><!-- /content-area -->
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('statusUpdateForm');
-    const statusSelect = document.getElementById('status');
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.getElementById('statusUpdateForm');
+        const statusSelect = document.getElementById('status');
 
-    function applyStatusColor(select) {
-        const val = select.value;
-        let bg = '#ffffff';
-        let color = '#111827';
-        if (val === 'pending')        { bg = '#fff3cd'; color = '#92600a'; }
-        else if (val === 'pencil_booked') { bg = '#ede9fe'; color = '#5b21b6'; }
-        else if (val === 'approved')  { bg = '#dcfce7'; color = '#166534'; }
-        else if (val === 'cancelled') { bg = '#fee2e2'; color = '#991b1b'; }
-        select.style.backgroundColor = bg;
-        select.style.color = color;
-    }
-
-    if (statusSelect) {
-        applyStatusColor(statusSelect);
-        statusSelect.addEventListener('change', function() { applyStatusColor(this); });
-    }
-
-    if (!form) return;
-    
-    form.addEventListener('submit', function(e) {
-        const remarksText  = document.getElementById('admin_remarks');
-        const currentStatus = '<?= $reservation['status'] ?>';
-
-        if (statusSelect.value === currentStatus) {
-            e.preventDefault();
-            alert('Please select a different status than the current one.');
-            return;
+        function applyStatusColor(select) {
+            const val = select.value;
+            let bg = '#ffffff';
+            let color = '#111827';
+            if (val === 'pending') { bg = '#fff3cd'; color = '#92600a'; }
+            else if (val === 'pencil_booked') { bg = '#ede9fe'; color = '#5b21b6'; }
+            else if (val === 'approved') { bg = '#dcfce7'; color = '#166534'; }
+            else if (val === 'cancelled') { bg = '#fee2e2'; color = '#991b1b'; }
+            select.style.backgroundColor = bg;
+            select.style.color = color;
         }
-        
-        if (remarksText.value.trim() === '') {
-            e.preventDefault();
-            alert('Admin remarks are required when updating reservation status.');
-            return;
+
+        if (statusSelect) {
+            applyStatusColor(statusSelect);
+            statusSelect.addEventListener('change', function () { applyStatusColor(this); });
         }
-        
-        let statusDisplay = statusSelect.value.replace('_', ' ').toUpperCase();
-        if (!confirm('Are you sure you want to change this reservation to ' + statusDisplay + '?')) {
-            e.preventDefault();
-        } else if (typeof window.showGlobalLoader === 'function') {
-            window.showGlobalLoader('Updating status to ' + statusDisplay + '...');
-        }
+
+        if (!form) return;
+
+        form.addEventListener('submit', function (e) {
+            const remarksText = document.getElementById('admin_remarks');
+            const currentStatus = '<?= $reservation['status'] ?>';
+
+            if (statusSelect.value === currentStatus) {
+                e.preventDefault();
+                alert('Please select a different status than the current one.');
+                return;
+            }
+
+            if (remarksText.value.trim() === '') {
+                e.preventDefault();
+                alert('Admin remarks are required when updating reservation status.');
+                return;
+            }
+
+            let statusDisplay = statusSelect.value.replace('_', ' ').toUpperCase();
+            if (!confirm('Are you sure you want to change this reservation to ' + statusDisplay + '?')) {
+                e.preventDefault();
+            } else if (typeof window.showGlobalLoader === 'function') {
+                window.showGlobalLoader('Updating status to ' + statusDisplay + '...');
+            }
+        });
     });
-});
 </script>
 
 <?php include 'inc/footer.php'; ?>
